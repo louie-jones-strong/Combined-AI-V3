@@ -6,7 +6,7 @@ import math
 
 class face(object):
 	def __init__(self, points, colour=[255,255,255]):
-		self.colour = colour
+		self.colour = [colour[0],colour[1],colour[2]]
 		self.points = points
 		x, y, z = [0,0,0]
 		for loop in range(len(points)):
@@ -159,8 +159,8 @@ class game(object):
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
 
-		object3D_list = objects(type="cube")
-		object3D_list += objects(type="rubix")
+		object3D_list = []
+		object3D_list += rubix()
 
 		display.init()
 		window = display.set_mode(self.resolution)
@@ -184,33 +184,42 @@ class game(object):
 			#print("FPS: " + str(1/time_taken))
 		return
 
-def shapes(colours, shape="cube"):
+def shapes(shape="cube", colour=[255,255,255]):
 	if shape == "cube":
-		faces =  [face(	[[1,0,1],[1,0,0],[1,1,0],[1,1,1]]		, colour=colours[0])]
-		faces += [face(	[[0,0,1],[0,0,0],[0,1,0],[0,1,1]]		, colour=colours[1])]
-		faces += [face(	[[0,0,0],[1,0,0],[1,1,0],[0,1,0]]		, colour=colours[2])]
-		faces += [face(	[[0,0,1],[1,0,1],[1,0,0],[0,0,0]]		, colour=colours[3])]
-		faces += [face(	[[0,1,1],[1,1,1],[1,1,0],[0,1,0]]		, colour=colours[4])]
-		faces += [face(	[[0,0,1],[1,0,1],[1,1,1],[0,1,1]]		, colour=colours[5])]
+		faces =  [face(	[[1,0,1],[1,0,0],[1,1,0],[1,1,1]]		, colour=colour)]
+		faces += [face(	[[0,0,1],[0,0,0],[0,1,0],[0,1,1]]		, colour=colour)]
+		faces += [face(	[[0,0,0],[1,0,0],[1,1,0],[0,1,0]]		, colour=colour)]
+		faces += [face(	[[0,0,1],[1,0,1],[1,0,0],[0,0,0]]		, colour=colour)]
+		faces += [face(	[[0,1,1],[1,1,1],[1,1,0],[0,1,0]]		, colour=colour)]
+		faces += [face(	[[0,0,1],[1,0,1],[1,1,1],[0,1,1]]		, colour=colour)]
 
 	return faces
-def objects(type="cube"):
-	colours = [[255,0,0],[0,255,0],[0,0,255],[255,255,0],[255,0,255],[0,255,255]]
+def rubix():
 	object3D_list = []
 
+	for loop in range(3):#x
+		for loop2 in range(3):#y
+			for loop3 in range(3):#z
 
-	if type == "cube":
-		shape = shapes(colours, shape="cube")
-		object3D_list += [object3D(shape, postion3D=[0,0,0], rotation3D=[0,0,0], hidden=False, selected=True)]
+				shape = shapes(shape="cube",colour=[0,0,0])
+				rotation3D = [0,0,0]
+				if loop == 0:
+					rotation3D[0] = 45
 
+				if loop == 0:
+					shape[1].colour = [255,0,0]
+				elif loop == 2:
+					shape[0].colour = [255,140,0]
+				if loop2 == 0:
+					shape[3].colour = [0,0,255]
+				elif loop2 == 2:
+					shape[4].colour = [0,255,0]
+				if loop3 == 0:
+					shape[2].colour = [255,255,255]
+				elif loop3 == 2:
+					shape[5].colour = [255,255,0]
 
-	elif type == "rubix":
-
-		for loop in range(3):
-			for loop2 in range(3):
-				for loop3 in range(3):
-					shape = shapes(colours, shape="cube")
-					object3D_list += [object3D(shape, postion3D=[loop-1.5,loop2-1.5,loop3-1.5], rotation3D=[0,0,0])]
+				object3D_list += [object3D(shape, postion3D=[loop-1.5,loop2-1.5,loop3-1.5], rotation3D=rotation3D)]
 	
 	return object3D_list
 
