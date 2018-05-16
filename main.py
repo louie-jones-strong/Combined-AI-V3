@@ -23,11 +23,9 @@ class object3D(object):
 		self.postion3D = postion3D
 		self.rotation3D = rotation3D
 		self.hidden = hidden
-		self.selected = selected
 		self.faces = faces
 		
 class game(object):
-
 	def rotateX(self, angle, point_3D):
 		""" Rotates the point around the X axis by the given angle in degrees. """
 		rad = angle * math.pi / 180
@@ -55,15 +53,16 @@ class game(object):
 		return [x, y, point_3D[2]]
 
 	def transform(self, point_3D, position3D, rotation3D):
-		x = point_3D[0]
-		y = point_3D[1]
-		z = point_3D[2]
-		x += position3D[0]
-		y += position3D[1]
-		z += position3D[2]
+		x = point_3D[0] + position3D[0]
+		y = point_3D[1] + position3D[1]
+		z = point_3D[2] + position3D[2]
 		x,y,z = self.rotateX(rotation3D[0], [x,y,z])
 		x,y,z = self.rotateY(rotation3D[1], [x,y,z])
 		x,y,z = self.rotateZ(rotation3D[2], [x,y,z])
+
+		x,y,z = self.rotateX(self.globalRotate[0], [x,y,z])
+		x,y,z = self.rotateY(self.globalRotate[1], [x,y,z])
+		x,y,z = self.rotateZ(self.globalRotate[2], [x,y,z])
 
 		return [x,y,z]
 
@@ -77,8 +76,8 @@ class game(object):
 		y = -y * factor + self.resolution[1] / 2
 		return int(x) , int(y)
 		
-	def update_window(self,window,object3D_list):
-		draw.rect(window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
+	def update_window(self,object3D_list,FPS=0):
+		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
 
 		face_list = []
 		for objectNum in range(len(object3D_list)):
@@ -102,35 +101,23 @@ class game(object):
 		for loop in range(len(face_list)):
 			if self.render_mode[0]:
 				for loop2 in range(len(face_list[loop][1])):
-					pygame.draw.circle(window, [255,255,255], face_list[loop][1][loop2], 3)
+					pygame.draw.circle(self.window, [255,255,255], face_list[loop][1][loop2], 3)
 					
 			if self.render_mode[2]:
-				pygame.draw.polygon(window, face_list[loop][2], face_list[loop][1], 0)	
+				pygame.draw.polygon(self.window, face_list[loop][2], face_list[loop][1], 0)	
 			if self.render_mode[1]:
-				pygame.draw.polygon(window, [100,100,100], face_list[loop][1], 4)	
+				pygame.draw.polygon(self.window, [100,100,100], face_list[loop][1], 4)	
 
+		if FPS != 0:
+			label = self.Font.render("FPS:"+str(FPS), 1,(255,255,255))
+			self.window.blit(label, [self.resolution[0]-75,10])
 		display.update()
 		return
 
-	def move_input(self,object_3D):
-		#move
-		move_vector = [0,0,0]
-		if keyboard.is_pressed("w"): 
-			move_vector[2] += -1
-		if keyboard.is_pressed("s"): 
-			move_vector[2] += 1
-		if keyboard.is_pressed("a"): 
-			move_vector[0] += 1
-		if keyboard.is_pressed("d"): 
-			move_vector[0] += -1
-		if keyboard.is_pressed("r"): 
-			move_vector[1] += -1
-		if keyboard.is_pressed("f"): 
-			move_vector[1] += 1
-
+	def move_input(self,object3D_list):
 		#rotate
-		rotate_vector = [1,1,0]
 		rotate_vector = [0,0,0]
+		#rotate_vector = [1,1,0]
 		if keyboard.is_pressed("up"): 
 			rotate_vector[0] += 1
 		if keyboard.is_pressed("down"): 
@@ -140,50 +127,115 @@ class game(object):
 		if keyboard.is_pressed("right"): 
 			rotate_vector[1] += -1
 
+		self.globalRotate[0] = (self.globalRotate[0] + rotate_vector[0]*self.rotation_multiplier)%360
+		self.globalRotate[1] = (self.globalRotate[1] + rotate_vector[1]*self.rotation_multiplier)%360
+		self.globalRotate[2] = (self.globalRotate[2] + rotate_vector[2]*self.rotation_multiplier)%360
 
-		object_3D.postion3D[0] += move_vector[0]*self.movement_multiplier
-		object_3D.postion3D[1] += move_vector[1]*self.movement_multiplier
-		object_3D.postion3D[2] += move_vector[2]*self.movement_multiplier
+		if self.face_turning_info[0]:
+			if keyboard.is_pressed("0"): 
+				self.face_turning_info[1] = 0
+				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
 
-		object_3D.rotation3D[0] = (object_3D.rotation3D[0] + rotate_vector[0]*self.rotation_multiplier)%360
-		object_3D.rotation3D[1] = (object_3D.rotation3D[1] + rotate_vector[1]*self.rotation_multiplier)%360
-		object_3D.rotation3D[2] = (object_3D.rotation3D[2] + rotate_vector[2]*self.rotation_multiplier)%360
+			elif keyboard.is_pressed("1"): 
+				self.face_turning_info[1] = 1
+				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
 
-		return object_3D
+			elif keyboard.is_pressed("2"): 
+				self.face_turning_info[1] = 2
+				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
+
+			elif keyboard.is_pressed("3"): 
+				self.face_turning_info[1] = 3
+				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
+
+			elif keyboard.is_pressed("4"): 
+				self.face_turning_info[1] = 4
+				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
+
+			elif keyboard.is_pressed("5"): 
+				self.face_turning_info[1] = 5
+				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
+
+
+		else:
+			object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
+
+		return object3D_list
 	
 	def main(self):
 		self.resolution = (800,800)
+		self.globalRotate = [0,0,0]
 		self.FOV = 256
 		self.viewer_distance = 5
-		self.movement_multiplier = 0.1
+		self.face_turn_multiplier = 5
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
+		self.face_turning_info = [True,-1]
+		FPS = 0
+		FPS_count = 0
 
 		object3D_list = []
 		object3D_list += rubix()
 
 		display.init()
-		window = display.set_mode(self.resolution)
+		pygame.font.init()
+		self.Font = pygame.font.SysFont("monospace", 15)
+		self.window = display.set_mode(self.resolution)
 		while True:
 			time_taken = time.time()
 
-			for loop in range(len(object3D_list)):
-				if object3D_list[loop].selected:
-					object3D_list[loop] = self.move_input(object3D_list[loop])
+			object3D_list = self.move_input(object3D_list)
 
-			self.update_window(window,object3D_list)
+			self.update_window(object3D_list,FPS=FPS)
 
 			if keyboard.is_pressed("esc"):
 				display.quit()
 				break
 
 			time_taken = time.time() - time_taken
-			time_taken = 1/65-time_taken
-			if time_taken > 0:
+			if time_taken < 1/65:
+				time_taken = 1/65-time_taken
 				time.sleep(time_taken)
-			#print("FPS: " + str(1/time_taken))
+
+			if FPS_count >= 30:
+				FPS = int(1/time_taken)
+				FPS_count = 0
+			else:
+				FPS_count += 1
+
 		return
 
+	def turn_face(self, cube, face=0):
+	
+		finished=True
+		object_num = 0
+		for loop in range(3):#x
+			for loop2 in range(3):#y
+				for loop3 in range(3):#z
+	
+					if face == 0 and loop == 0:
+						cube[object_num].rotation3D[0] = (cube[object_num].rotation3D[0] + 1*self.face_turn_multiplier)%360 
+					if face == 2 and loop == 2:
+						cube[object_num].rotation3D[0] = (cube[object_num].rotation3D[0] + 1*self.face_turn_multiplier)%360 
+					if face == 3 and loop2 == 0:
+						cube[object_num].rotation3D[1] = (cube[object_num].rotation3D[1] + 1*self.face_turn_multiplier)%360
+					if face == 1 and loop2 == 2:
+						cube[object_num].rotation3D[1] = (cube[object_num].rotation3D[1] + 1*self.face_turn_multiplier)%360
+					if face == 4 and loop3 == 0:
+						cube[object_num].rotation3D[2] = (cube[object_num].rotation3D[2] + 1*self.face_turn_multiplier)%360
+					if face == 5 and loop3 == 2:
+						cube[object_num].rotation3D[2] = (cube[object_num].rotation3D[2] + 1*self.face_turn_multiplier)%360
+
+
+					angle = cube[object_num].rotation3D
+					for loop4 in range(3):
+						if not(angle[loop4] == 0 or angle[loop4] == 90 or angle[loop4] == 180 or angle[loop4] == 270):
+							finished = False
+
+					object_num += 1
+
+		return cube, finished
+	
 def shapes(shape="cube", colour=[255,255,255]):
 	if shape == "cube":
 		faces =  [face(	[[1,0,1],[1,0,0],[1,1,0],[1,1,1]]		, colour=colour)]
@@ -203,8 +255,6 @@ def rubix():
 
 				shape = shapes(shape="cube",colour=[0,0,0])
 				rotation3D = [0,0,0]
-				if loop == 0:
-					rotation3D[0] = 45
 
 				if loop == 0:
 					shape[1].colour = [255,0,0]
