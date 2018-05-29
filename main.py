@@ -76,10 +76,8 @@ class game(object):
 		x = x * factor + self.resolution[0] / 2
 		y = -y * factor + self.resolution[1] / 2
 		return int(x) , int(y)
-		
-	def update_window(self,object3D_list,globalRotate,FPS=0):
-		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
-
+	
+	def objects_to_2DFaceList(self,object3D_list,globalRotate):
 		face_list = []
 		for objectNum in range(len(object3D_list)):
 			object3D = object3D_list[objectNum]
@@ -97,7 +95,12 @@ class game(object):
 					
 					face_list += [[ distance , face , object3D.faces[loop].colour ]]
 
-		face_list = sorted(face_list)
+		return sorted(face_list)
+
+	def update_window(self,object3D_list,globalRotate,FPS=0):
+		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
+
+		face_list = self.objects_to_2DFaceList(object3D_list,globalRotate)
 
 		for loop in range(len(face_list)):
 			if self.render_mode[0]:
@@ -137,14 +140,14 @@ class game(object):
 	def setup(self):
 		display.init()
 		pygame.font.init()
-		self.Font = pygame.font.SysFont("monospace", 15)
-		self.window = display.set_mode(self.resolution)
 		self.resolution = (800,800)
 		self.globalRotate = [0,0,0]
 		self.FOV = 256
 		self.viewer_distance = 3
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
+		self.Font = pygame.font.SysFont("monospace", 15)
+		self.window = display.set_mode(self.resolution)
 
 		object3D_list = []
 		object3D_list += [object3D(shapes(),postion3D=[-0.5,-0.5,-0.5])]
@@ -159,6 +162,7 @@ class game(object):
 		return object3D_list
 
 	def main(self):
+		object3D_list = self.setup()
 		FPS = 0
 		FPS_count = 0
 		draging = False
