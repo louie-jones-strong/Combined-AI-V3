@@ -114,7 +114,7 @@ class game(object):
 		display.update()
 		return
 
-	def move_input(self,object3D_list):
+	def move_input(self):
 		#rotate
 		rotate_vector = [0,0,0]
 		#rotate_vector = [1,1,0]
@@ -131,51 +131,20 @@ class game(object):
 		self.globalRotate[1] = (self.globalRotate[1] + rotate_vector[1]*self.rotation_multiplier)%360
 		self.globalRotate[2] = (self.globalRotate[2] + rotate_vector[2]*self.rotation_multiplier)%360
 
-		if self.face_turning_info[0]:
-			if keyboard.is_pressed("0"): 
-				self.face_turning_info[1] = 0
-				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
-
-			elif keyboard.is_pressed("1"): 
-				self.face_turning_info[1] = 1
-				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
-
-			elif keyboard.is_pressed("2"): 
-				self.face_turning_info[1] = 2
-				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
-
-			elif keyboard.is_pressed("3"): 
-				self.face_turning_info[1] = 3
-				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
-
-			elif keyboard.is_pressed("4"): 
-				self.face_turning_info[1] = 4
-				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
-
-			elif keyboard.is_pressed("5"): 
-				self.face_turning_info[1] = 5
-				object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
-
-
-		else:
-			object3D_list, self.face_turning_info[0] = self.turn_face(object3D_list, face=self.face_turning_info[1])
-
-		return object3D_list
+		return 
 	
 	def main(self):
 		self.resolution = (800,800)
 		self.globalRotate = [0,0,0]
 		self.FOV = 256
-		self.viewer_distance = 5
-		self.face_turn_multiplier = 5
+		self.viewer_distance = 3
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
-		self.face_turning_info = [True,-1]
 		FPS = 0
 		FPS_count = 0
 
 		object3D_list = []
-		object3D_list += rubix()
+		object3D_list += [object3D(shapes(),postion3D=[-0.5,-0.5,-0.5])]
 
 		display.init()
 		pygame.font.init()
@@ -184,7 +153,7 @@ class game(object):
 		while True:
 			time_taken = time.time()
 
-			object3D_list = self.move_input(object3D_list)
+			self.move_input()
 
 			self.update_window(object3D_list,FPS=FPS)
 
@@ -204,37 +173,6 @@ class game(object):
 				FPS_count += 1
 
 		return
-
-	def turn_face(self, cube, face=0):
-	
-		finished=True
-		object_num = 0
-		for loop in range(3):#x
-			for loop2 in range(3):#y
-				for loop3 in range(3):#z
-	
-					if face == 0 and loop == 0:
-						cube[object_num].rotation3D[0] = (cube[object_num].rotation3D[0] + 1*self.face_turn_multiplier)%360 
-					if face == 2 and loop == 2:
-						cube[object_num].rotation3D[0] = (cube[object_num].rotation3D[0] + 1*self.face_turn_multiplier)%360 
-					if face == 3 and loop2 == 0:
-						cube[object_num].rotation3D[1] = (cube[object_num].rotation3D[1] + 1*self.face_turn_multiplier)%360
-					if face == 1 and loop2 == 2:
-						cube[object_num].rotation3D[1] = (cube[object_num].rotation3D[1] + 1*self.face_turn_multiplier)%360
-					if face == 4 and loop3 == 0:
-						cube[object_num].rotation3D[2] = (cube[object_num].rotation3D[2] + 1*self.face_turn_multiplier)%360
-					if face == 5 and loop3 == 2:
-						cube[object_num].rotation3D[2] = (cube[object_num].rotation3D[2] + 1*self.face_turn_multiplier)%360
-
-
-					angle = cube[object_num].rotation3D
-					for loop4 in range(3):
-						if not(angle[loop4] == 0 or angle[loop4] == 90 or angle[loop4] == 180 or angle[loop4] == 270):
-							finished = False
-
-					object_num += 1
-
-		return cube, finished
 	
 def shapes(shape="cube", colour=[255,255,255]):
 	if shape == "cube":
@@ -246,32 +184,6 @@ def shapes(shape="cube", colour=[255,255,255]):
 		faces += [face(	[[0,0,1],[1,0,1],[1,1,1],[0,1,1]]		, colour=colour)]
 
 	return faces
-def rubix():
-	object3D_list = []
-
-	for loop in range(3):#x
-		for loop2 in range(3):#y
-			for loop3 in range(3):#z
-
-				shape = shapes(shape="cube",colour=[0,0,0])
-				rotation3D = [0,0,0]
-
-				if loop == 0:
-					shape[1].colour = [255,0,0]
-				elif loop == 2:
-					shape[0].colour = [255,140,0]
-				if loop2 == 0:
-					shape[3].colour = [0,0,255]
-				elif loop2 == 2:
-					shape[4].colour = [0,255,0]
-				if loop3 == 0:
-					shape[2].colour = [255,255,255]
-				elif loop3 == 2:
-					shape[5].colour = [255,255,0]
-
-				object3D_list += [object3D(shape, postion3D=[loop-1.5,loop2-1.5,loop3-1.5], rotation3D=rotation3D)]
-	
-	return object3D_list
 
 game = game()
 game.main()
