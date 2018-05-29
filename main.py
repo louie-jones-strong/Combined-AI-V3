@@ -2,6 +2,7 @@ from pygame import display,draw,Color
 import pygame
 import time
 import keyboard
+import mouse
 import math
 
 class face(object):
@@ -52,7 +53,7 @@ class game(object):
 		y = point_3D[0] * sina + point_3D[1] * cosa
 		return [x, y, point_3D[2]]
 
-	def transform(self, point_3D, position3D, rotation3D):
+	def transform(self, point_3D, position3D, rotation3D,globalRotate):
 		x = point_3D[0] + position3D[0]
 		y = point_3D[1] + position3D[1]
 		z = point_3D[2] + position3D[2]
@@ -60,9 +61,9 @@ class game(object):
 		x,y,z = self.rotateY(rotation3D[1], [x,y,z])
 		x,y,z = self.rotateZ(rotation3D[2], [x,y,z])
 
-		x,y,z = self.rotateX(self.globalRotate[0], [x,y,z])
-		x,y,z = self.rotateY(self.globalRotate[1], [x,y,z])
-		x,y,z = self.rotateZ(self.globalRotate[2], [x,y,z])
+		x,y,z = self.rotateX(globalRotate[0], [x,y,z])
+		x,y,z = self.rotateY(globalRotate[1], [x,y,z])
+		x,y,z = self.rotateZ(globalRotate[2], [x,y,z])
 
 		return [x,y,z]
 
@@ -76,7 +77,7 @@ class game(object):
 		y = -y * factor + self.resolution[1] / 2
 		return int(x) , int(y)
 		
-	def update_window(self,object3D_list,FPS=0):
+	def update_window(self,object3D_list,globalRotate,FPS=0):
 		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
 
 		face_list = []
@@ -87,10 +88,10 @@ class game(object):
 
 					face = []
 					for loop2 in range(len(object3D.faces[loop].points)):
-						point3D = self.transform(object3D.faces[loop].points[loop2], object3D.postion3D, object3D.rotation3D)
+						point3D = self.transform(object3D.faces[loop].points[loop2], object3D.postion3D, object3D.rotation3D,globalRotate)
 						face += [self.point3D_to_point2D(point3D)]
 
-					centre = self.transform(object3D.faces[loop].centre, object3D.postion3D, object3D.rotation3D)
+					centre = self.transform(object3D.faces[loop].centre, object3D.postion3D, object3D.rotation3D,globalRotate)
 
 					distance = math.sqrt( centre[0]**2 + centre[1]**2 + (centre[2]-self.FOV)**2 )
 					
@@ -133,33 +134,66 @@ class game(object):
 
 		return 
 	
-	def main(self):
+	def setup(self):
+		display.init()
+		pygame.font.init()
+		self.Font = pygame.font.SysFont("monospace", 15)
+		self.window = display.set_mode(self.resolution)
 		self.resolution = (800,800)
 		self.globalRotate = [0,0,0]
 		self.FOV = 256
 		self.viewer_distance = 3
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
-		FPS = 0
-		FPS_count = 0
 
 		object3D_list = []
 		object3D_list += [object3D(shapes(),postion3D=[-0.5,-0.5,-0.5])]
 
-		display.init()
-		pygame.font.init()
-		self.Font = pygame.font.SysFont("monospace", 15)
-		self.window = display.set_mode(self.resolution)
+		object3D_list[0].faces[0].colour = [255,0,0]
+		object3D_list[0].faces[1].colour = [0,255,0]
+		object3D_list[0].faces[2].colour = [0,0,255]
+		object3D_list[0].faces[3].colour = [255,255,0]
+		object3D_list[0].faces[4].colour = [0,255,255]
+		object3D_list[0].faces[5].colour = [255,0,255]
+
+		return object3D_list
+
+	def main(self):
+		FPS = 0
+		FPS_count = 0
+		draging = False
+
 		while True:
 			time_taken = time.time()
+			globalRotate = [self.globalRotate[0],self.globalRotate[1],self.globalRotate[2]]
+			if mouse.is_pressed(button='right') and not draging:
+				startPos = mouse.get_position()
+				draging = True
 
-			self.move_input()
+			elif not mouse.is_pressed(button='right') and draging:
+				change = [0,0]
+				finishPos = mouse.get_position()
+				change[0] = (startPos[1]-finishPos[1])/self.resolution[1]
+				change[1] = (startPos[0]-finishPos[0])/self.resolution[0]
+				self.globalRotate[0] = (self.globalRotate[0] + 360*change[0])%360
+				self.globalRotate[1] = (self.globalRotate[1] + 360*change[1])%360 
+				draging = False
 
-			self.update_window(object3D_list,FPS=FPS)
+			elif mouse.is_pressed(button='right') and draging:
+				change = [0,0]
+				finishPos = mouse.get_position()
+				change[0] = (startPos[1]-finishPos[1])/self.resolution[1]
+				change[1] = (startPos[0]-finishPos[0])/self.resolution[0]
+				globalRotate[0] = (globalRotate[0] + 360*change[0])%360
+				globalRotate[1] = (globalRotate[1] + 360*change[1])%360 
+
+			self.update_window(object3D_list,globalRotate,FPS=FPS)
 
 			if keyboard.is_pressed("esc"):
 				display.quit()
 				break
+
+
 
 			time_taken = time.time() - time_taken
 			if time_taken < 1/65:
