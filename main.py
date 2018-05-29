@@ -26,6 +26,17 @@ class object3D(object):
 		self.hidden = hidden
 		self.selected = selected
 		self.faces = faces
+
+def shapes(shape="cube", colour=[255,255,255]):
+	if shape == "cube":
+		faces =  [face(	[[1,0,1],[1,0,0],[1,1,0],[1,1,1]]		, colour=colour)]
+		faces += [face(	[[0,0,1],[0,0,0],[0,1,0],[0,1,1]]		, colour=colour)]
+		faces += [face(	[[0,0,0],[1,0,0],[1,1,0],[0,1,0]]		, colour=colour)]
+		faces += [face(	[[0,0,1],[1,0,1],[1,0,0],[0,0,0]]		, colour=colour)]
+		faces += [face(	[[0,1,1],[1,1,1],[1,1,0],[0,1,0]]		, colour=colour)]
+		faces += [face(	[[0,0,1],[1,0,1],[1,1,1],[0,1,1]]		, colour=colour)]
+
+	return faces
 		
 class game(object):
 	def rotateX(self, angle, point_3D):
@@ -67,7 +78,6 @@ class game(object):
 		x,y,z = self.rotateZ(globalRotate[2], [x,y,z])
 
 		return [x,y,z]
-
 	def point3D_to_point2D(self,point_3D):
 		x = point_3D[0]
 		y = point_3D[1]
@@ -77,7 +87,6 @@ class game(object):
 		x = x * factor + self.resolution[0] / 2
 		y = -y * factor + self.resolution[1] / 2
 		return int(x) , int(y)
-	
 	def objects_to_2DFaceList(self,object3D_list,globalRotate):
 		face_list = []
 		for objectNum in range(len(object3D_list)):
@@ -97,7 +106,6 @@ class game(object):
 					face_list += [[ distance , face , object3D.faces[loop].colour , objectNum , object3D.selected ]]
 
 		return sorted(face_list)
-
 	def update_window(self,object3D_list,globalRotate,FPS=0):
 		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
 
@@ -121,25 +129,6 @@ class game(object):
 			self.window.blit(label, [self.resolution[0]-75,10])
 		display.update()
 		return
-
-	def move_input(self):
-		#rotate
-		rotate_vector = [0,0,0]
-		#rotate_vector = [1,1,0]
-		if keyboard.is_pressed("up"): 
-			rotate_vector[0] += 1
-		if keyboard.is_pressed("down"): 
-			rotate_vector[0] += -1
-		if keyboard.is_pressed("left"): 
-			rotate_vector[1] += 1
-		if keyboard.is_pressed("right"): 
-			rotate_vector[1] += -1
-
-		self.globalRotate[0] = (self.globalRotate[0] + rotate_vector[0]*self.rotation_multiplier)%360
-		self.globalRotate[1] = (self.globalRotate[1] + rotate_vector[1]*self.rotation_multiplier)%360
-		self.globalRotate[2] = (self.globalRotate[2] + rotate_vector[2]*self.rotation_multiplier)%360
-
-		return 
 	
 	def setup(self):
 		display.init()
@@ -148,6 +137,8 @@ class game(object):
 		self.windowPostion = [0,0]
 		self.globalRotate = [0,0,0]
 		self.FOV = 256
+		self.draging = False
+		self.startPos = [0,0]
 		self.viewer_distance = 3
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
@@ -158,6 +149,13 @@ class game(object):
 		else:
 			self.window = display.set_mode(self.resolution)
 
+		temp = mouse.get_position()
+		pygame.mouse.set_pos([0,0])
+		self.windowPostion = mouse.get_position()
+		mouse.move(temp[0], temp[1])
+
+		return
+	def setup_object3D_list(self):
 		object3D_list = []
 		object3D_list += [object3D(shapes(),postion3D=[-0.5,-0.5,-0.5])]
 		object3D_list += [object3D(shapes(),postion3D=[0.5,-0.5,-0.5])]
@@ -169,12 +167,6 @@ class game(object):
 			object3D_list[loop].faces[3].colour = [255,255,0]
 			object3D_list[loop].faces[4].colour = [0,255,255]
 			object3D_list[loop].faces[5].colour = [255,0,255]
-
-		temp = mouse.get_position()
-		pygame.mouse.set_pos([0,0])
-		self.windowPostion = mouse.get_position()
-		mouse.move(temp[0], temp[1])
-
 		return object3D_list
 
 	def inside_polygon(self,x, y, points):
@@ -192,7 +184,6 @@ class game(object):
 							inside = not inside
 			p1x, p1y = p2x, p2y
 		return inside
-
 	def getObjectClicked(self,object3D_list,globalRotate):
 		pos = mouse.get_position()
 		pos = [pos[0]-self.windowPostion[0],pos[1]-self.windowPostion[1]]
@@ -201,37 +192,40 @@ class game(object):
 			if self.inside_polygon(pos[0],pos[1],face2DList[loop][1]):
 				return object3D_list[face2DList[loop][3]]
 		return None
+	def mouseDraging(self):
+		if mouse.is_pressed(button='middle') and not self.draging:
+			self.startPos = mouse.get_position()
+			self.draging = True
+
+		elif not mouse.is_pressed(button='middle') and self.draging:
+			change = [0,0]
+			finishPos = mouse.get_position()
+			change[0] = (self.startPos[1]-finishPos[1])/self.resolution[1]
+			change[1] = (self.startPos[0]-finishPos[0])/self.resolution[0]
+			self.globalRotate[0] = (self.globalRotate[0] + 360*change[0])%360
+			self.globalRotate[1] = (self.globalRotate[1] + 360*change[1])%360 
+			self.draging = False
+
+		globalRotate = [self.globalRotate[0],self.globalRotate[1],self.globalRotate[2]]
+		if mouse.is_pressed(button='middle') and self.draging:
+			change = [0,0]
+			finishPos = mouse.get_position()
+			change[0] = (self.startPos[1]-finishPos[1])/self.resolution[1]
+			change[1] = (self.startPos[0]-finishPos[0])/self.resolution[0]
+			globalRotate[0] = (globalRotate[0] + 360*change[0])%360
+			globalRotate[1] = (globalRotate[1] + 360*change[1])%360
+		return globalRotate
 
 	def main(self):
-		object3D_list = self.setup()
+		self.setup()
+		object3D_list = self.setup_object3D_list()
 		FPS = 0
 		FPS_count = 0
-		draging = False
+
 
 		while True:
 			time_taken = time.time()
-			if mouse.is_pressed(button='middle') and not draging:
-				startPos = mouse.get_position()
-				draging = True
-
-			elif not mouse.is_pressed(button='middle') and draging:
-				change = [0,0]
-				finishPos = mouse.get_position()
-				change[0] = (startPos[1]-finishPos[1])/self.resolution[1]
-				change[1] = (startPos[0]-finishPos[0])/self.resolution[0]
-				self.globalRotate[0] = (self.globalRotate[0] + 360*change[0])%360
-				self.globalRotate[1] = (self.globalRotate[1] + 360*change[1])%360 
-				draging = False
-
-			globalRotate = [self.globalRotate[0],self.globalRotate[1],self.globalRotate[2]]
-			if mouse.is_pressed(button='middle') and draging:
-				change = [0,0]
-				finishPos = mouse.get_position()
-				change[0] = (startPos[1]-finishPos[1])/self.resolution[1]
-				change[1] = (startPos[0]-finishPos[0])/self.resolution[0]
-				globalRotate[0] = (globalRotate[0] + 360*change[0])%360
-				globalRotate[1] = (globalRotate[1] + 360*change[1])%360 
-
+			globalRotate = self.mouseDraging()
 
 			if mouse.is_pressed(button='right'):
 				object3D = self.getObjectClicked(object3D_list,globalRotate)
@@ -250,13 +244,12 @@ class game(object):
 				break
 
 
-
 			time_taken = time.time() - time_taken
 			if time_taken < 1/60:
 				time_taken = 1/60-time_taken
 				time.sleep(time_taken)
 
-			if FPS_count >= 30:
+			if FPS_count >= 30:`
 				FPS = int(1/time_taken)
 				FPS_count = 0
 			else:
@@ -264,16 +257,5 @@ class game(object):
 
 		return
 	
-def shapes(shape="cube", colour=[255,255,255]):
-	if shape == "cube":
-		faces =  [face(	[[1,0,1],[1,0,0],[1,1,0],[1,1,1]]		, colour=colour)]
-		faces += [face(	[[0,0,1],[0,0,0],[0,1,0],[0,1,1]]		, colour=colour)]
-		faces += [face(	[[0,0,0],[1,0,0],[1,1,0],[0,1,0]]		, colour=colour)]
-		faces += [face(	[[0,0,1],[1,0,1],[1,0,0],[0,0,0]]		, colour=colour)]
-		faces += [face(	[[0,1,1],[1,1,1],[1,1,0],[0,1,0]]		, colour=colour)]
-		faces += [face(	[[0,0,1],[1,0,1],[1,1,1],[0,1,1]]		, colour=colour)]
-
-	return faces
-
 game = game()
 game.main()
