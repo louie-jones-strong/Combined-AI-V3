@@ -249,7 +249,7 @@ class game(object):
 				time_taken = 1/60-time_taken
 				time.sleep(time_taken)
 
-			if FPS_count >= 30:`
+			if FPS_count >= 30:
 				FPS = int(1/time_taken)
 				FPS_count = 0
 			else:
