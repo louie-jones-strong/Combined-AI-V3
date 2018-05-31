@@ -4,6 +4,7 @@ import time
 import keyboard
 import mouse
 import math
+import draughts
 
 class face(object):
 	def __init__(self, points, colour=[255,255,255]):
@@ -20,25 +21,26 @@ class face(object):
 		self.centre = (x,y,z)
 
 class object3D(object):
-	def __init__(self, faces, postion3D=[0,0,0], rotation3D=[0,0,0], hidden=False, selected=False):
+	def __init__(self, faces, name="object3D" ,postion3D=[0,0,0], rotation3D=[0,0,0], hidden=False, selected=False):
+		self.name = name
 		self.postion3D = postion3D
 		self.rotation3D = rotation3D
 		self.hidden = hidden
 		self.selected = selected
 		self.faces = faces
 
-def shapes(shape="cube", colour=[255,255,255]):
+def shapes(shape="cube", colour=[255,255,255], stretch=[1,1,1]):
+	s=stretch
 	if shape == "cube":
-		faces =  [face(	[[1,0,1],[1,0,0],[1,1,0],[1,1,1]]		, colour=colour)]
-		faces += [face(	[[0,0,1],[0,0,0],[0,1,0],[0,1,1]]		, colour=colour)]
-		faces += [face(	[[0,0,0],[1,0,0],[1,1,0],[0,1,0]]		, colour=colour)]
-		faces += [face(	[[0,0,1],[1,0,1],[1,0,0],[0,0,0]]		, colour=colour)]
-		faces += [face(	[[0,1,1],[1,1,1],[1,1,0],[0,1,0]]		, colour=colour)]
-		faces += [face(	[[0,0,1],[1,0,1],[1,1,1],[0,1,1]]		, colour=colour)]
-
+		faces= [face([[1*s[0],0*s[1],1*s[2]],[1*s[0],0*s[1],0*s[2]],[1*s[0],1*s[1],0*s[2]],[1*s[0],1*s[1],1*s[2]]]		, colour=colour)]
+		faces+=[face([[0*s[0],0*s[1],1*s[2]],[0*s[0],0*s[1],0*s[2]],[0*s[0],1*s[1],0*s[2]],[0*s[0],1*s[1],1*s[2]]]		, colour=colour)]
+		faces+=[face([[0*s[0],0*s[1],0*s[2]],[1*s[0],0*s[1],0*s[2]],[1*s[0],1*s[1],0*s[2]],[0*s[0],1*s[1],0*s[2]]]		, colour=colour)]
+		faces+=[face([[0*s[0],0*s[1],1*s[2]],[1*s[0],0*s[1],1*s[2]],[1*s[0],0*s[1],0*s[2]],[0*s[0],0*s[1],0*s[2]]]		, colour=colour)]
+		faces+=[face([[0*s[0],1*s[1],1*s[2]],[1*s[0],1*s[1],1*s[2]],[1*s[0],1*s[1],0*s[2]],[0*s[0],1*s[1],0*s[2]]]		, colour=colour)]
+		faces+=[face([[0*s[0],0*s[1],1*s[2]],[1*s[0],0*s[1],1*s[2]],[1*s[0],1*s[1],1*s[2]],[0*s[0],1*s[1],1*s[2]]]		, colour=colour)]
 	return faces
 		
-class game(object):
+class renderEngine(object):
 	def rotateX(self, angle, point_3D):
 		""" Rotates the point around the X axis by the given angle in degrees. """
 		rad = angle * math.pi / 180
@@ -106,27 +108,33 @@ class game(object):
 					face_list += [[ distance , face , object3D.faces[loop].colour , objectNum , object3D.selected ]]
 
 		return sorted(face_list)
-	def update_window(self,object3D_list,globalRotate,FPS=0):
+	def update_window(self,object3D_list,globalRotate):
 		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
 
 		face_list = self.objects_to_2DFaceList(object3D_list,globalRotate)
 
 		for loop in range(len(face_list)):
-			if self.render_mode[0]:
-				for loop2 in range(len(face_list[loop][1])):
-					pygame.draw.circle(self.window, [255,255,255], face_list[loop][1][loop2], 3)
-					
-			if self.render_mode[2]:
-				pygame.draw.polygon(self.window, face_list[loop][2], face_list[loop][1], 0)	
-			if self.render_mode[1]:
-				if face_list[loop][4]:
-					pygame.draw.polygon(self.window, [255,0,0], face_list[loop][1], 4)	
-				else:
-					pygame.draw.polygon(self.window, [100,100,100], face_list[loop][1], 4)	
 
-		if FPS != 0:
-			label = self.Font.render("FPS:"+str(FPS), 1,(255,255,255))
+			size = 3
+
+			if self.render_mode[2]:#faces
+				pygame.draw.polygon(self.window, face_list[loop][2], face_list[loop][1], 0)	
+
+			if self.render_mode[1]:#lines
+				if face_list[loop][4]:
+					pygame.draw.polygon(self.window, [255,0,0], face_list[loop][1], size)	
+				else:
+					pygame.draw.polygon(self.window, [100,100,100], face_list[loop][1], size)
+
+			if self.render_mode[0]:#dots
+				for loop2 in range(len(face_list[loop][1])):
+					pygame.draw.circle(self.window, [255,255,255], face_list[loop][1][loop2], size)
+
+
+		if self.FPS != -1:
+			label = self.Font.render("FPS:"+str(self.FPS), 1,(255,255,255))
 			self.window.blit(label, [self.resolution[0]-75,10])
+		
 		display.update()
 		return
 	
@@ -135,13 +143,16 @@ class game(object):
 		pygame.font.init()
 		self.resolution = (800,800)
 		self.windowPostion = [0,0]
-		self.globalRotate = [0,0,0]
+		self.globalRotate = [45,180,0]
 		self.FOV = 256
+		self.FPS = -1
 		self.draging = False
 		self.startPos = [0,0]
-		self.viewer_distance = 3
+		self.viewer_distance = 7
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
+		self.animation = True
+		self.midMoving = False
 		self.Font = pygame.font.SysFont("monospace", 15)
 		if False:
 			self.resolution = (1920,1080)
@@ -157,16 +168,56 @@ class game(object):
 		return
 	def setup_object3D_list(self):
 		object3D_list = []
-		object3D_list += [object3D(shapes(),postion3D=[-0.5,-0.5,-0.5])]
-		object3D_list += [object3D(shapes(),postion3D=[0.5,-0.5,-0.5])]
+		colour1 = [255,255,255]
+		colour2 = [0,0,0]
+		pickColour = 1
+		for loop in range(8):
+			for loop2 in range(8):
+				pos = [loop-4,-0.5,loop2-4]
+				if pickColour == 1:
+					object3D_list += [object3D(shapes(colour=colour1), name="Board_"+str(loop)+"_"+str(loop2) ,postion3D=pos)]
+					pickColour = 2
+				else:
+					object3D_list += [object3D(shapes(colour=colour2), name="Board_"+str(loop)+"_"+str(loop2) ,postion3D=pos)]
+					pickColour = 1
+			if pickColour == 1:
+				pickColour = 2
+			else:
+				pickColour = 1
 
-		for loop in range(len(object3D_list)):
-			object3D_list[loop].faces[0].colour = [255,0,0]
-			object3D_list[loop].faces[1].colour = [0,255,0]
-			object3D_list[loop].faces[2].colour = [0,0,255]
-			object3D_list[loop].faces[3].colour = [255,255,0]
-			object3D_list[loop].faces[4].colour = [0,255,255]
-			object3D_list[loop].faces[5].colour = [255,0,255]
+		return object3D_list
+	def addPieces(self,board):
+		object3D_list = []
+		for loop in range(8):
+			for loop2 in range(8):
+				pos = [loop-3.75,0.5,loop2-3.75]
+				draw = False
+				if board[loop][loop2][0] == "W":
+					if board[loop][loop2][1] == " ":
+						shape = shapes(colour=[255,255,255],stretch=[0.5,0.25,0.5])
+					else:
+						shape = shapes(colour=[255,255,255],stretch=[0.5,0.75,0.5])
+					draw = True
+
+				elif board[loop][loop2][0] == "B":
+					if board[loop][loop2][1] == " ":
+						shape = shapes(colour=[0,0,0],stretch=[0.5,0.25,0.5])
+					else:
+						shape = shapes(colour=[0,0,0],stretch=[0.5,0.75,0.5])
+					draw = True
+					
+				if draw:
+					object3D_list += [object3D(shape, name="Piece_"+str(loop)+"_"+str(loop2) ,postion3D=pos)]
+
+		return object3D_list
+	def moveableAreas(self,board,object3D_list):
+		object3D_list[0:63] = self.setup_object3D_list()
+		objectNum = 0
+		for loop in range(8):
+			for loop2 in range(8):
+				if board[loop][loop2][0] == "-":
+					object3D_list[objectNum].faces[4].colour = [0,255,0]
+				objectNum += 1
 		return object3D_list
 
 	def inside_polygon(self,x, y, points):
@@ -188,6 +239,8 @@ class game(object):
 		pos = mouse.get_position()
 		pos = [pos[0]-self.windowPostion[0],pos[1]-self.windowPostion[1]]
 		face2DList = self.objects_to_2DFaceList(object3D_list,globalRotate)
+		face2DList = face2DList[::-1]
+
 		for loop in range(len(face2DList)):
 			if self.inside_polygon(pos[0],pos[1],face2DList[loop][1]):
 				return object3D_list[face2DList[loop][3]]
@@ -216,46 +269,74 @@ class game(object):
 			globalRotate[1] = (globalRotate[1] + 360*change[1])%360
 		return globalRotate
 
-	def main(self):
+	def __init__(self):
 		self.setup()
-		object3D_list = self.setup_object3D_list()
-		FPS = 0
 		FPS_count = 0
 
+		game = draughts.game()
+		board, turn, step = game.start()
+		object3D_list = self.setup_object3D_list()
+		object3D_list += self.addPieces(board)
 
-		while True:
-			time_taken = time.time()
-			globalRotate = self.mouseDraging()
 
-			if mouse.is_pressed(button='right'):
-				object3D = self.getObjectClicked(object3D_list,globalRotate)
+		time_taken = time.time()
+		while True:		
+			if turn == 1 and self.animation:
+				if self.globalRotate != [-45,0,0] and self.animation:
+					self.globalRotate = [self.globalRotate[0]+(-3),self.globalRotate[1]+(-6),self.globalRotate[2]]
+					self.midMoving = True
+				else:
+					self.globalRotate = [-45,0,0]
+					self.midMoving = False
+			elif self.animation:
+				if self.globalRotate != [45,180,0] and self.animation:
+					self.globalRotate = [self.globalRotate[0]+(3),self.globalRotate[1]+(6),self.globalRotate[2]]
+					self.midMoving = True
+				else:
+					self.globalRotate = [45,180,0]
+					self.midMoving = False
+
+			if self.globalRotate == [0,90,0] and self.animation:
+				object3D_list = self.setup_object3D_list()
+				object3D_list += self.addPieces(board)
+
+
+
+			if mouse.is_pressed(button='right') and not self.midMoving:
+				object3D = self.getObjectClicked(object3D_list,self.globalRotate)
 				if not object3D == None:
 					time.sleep(0.1)
-					if object3D.selected:
-						object3D.selected = False
-					else:
-						object3D.selected = True
+					X = int(object3D.name[6:7])
+					Y = int(object3D.name[8:9])
 
+					if object3D.name[0:6] == "Piece_":
+						valid, board, step = game.selection(X, Y)
+						if step == 2:
+							object3D_list[64:-1] = self.addPieces(board)
+						if valid:
+							object3D.selected = True
+							object3D_list = self.moveableAreas(board,object3D_list)
+							
 
-			self.update_window(object3D_list,globalRotate,FPS=FPS)
+					elif object3D.name[0:6] == "Board_" and step == 2:
+						valid, board, turn, step = game.moveCal(X, Y)
+						if valid and not self.animation:
+							object3D_list = self.setup_object3D_list()
+							object3D_list += self.addPieces(board)
+
+			self.update_window(object3D_list,self.globalRotate)
 
 			if keyboard.is_pressed("esc"):
 				display.quit()
 				break
 
 
-			time_taken = time.time() - time_taken
-			if time_taken < 1/60:
-				time_taken = 1/60-time_taken
-				time.sleep(time_taken)
+			FPS_count += 1
 
-			if FPS_count >= 30:
-				FPS = int(1/time_taken)
+			if (time.time() - time_taken) >= 0.25:
+				self.FPS = FPS_count*4
 				FPS_count = 0
-			else:
-				FPS_count += 1
+				time_taken = time.time()
 
-		return
-	
-game = game()
-game.main()
+		return	
+renderEngine()
