@@ -61,6 +61,14 @@ class game(object):
 	def moveCal(self,X,Y):
 		valid = False
 		if self.Board[X][Y][0] == "-":
+
+			if abs(X - self.selectedPos[0] > 1) or abs(Y - self.selectedPos[1]) > 1:
+				output = self.attackMoves(self.selectedPos[0],self.selectedPos[1])
+				for loop in range(len(output[0])):
+					if output[0][loop][0] == X and output[0][loop][1] == Y:
+						temp = output[1][loop]
+						self.Board[temp[0]][temp[1]] = "  "
+
 			self.Board[X][Y] = self.Board[self.selectedPos[0]][self.selectedPos[1]]
 			self.Board[self.selectedPos[0]][self.selectedPos[1]] = "  "
 
@@ -85,44 +93,94 @@ class game(object):
 				self.turn = 1
 		return valid, self.Board, self.turn, self.step
 
-	def attackMoves(self):
-
-		return
-		
-	def possibleMoves(self,X,Y):
+	def attackMoves(self,X,Y):
 		outputList = []
+		ToRemoveList = []
+
+		if self.Board[X][Y][0] == "W":
+			enemyType = "B"
+		else:
+			enemyType = "W"
+
 		if self.Board[X][Y][0] == self.Board[X][Y][1]:
 
-			if X >= 1 and Y >= 1:
-				if self.Board[X-1][Y-1][0] == " ":
-					outputList += [[X-1,Y-1]]
-			if X <= 6 and Y >= 1:
-				if self.Board[X+1][Y-1][0] == " ":
-					outputList += [[X+1,Y-1]]
-			if X >= 1 and Y <= 6:
-				if self.Board[X-1][Y+1][0] == " ":
-					outputList += [[X-1,Y+1]]
-			if X <= 6 and Y <= 6:
-				if self.Board[X+1][Y+1][0] == " ":
-					outputList += [[X+1,Y+1]]
+			if X >= 2 and Y >= 2:
+				if self.Board[X-1][Y-1][0] == enemyType and (self.Board[X-2][Y-2][0] == " " or self.Board[X-2][Y-2][0] == "-"):
+					outputList += [[X-2,Y-2]]
+					ToRemoveList += [[X-1,Y-1]]
+			if X <= 5 and Y >= 2:
+				if self.Board[X+1][Y-1][0] == enemyType and (self.Board[X+2][Y-2][0] == " " or self.Board[X+2][Y-2][0] == "-"):
+					outputList += [[X+2,Y-2]]
+					ToRemoveList += [[X+1,Y-1]]
+			if X >= 2 and Y <= 5:
+				if self.Board[X-1][Y+1][0] == enemyType and (self.Board[X-2][Y+2][0] == " " or self.Board[X-2][Y+2][0] == "-"):
+					outputList += [[X-2,Y+2]]
+					ToRemoveList += [[X-1,Y+1]]
+			if X <= 5 and Y <= 5:
+				if self.Board[X+1][Y+1][0] == enemyType and (self.Board[X+2][Y+2][0] == " " or self.Board[X+2][Y+2][0] == "-"):
+					outputList += [[X+2,Y+2]]
+					ToRemoveList += [[X+1,Y+1]]
 
 		elif self.Board[X][Y][0] == "W":
 
-			if X >= 1 and Y <= 6:
-				if self.Board[X-1][Y+1][0] == " ":
-					outputList += [[X-1,Y+1]]
-			if X <= 6 and Y <= 6:
-				if self.Board[X+1][Y+1][0] == " ":
-					outputList += [[X+1,Y+1]]
+			if X >= 2 and Y <= 5:
+				if self.Board[X-1][Y+1][0] == enemyType and (self.Board[X-2][Y+2][0] == " " or self.Board[X-2][Y+2][0] == "-"):
+					outputList += [[X-2,Y+2]]
+					ToRemoveList += [[X-1,Y+1]]
+			if X <= 5 and Y <= 5:
+				if self.Board[X+1][Y+1][0] == enemyType and (self.Board[X+2][Y+2][0] == " " or self.Board[X+2][Y+2][0] == "-"):
+					outputList += [[X+2,Y+2]]
+					ToRemoveList += [[X+1,Y+1]]
 
 		elif self.Board[X][Y][0] == "B":
 
-			if X >= 1 and Y >= 1:
-				if self.Board[X-1][Y-1][0] == " ":
-					outputList += [[X-1,Y-1]]
-			if X <= 6 and Y >= 1:
-				if self.Board[X+1][Y-1][0] == " ":
-					outputList += [[X+1,Y-1]]
+			if X >= 2 and Y >= 2:
+				if self.Board[X-1][Y-1][0] == enemyType and (self.Board[X-2][Y-2][0] == " " or self.Board[X-2][Y-2][0] == "-"):
+					outputList += [[X-2,Y-2]]
+					ToRemoveList += [[X-1,Y-1]]
+			if X <= 5 and Y >= 2:
+				if self.Board[X+1][Y-1][0] == enemyType and (self.Board[X+2][Y-2][0] == " " or self.Board[X+2][Y-2][0] == "-"):
+					outputList += [[X+2,Y-2]]
+					ToRemoveList += [[X+1,Y-1]]
+
+		return outputList, ToRemoveList
+
+	def possibleMoves(self,X,Y):
+		outputList = self.attackMoves(X,Y)[0]
+		if len(outputList) == 0:
+
+			if self.Board[X][Y][0] == self.Board[X][Y][1]:
+
+				if X >= 1 and Y >= 1:
+					if self.Board[X-1][Y-1][0] == " ":
+						outputList += [[X-1,Y-1]]
+				if X <= 6 and Y >= 1:
+					if self.Board[X+1][Y-1][0] == " ":
+						outputList += [[X+1,Y-1]]
+				if X >= 1 and Y <= 6:
+					if self.Board[X-1][Y+1][0] == " ":
+						outputList += [[X-1,Y+1]]
+				if X <= 6 and Y <= 6:
+					if self.Board[X+1][Y+1][0] == " ":
+						outputList += [[X+1,Y+1]]
+
+			elif self.Board[X][Y][0] == "W":
+
+				if X >= 1 and Y <= 6:
+					if self.Board[X-1][Y+1][0] == " ":
+						outputList += [[X-1,Y+1]]
+				if X <= 6 and Y <= 6:
+					if self.Board[X+1][Y+1][0] == " ":
+						outputList += [[X+1,Y+1]]
+
+			elif self.Board[X][Y][0] == "B":
+
+				if X >= 1 and Y >= 1:
+					if self.Board[X-1][Y-1][0] == " ":
+						outputList += [[X-1,Y-1]]
+				if X <= 6 and Y >= 1:
+					if self.Board[X+1][Y-1][0] == " ":
+						outputList += [[X+1,Y-1]]
 
 
 		return outputList

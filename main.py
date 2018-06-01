@@ -91,13 +91,13 @@ class renderEngine(object):
 		return int(x) , int(y)
 	def objects_to_2DFaceList(self,object3D_list,globalRotate):
 		face_list = []
-		for objectNum in range(len(object3D_list)):
+		for objectNum in range(len(object3D_list)):#objects
 			object3D = object3D_list[objectNum]
 			if not object3D.hidden:
-				for loop in range(len(object3D.faces)):
+				for loop in range(len(object3D.faces)):#faces
 
 					face = []
-					for loop2 in range(len(object3D.faces[loop].points)):
+					for loop2 in range(len(object3D.faces[loop].points)):#points
 						point3D = self.transform(object3D.faces[loop].points[loop2], object3D.postion3D, object3D.rotation3D,globalRotate)
 						face += [self.point3D_to_point2D(point3D)]
 
@@ -109,6 +109,7 @@ class renderEngine(object):
 
 		return sorted(face_list)
 	def update_window(self,object3D_list,globalRotate):
+		time_taken = time.time()
 		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
 
 		face_list = self.objects_to_2DFaceList(object3D_list,globalRotate)
@@ -134,8 +135,8 @@ class renderEngine(object):
 		if self.FPS != -1:
 			label = self.Font.render("FPS:"+str(self.FPS), 1,(255,255,255))
 			self.window.blit(label, [self.resolution[0]-75,10])
-		
 		display.update()
+		print("total: " + str(time.time()-time_taken))
 		return
 	
 	def setup(self):
@@ -332,9 +333,8 @@ class renderEngine(object):
 
 
 			FPS_count += 1
-
-			if (time.time() - time_taken) >= 0.25:
-				self.FPS = FPS_count*4
+			if (time.time() - time_taken) >= 0.1:
+				self.FPS = FPS_count*10
 				FPS_count = 0
 				time_taken = time.time()
 
