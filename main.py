@@ -44,7 +44,6 @@ def shapes(shape="cube", colour=[255,255,255], stretch=[1,1,1]):
 		
 class renderEngine(object):
 	def rotateX(self, angle, point_3D):
-		""" Rotates the point around the X axis by the given angle in degrees. """
 		rad = angle * math.pi / 180
 		cosa = math.cos(rad)
 		sina = math.sin(rad)
@@ -72,13 +71,13 @@ class renderEngine(object):
 		x = point_3D[0] + position3D[0]
 		y = point_3D[1] + position3D[1]
 		z = point_3D[2] + position3D[2]
-		x,y,z = self.rotateX(rotation3D[0], [x,y,z])
-		x,y,z = self.rotateY(rotation3D[1], [x,y,z])
-		x,y,z = self.rotateZ(rotation3D[2], [x,y,z])
 
-		x,y,z = self.rotateX(globalRotate[0], [x,y,z])
-		x,y,z = self.rotateY(globalRotate[1], [x,y,z])
-		x,y,z = self.rotateZ(globalRotate[2], [x,y,z])
+		if globalRotate[0] != 0:
+			x,y,z = self.rotateX(globalRotate[0], [x,y,z])
+		if globalRotate[1] != 0:
+			x,y,z = self.rotateY(globalRotate[1], [x,y,z])
+		if globalRotate[2] != 0:
+			x,y,z = self.rotateZ(globalRotate[2], [x,y,z])
 
 		return [x,y,z]
 	def point3D_to_point2D(self,point_3D):
@@ -135,8 +134,10 @@ class renderEngine(object):
 		if self.FPS != -1:
 			label = self.Font.render("FPS:"+str(self.FPS), 1,(255,255,255))
 			self.window.blit(label, [10,10])
-			label = self.Font.render("polygons:"+str(len(face_list)), 1,(255,255,255))
-			self.window.blit(label, [10,20])
+			label = self.Font.render("Polygons:"+str(len(face_list)), 1,(255,255,255))
+			self.window.blit(label, [10,22])
+			label = self.Font.render("Objects:"+str(len(object3D_list)), 1,(255,255,255))
+			self.window.blit(label, [10,34])
 		display.update()
 		return
 	
@@ -341,5 +342,5 @@ class renderEngine(object):
 
 		return	
 
-
-renderEngine()
+if __name__ == "__main__":
+	renderEngine()
