@@ -38,6 +38,8 @@ def shapes(shape="cube", colour=[255,255,255], stretch=[1,1,1]):
 		faces+=[face([[0*s[0],0*s[1],1*s[2]],[1*s[0],0*s[1],1*s[2]],[1*s[0],0*s[1],0*s[2]],[0*s[0],0*s[1],0*s[2]]]		, colour=colour)]
 		faces+=[face([[0*s[0],1*s[1],1*s[2]],[1*s[0],1*s[1],1*s[2]],[1*s[0],1*s[1],0*s[2]],[0*s[0],1*s[1],0*s[2]]]		, colour=colour)]
 		faces+=[face([[0*s[0],0*s[1],1*s[2]],[1*s[0],0*s[1],1*s[2]],[1*s[0],1*s[1],1*s[2]],[0*s[0],1*s[1],1*s[2]]]		, colour=colour)]
+	elif shape == "face":
+		faces= [face([[0*s[0],1*s[1],1*s[2]],[1*s[0],1*s[1],1*s[2]],[1*s[0],1*s[1],0*s[2]],[0*s[0],1*s[1],0*s[2]]]		, colour=colour)]
 	return faces
 		
 class renderEngine(object):
@@ -66,7 +68,6 @@ class renderEngine(object):
 		x = point_3D[0] * cosa - point_3D[1] * sina
 		y = point_3D[0] * sina + point_3D[1] * cosa
 		return [x, y, point_3D[2]]
-
 	def transform(self, point_3D, position3D, rotation3D,globalRotate):
 		x = point_3D[0] + position3D[0]
 		y = point_3D[1] + position3D[1]
@@ -109,7 +110,6 @@ class renderEngine(object):
 
 		return sorted(face_list)
 	def update_window(self,object3D_list,globalRotate):
-		time_taken = time.time()
 		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
 
 		face_list = self.objects_to_2DFaceList(object3D_list,globalRotate)
@@ -134,9 +134,10 @@ class renderEngine(object):
 
 		if self.FPS != -1:
 			label = self.Font.render("FPS:"+str(self.FPS), 1,(255,255,255))
-			self.window.blit(label, [self.resolution[0]-75,10])
+			self.window.blit(label, [10,10])
+			label = self.Font.render("polygons:"+str(len(face_list)), 1,(255,255,255))
+			self.window.blit(label, [10,20])
 		display.update()
-		print("total: " + str(time.time()-time_taken))
 		return
 	
 	def setup(self):
@@ -176,10 +177,10 @@ class renderEngine(object):
 			for loop2 in range(8):
 				pos = [loop-4,-0.5,loop2-4]
 				if pickColour == 1:
-					object3D_list += [object3D(shapes(colour=colour1), name="Board_"+str(loop)+"_"+str(loop2) ,postion3D=pos)]
+					object3D_list += [object3D(shapes(shape="face",colour=colour1), name="Board_"+str(loop)+"_"+str(loop2) ,postion3D=pos)]
 					pickColour = 2
 				else:
-					object3D_list += [object3D(shapes(colour=colour2), name="Board_"+str(loop)+"_"+str(loop2) ,postion3D=pos)]
+					object3D_list += [object3D(shapes(shape="face",colour=colour2), name="Board_"+str(loop)+"_"+str(loop2) ,postion3D=pos)]
 					pickColour = 1
 			if pickColour == 1:
 				pickColour = 2
@@ -217,7 +218,7 @@ class renderEngine(object):
 		for loop in range(8):
 			for loop2 in range(8):
 				if board[loop][loop2][0] == "-":
-					object3D_list[objectNum].faces[4].colour = [0,255,0]
+					object3D_list[objectNum].faces[0].colour = [0,255,0]
 				objectNum += 1
 		return object3D_list
 
@@ -339,4 +340,6 @@ class renderEngine(object):
 				time_taken = time.time()
 
 		return	
+
+
 renderEngine()
