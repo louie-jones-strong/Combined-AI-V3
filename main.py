@@ -38,7 +38,7 @@ def shapes(shape="cube", colour=[255,255,255]):
 
 	return faces
 		
-class game(object):
+class renderEngine(object):
 	def rotateX(self, angle, point_3D):
 		""" Rotates the point around the X axis by the given angle in degrees. """
 		rad = angle * math.pi / 180
@@ -69,13 +69,13 @@ class game(object):
 		x = point_3D[0] + position3D[0]
 		y = point_3D[1] + position3D[1]
 		z = point_3D[2] + position3D[2]
-		x,y,z = self.rotateX(rotation3D[0], [x,y,z])
-		x,y,z = self.rotateY(rotation3D[1], [x,y,z])
-		x,y,z = self.rotateZ(rotation3D[2], [x,y,z])
 
-		x,y,z = self.rotateX(globalRotate[0], [x,y,z])
-		x,y,z = self.rotateY(globalRotate[1], [x,y,z])
-		x,y,z = self.rotateZ(globalRotate[2], [x,y,z])
+		if globalRotate[0] != 0:
+			x,y,z = self.rotateX(globalRotate[0], [x,y,z])
+		if globalRotate[1] != 0:
+			x,y,z = self.rotateY(globalRotate[1], [x,y,z])
+		if globalRotate[2] != 0:
+			x,y,z = self.rotateZ(globalRotate[2], [x,y,z])
 
 		return [x,y,z]
 	def point3D_to_point2D(self,point_3D):
@@ -106,7 +106,7 @@ class game(object):
 					face_list += [[ distance , face , object3D.faces[loop].colour , objectNum , object3D.selected ]]
 
 		return sorted(face_list)
-	def update_window(self,object3D_list,globalRotate,FPS=0):
+	def update_window(self,object3D_list,globalRotate):
 		draw.rect(self.window, [0,0,0], [0,0,self.resolution[0],self.resolution[1]], 0)
 
 		face_list = self.objects_to_2DFaceList(object3D_list,globalRotate)
@@ -124,9 +124,13 @@ class game(object):
 				else:
 					pygame.draw.polygon(self.window, [100,100,100], face_list[loop][1], 4)	
 
-		if FPS != 0:
-			label = self.Font.render("FPS:"+str(FPS), 1,(255,255,255))
-			self.window.blit(label, [self.resolution[0]-75,10])
+		if self.FPS != -1:
+			label = self.Font.render("FPS:"+str(self.FPS), 1,(255,255,255))
+			self.window.blit(label, [10,10])
+			label = self.Font.render("Polygons:"+str(len(face_list)), 1,(255,255,255))
+			self.window.blit(label, [10,22])
+			label = self.Font.render("Objects:"+str(len(object3D_list)), 1,(255,255,255))
+			self.window.blit(label, [10,34])
 		display.update()
 		return
 	
@@ -137,6 +141,7 @@ class game(object):
 		self.windowPostion = [0,0]
 		self.globalRotate = [0,0,0]
 		self.FOV = 256
+		self.FPS = -1
 		self.draging = False
 		self.startPos = [0,0]
 		self.viewer_distance = 3
@@ -157,8 +162,8 @@ class game(object):
 		return
 	def setup_object3D_list(self):
 		object3D_list = []
-		object3D_list += [object3D(shapes(),postion3D=[-0.5,-0.5,-0.5])]
-		object3D_list += [object3D(shapes(),postion3D=[0.5,-0.5,-0.5])]
+		for loop in range(1):
+			object3D_list += [object3D(shapes(),postion3D=[-0.5,-0.5,-0.5])]
 
 		for loop in range(len(object3D_list)):
 			object3D_list[loop].faces[0].colour = [255,0,0]
@@ -216,46 +221,30 @@ class game(object):
 			globalRotate[1] = (globalRotate[1] + 360*change[1])%360
 		return globalRotate
 
-	def main(self):
+	def __init__(self):
 		self.setup()
 		object3D_list = self.setup_object3D_list()
 		FPS = 0
 		FPS_count = 0
 
-
+		time_taken = time.time()
 		while True:
-			time_taken = time.time()
 			globalRotate = self.mouseDraging()
 
-			if mouse.is_pressed(button='right'):
-				object3D = self.getObjectClicked(object3D_list,globalRotate)
-				if not object3D == None:
-					time.sleep(0.1)
-					if object3D.selected:
-						object3D.selected = False
-					else:
-						object3D.selected = True
-
-
-			self.update_window(object3D_list,globalRotate,FPS=FPS)
+			self.update_window(object3D_list,globalRotate)
 
 			if keyboard.is_pressed("esc"):
 				display.quit()
 				break
 
 
-			time_taken = time.time() - time_taken
-			if time_taken < 1/60:
-				time_taken = 1/60-time_taken
-				time.sleep(time_taken)
-
-			if FPS_count >= 30:
-				FPS = int(1/time_taken)
+			FPS_count += 1
+			if (time.time() - time_taken) >= 0.1:
+				self.FPS = FPS_count*10
 				FPS_count = 0
-			else:
-				FPS_count += 1
+				time_taken = time.time()
 
 		return
 	
-game = game()
-game.main()
+if __name__ == "__main__":
+	renderEngine()
