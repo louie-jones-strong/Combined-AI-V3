@@ -195,15 +195,15 @@ class renderEngine(object):
 			for loop2 in range(8):
 				pos = [loop-3.75,0.5,loop2-3.75]
 				draw = False
-				if board[loop][loop2][0] == "W":
-					if board[loop][loop2][1] == " ":
+				if board[loop][loop2] == 1 or board[loop][loop2] == 3:
+					if board[loop][loop2] == 1:
 						shape = shapes(colour=[255,255,255],stretch=[0.5,0.25,0.5])
 					else:
 						shape = shapes(colour=[255,255,255],stretch=[0.5,0.75,0.5])
 					draw = True
 
-				elif board[loop][loop2][0] == "B":
-					if board[loop][loop2][1] == " ":
+				elif board[loop][loop2] == 2 or board[loop][loop2] == 4:
+					if board[loop][loop2] == 2:
 						shape = shapes(colour=[0,0,0],stretch=[0.5,0.25,0.5])
 					else:
 						shape = shapes(colour=[0,0,0],stretch=[0.5,0.75,0.5])
@@ -218,7 +218,7 @@ class renderEngine(object):
 		objectNum = 0
 		for loop in range(8):
 			for loop2 in range(8):
-				if board[loop][loop2][0] == "-":
+				if board[loop][loop2] == -1:
 					object3D_list[objectNum].faces[0].colour = [0,255,0]
 				objectNum += 1
 		return object3D_list
@@ -249,11 +249,11 @@ class renderEngine(object):
 				return object3D_list[face2DList[loop][3]]
 		return None
 	def mouseDraging(self):
-		if mouse.is_pressed(button='middle') and not self.draging:
+		if mouse.is_pressed(button="middle") and not self.draging:
 			self.startPos = mouse.get_position()
 			self.draging = True
 
-		elif not mouse.is_pressed(button='middle') and self.draging:
+		elif not mouse.is_pressed(button="middle") and self.draging:
 			change = [0,0]
 			finishPos = mouse.get_position()
 			change[0] = (self.startPos[1]-finishPos[1])/self.resolution[1]
@@ -263,7 +263,7 @@ class renderEngine(object):
 			self.draging = False
 
 		globalRotate = [self.globalRotate[0],self.globalRotate[1],self.globalRotate[2]]
-		if mouse.is_pressed(button='middle') and self.draging:
+		if mouse.is_pressed(button="middle") and self.draging:
 			change = [0,0]
 			finishPos = mouse.get_position()
 			change[0] = (self.startPos[1]-finishPos[1])/self.resolution[1]
@@ -275,6 +275,7 @@ class renderEngine(object):
 	def __init__(self):
 		self.setup()
 		FPS_count = 0
+		PlayAI = True
 
 		game = draughts.game()
 		board, turn, step = game.start()
@@ -284,29 +285,28 @@ class renderEngine(object):
 
 		time_taken = time.time()
 		while True:		
-			if turn == 1 and self.animation:
-				if self.globalRotate != [-45,0,0] and self.animation:
+			if turn == 1 and self.animation:  # turn 1
+				if self.globalRotate != [-45,0,0]:
 					self.globalRotate = [self.globalRotate[0]+(-3),self.globalRotate[1]+(-6),self.globalRotate[2]]
 					self.midMoving = True
 				else:
 					self.globalRotate = [-45,0,0]
 					self.midMoving = False
-			elif self.animation:
-				if self.globalRotate != [45,180,0] and self.animation:
+
+			elif self.animation and not PlayAI: # turn 2
+				if self.globalRotate != [45,180,0]:
 					self.globalRotate = [self.globalRotate[0]+(3),self.globalRotate[1]+(6),self.globalRotate[2]]
 					self.midMoving = True
 				else:
 					self.globalRotate = [45,180,0]
 					self.midMoving = False
 
-			if self.globalRotate == [0,90,0] and self.animation:
+			if (self.globalRotate == [0, 90, 0] and self.animation) or (PlayAI and turn == 2):
 				object3D_list = self.setup_object3D_list()
 				object3D_list += self.addPieces(board)
 
-
-
-			if mouse.is_pressed(button='right') and not self.midMoving:
-				object3D = self.getObjectClicked(object3D_list,self.globalRotate)
+			if mouse.is_pressed(button="right") and not self.midMoving and not (PlayAI and turn == 2):
+				object3D = self.getObjectClicked(object3D_list, self.globalRotate)
 				if not object3D == None:
 					time.sleep(0.1)
 					X = int(object3D.name[6:7])
@@ -326,6 +326,12 @@ class renderEngine(object):
 						if valid and not self.animation:
 							object3D_list = self.setup_object3D_list()
 							object3D_list += self.addPieces(board)
+
+			if PlayAI and turn == 2:
+				# play ai move
+				print("run ai move!")
+				input("enter:")
+
 
 			self.update_window(object3D_list,self.globalRotate)
 

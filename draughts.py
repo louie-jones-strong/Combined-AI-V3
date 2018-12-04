@@ -14,14 +14,14 @@ class game(object):
 			for loop2 in range(8):
 				if pickColour == 1 :
 					if loop2 < 3 :
-						test2 += ["W "]
+						test2 += [1]
 					elif loop2>4:
-						test2 += ["B "]
+						test2 += [2]
 					else:
-						test2 += ["  "]
+						test2 += [0]
 					pickColour = 2
 				else:
-					test2 += ["  "]
+					test2 += [0]
 					pickColour = 1
 	
 			if pickColour == 1:
@@ -34,19 +34,19 @@ class game(object):
 
 	def selection(self,X,Y):
 		valid = False
-		if self.Board[X][Y][0] == "W" and self.turn == 1:
+		if (self.Board[X][Y] == 1 or self.Board[X][Y] == 3) and self.turn == 1:
 			self.selectedPos = [X,Y]
 			valid = True
 
-		elif self.Board[X][Y][0] == "B" and self.turn == 2:
+		elif (self.Board[X][Y] == 2 or self.Board[X][Y] == 4) and self.turn == 2:
 			self.selectedPos = [X,Y]
 			valid = True
 
 		if self.step == 2 and valid:
 			for loop in range(8):
 				for loop2 in range(8):
-					if self.Board[loop][loop2][0] == "-":
-						self.Board[loop][loop2] = "  "
+					if self.Board[loop][loop2] == -1:
+						self.Board[loop][loop2] = 0
 
 		if valid:
 			self.step = 2
@@ -54,37 +54,37 @@ class game(object):
 			moves = self.possibleMoves(X,Y)
 
 			for loop in range(len(moves)):
-				self.Board[moves[loop][0]][moves[loop][1]] = "- "
+				self.Board[moves[loop][0]][moves[loop][1]] = -1
 
 		return valid, self.Board, self.step
 		
 	def moveCal(self,X,Y):
 		valid = False
-		if self.Board[X][Y][0] == "-":
+		if self.Board[X][Y] == -1:
 
 			if abs(X - self.selectedPos[0] > 1) or abs(Y - self.selectedPos[1]) > 1:
 				output = self.attackMoves(self.selectedPos[0],self.selectedPos[1])
 				for loop in range(len(output[0])):
 					if output[0][loop][0] == X and output[0][loop][1] == Y:
 						temp = output[1][loop]
-						self.Board[temp[0]][temp[1]] = "  "
+						self.Board[temp[0]][temp[1]] = 0
 
 			self.Board[X][Y] = self.Board[self.selectedPos[0]][self.selectedPos[1]]
-			self.Board[self.selectedPos[0]][self.selectedPos[1]] = "  "
+			self.Board[self.selectedPos[0]][self.selectedPos[1]] = 0
 
-			if self.Board[X][Y][1] == " ":
-				if self.Board[X][Y][0] == "W" and Y == 7:
-					self.Board[X][Y] = "WW"
-				elif self.Board[X][Y][0] == "B" and Y == 0 :
-					self.Board[X][Y] = "BB"
+			if self.Board[X][Y] == 1 or self.Board[X][Y] == 2:
+				if self.Board[X][Y] == 1 and Y == 7:
+					self.Board[X][Y] = 3
+				elif self.Board[X][Y] == 2 and Y == 0 :
+					self.Board[X][Y] = 4
 
 			valid = True
 			self.step = 1
 
 		for loop in range(8):
 			for loop2 in range(8):
-				if self.Board[loop][loop2][0] == "-":
-					self.Board[loop][loop2] = "  "
+				if self.Board[loop][loop2] == -1:
+					self.Board[loop][loop2] = 0
 
 		if valid:
 			if self.turn == 1:
@@ -97,49 +97,49 @@ class game(object):
 		outputList = []
 		ToRemoveList = []
 
-		if self.Board[X][Y][0] == "W":
-			enemyType = "B"
+		if self.Board[X][Y] == 1:
+			enemyType = 2
 		else:
-			enemyType = "W"
+			enemyType = 1
 
-		if self.Board[X][Y][0] == self.Board[X][Y][1]:
+		if self.Board[X][Y] == 3 or self.Board[X][Y] == 4:
 
 			if X >= 2 and Y >= 2:
-				if self.Board[X-1][Y-1][0] == enemyType and (self.Board[X-2][Y-2][0] == " " or self.Board[X-2][Y-2][0] == "-"):
+				if self.Board[X-1][Y-1] == enemyType and (self.Board[X-2][Y-2] == 0 or self.Board[X-2][Y-2] == -1):
 					outputList += [[X-2,Y-2]]
 					ToRemoveList += [[X-1,Y-1]]
 			if X <= 5 and Y >= 2:
-				if self.Board[X+1][Y-1][0] == enemyType and (self.Board[X+2][Y-2][0] == " " or self.Board[X+2][Y-2][0] == "-"):
+				if self.Board[X+1][Y-1] == enemyType and (self.Board[X+2][Y-2] == 0 or self.Board[X+2][Y-2] == -1):
 					outputList += [[X+2,Y-2]]
 					ToRemoveList += [[X+1,Y-1]]
 			if X >= 2 and Y <= 5:
-				if self.Board[X-1][Y+1][0] == enemyType and (self.Board[X-2][Y+2][0] == " " or self.Board[X-2][Y+2][0] == "-"):
+				if self.Board[X-1][Y+1] == enemyType and (self.Board[X-2][Y+2] == 0 or self.Board[X-2][Y+2] == -1):
 					outputList += [[X-2,Y+2]]
 					ToRemoveList += [[X-1,Y+1]]
 			if X <= 5 and Y <= 5:
-				if self.Board[X+1][Y+1][0] == enemyType and (self.Board[X+2][Y+2][0] == " " or self.Board[X+2][Y+2][0] == "-"):
+				if self.Board[X+1][Y+1] == enemyType and (self.Board[X+2][Y+2] == 0 or self.Board[X+2][Y+2] == -1):
 					outputList += [[X+2,Y+2]]
 					ToRemoveList += [[X+1,Y+1]]
 
-		elif self.Board[X][Y][0] == "W":
+		elif self.Board[X][Y] == 1 or self.Board[X][Y] == 3:
 
 			if X >= 2 and Y <= 5:
-				if self.Board[X-1][Y+1][0] == enemyType and (self.Board[X-2][Y+2][0] == " " or self.Board[X-2][Y+2][0] == "-"):
+				if self.Board[X-1][Y+1] == enemyType and (self.Board[X-2][Y+2] == 0 or self.Board[X-2][Y+2] == -1):
 					outputList += [[X-2,Y+2]]
 					ToRemoveList += [[X-1,Y+1]]
 			if X <= 5 and Y <= 5:
-				if self.Board[X+1][Y+1][0] == enemyType and (self.Board[X+2][Y+2][0] == " " or self.Board[X+2][Y+2][0] == "-"):
+				if self.Board[X+1][Y+1] == enemyType and (self.Board[X+2][Y+2] == 0 or self.Board[X+2][Y+2] == -1):
 					outputList += [[X+2,Y+2]]
 					ToRemoveList += [[X+1,Y+1]]
 
-		elif self.Board[X][Y][0] == "B":
+		elif self.Board[X][Y] == 2 or self.Board[X][Y] == 4:
 
 			if X >= 2 and Y >= 2:
-				if self.Board[X-1][Y-1][0] == enemyType and (self.Board[X-2][Y-2][0] == " " or self.Board[X-2][Y-2][0] == "-"):
+				if self.Board[X-1][Y-1] == enemyType and (self.Board[X-2][Y-2] == 0 or self.Board[X-2][Y-2] == -1):
 					outputList += [[X-2,Y-2]]
 					ToRemoveList += [[X-1,Y-1]]
 			if X <= 5 and Y >= 2:
-				if self.Board[X+1][Y-1][0] == enemyType and (self.Board[X+2][Y-2][0] == " " or self.Board[X+2][Y-2][0] == "-"):
+				if self.Board[X+1][Y-1] == enemyType and (self.Board[X+2][Y-2] == 0 or self.Board[X+2][Y-2] == -1):
 					outputList += [[X+2,Y-2]]
 					ToRemoveList += [[X+1,Y-1]]
 
@@ -149,38 +149,43 @@ class game(object):
 		outputList = self.attackMoves(X,Y)[0]
 		if len(outputList) == 0:
 
-			if self.Board[X][Y][0] == self.Board[X][Y][1]:
+			if self.Board[X][Y] == 3 or self.Board[X][Y] == 4:
 
 				if X >= 1 and Y >= 1:
-					if self.Board[X-1][Y-1][0] == " ":
+					if self.Board[X-1][Y-1] == 0:
 						outputList += [[X-1,Y-1]]
 				if X <= 6 and Y >= 1:
-					if self.Board[X+1][Y-1][0] == " ":
+					if self.Board[X+1][Y-1] == 0:
 						outputList += [[X+1,Y-1]]
 				if X >= 1 and Y <= 6:
-					if self.Board[X-1][Y+1][0] == " ":
+					if self.Board[X-1][Y+1] == 0:
 						outputList += [[X-1,Y+1]]
 				if X <= 6 and Y <= 6:
-					if self.Board[X+1][Y+1][0] == " ":
+					if self.Board[X+1][Y+1] == 0:
 						outputList += [[X+1,Y+1]]
 
-			elif self.Board[X][Y][0] == "W":
+			elif self.Board[X][Y] == 1:
 
 				if X >= 1 and Y <= 6:
-					if self.Board[X-1][Y+1][0] == " ":
+					if self.Board[X-1][Y+1] == 0:
 						outputList += [[X-1,Y+1]]
 				if X <= 6 and Y <= 6:
-					if self.Board[X+1][Y+1][0] == " ":
+					if self.Board[X+1][Y+1] == 0:
 						outputList += [[X+1,Y+1]]
 
-			elif self.Board[X][Y][0] == "B":
+			elif self.Board[X][Y] == 2:
 
 				if X >= 1 and Y >= 1:
-					if self.Board[X-1][Y-1][0] == " ":
+					if self.Board[X-1][Y-1] == 0:
 						outputList += [[X-1,Y-1]]
 				if X <= 6 and Y >= 1:
-					if self.Board[X+1][Y-1][0] == " ":
+					if self.Board[X+1][Y-1] == 0:
 						outputList += [[X+1,Y-1]]
 
 
 		return outputList
+
+
+if (__name__ == "__main__"):
+	game = game()
+	print(game.start())
