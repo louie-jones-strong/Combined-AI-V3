@@ -185,7 +185,18 @@ class game(object):
 
 		return outputList
 
+def output(board):
+	for loop in range(8):
+		output = ""
+		for loop2 in range(8):
+			output += str(board[loop2][loop])
+		print(output)
+	print("")
+	return
 
 if (__name__ == "__main__"):
 	game = game()
-	print(game.start())
+	board = game.start()
+	output(board[0])
+	w, board, e = game.selection(1, 5)
+	output(board)

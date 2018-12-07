@@ -1,4 +1,5 @@
 from pygame import display,draw,Color
+import BruteForce as DraughtsAI
 import pygame
 import time
 import keyboard
@@ -146,7 +147,7 @@ class renderEngine(object):
 		pygame.font.init()
 		self.resolution = (800,800)
 		self.windowPostion = [0,0]
-		self.globalRotate = [45,180,0]
+		self.globalRotate = [-45, 0, 0]
 		self.FOV = 256
 		self.FPS = -1
 		self.draging = False
@@ -154,7 +155,7 @@ class renderEngine(object):
 		self.viewer_distance = 7
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
-		self.animation = True
+		self.PlayAI = True
 		self.midMoving = False
 		self.Font = pygame.font.SysFont("monospace", 15)
 		if False:
@@ -162,6 +163,12 @@ class renderEngine(object):
 			self.window = display.set_mode(self.resolution,pygame.FULLSCREEN )
 		else:
 			self.window = display.set_mode(self.resolution)
+
+		if self.PlayAI:
+			self.animation = False
+		else:
+			self.animation = True
+
 
 		temp = mouse.get_position()
 		pygame.mouse.set_pos([0,0])
@@ -275,9 +282,11 @@ class renderEngine(object):
 	def __init__(self):
 		self.setup()
 		FPS_count = 0
-		PlayAI = True
 
 		game = draughts.game()
+		AI = DraughtsAI.Main()
+		AI.Setup(2,7)
+
 		board, turn, step = game.start()
 		object3D_list = self.setup_object3D_list()
 		object3D_list += self.addPieces(board)
@@ -293,7 +302,7 @@ class renderEngine(object):
 					self.globalRotate = [-45,0,0]
 					self.midMoving = False
 
-			elif self.animation and not PlayAI: # turn 2
+			elif self.animation: # turn 2
 				if self.globalRotate != [45,180,0]:
 					self.globalRotate = [self.globalRotate[0]+(3),self.globalRotate[1]+(6),self.globalRotate[2]]
 					self.midMoving = True
@@ -301,11 +310,17 @@ class renderEngine(object):
 					self.globalRotate = [45,180,0]
 					self.midMoving = False
 
-			if (self.globalRotate == [0, 90, 0] and self.animation) or (PlayAI and turn == 2):
+			if (self.globalRotate == [0, 90, 0] and self.animation):
 				object3D_list = self.setup_object3D_list()
 				object3D_list += self.addPieces(board)
 
-			if mouse.is_pressed(button="right") and not self.midMoving and not (PlayAI and turn == 2):
+			self.update_window(object3D_list,self.globalRotate)
+
+			if keyboard.is_pressed("esc"):
+				display.quit()
+				break
+
+			if mouse.is_pressed(button="right") and not self.midMoving and not (self.PlayAI and turn == 2):
 				object3D = self.getObjectClicked(object3D_list, self.globalRotate)
 				if not object3D == None:
 					time.sleep(0.1)
@@ -318,26 +333,36 @@ class renderEngine(object):
 							object3D_list[64:-1] = self.addPieces(board)
 						if valid:
 							object3D.selected = True
-							object3D_list = self.moveableAreas(board,object3D_list)
-							
+							object3D_list = self.moveableAreas(board, object3D_list)
 
 					elif object3D.name[0:6] == "Board_" and step == 2:
 						valid, board, turn, step = game.moveCal(X, Y)
 						if valid and not self.animation:
 							object3D_list = self.setup_object3D_list()
 							object3D_list += self.addPieces(board)
-
-			if PlayAI and turn == 2:
+			
+			elif self.PlayAI and turn == 2:
 				# play ai move
 				print("run ai move!")
-				input("enter:")
+				valid = False
+				while not valid:
+					move = AI.MoveCal(board)
+					valid, board, step = game.selection(move[0], move[1])
+					if not valid:
+						AI.UpdateInvalidMove(board, move)
 
+				while not valid:
+					move = AI.MoveCal(board)
+					valid, board, turn, step = game.moveCal(move[0], move[1])
+					if not valid:
+						AI.UpdateInvalidMove(board, move)
+					
+				if (not valid):
+					self.PlayAI = False
+					self.animation = True
 
-			self.update_window(object3D_list,self.globalRotate)
-
-			if keyboard.is_pressed("esc"):
-				display.quit()
-				break
+				object3D_list = self.setup_object3D_list()
+				object3D_list += self.addPieces(board)
 
 
 			FPS_count += 1
