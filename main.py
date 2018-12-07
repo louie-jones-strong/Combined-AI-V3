@@ -285,7 +285,7 @@ class renderEngine(object):
 
 		game = draughts.game()
 		AI = DraughtsAI.Main()
-		AI.Setup(2,7)
+		AI.Setup(4,8)
 
 		board, turn, step = game.start()
 		object3D_list = self.setup_object3D_list()
@@ -350,12 +350,10 @@ class renderEngine(object):
 					valid, board, step = game.selection(move[0], move[1])
 					if not valid:
 						AI.UpdateInvalidMove(board, move)
-
-				while not valid:
-					move = AI.MoveCal(board)
-					valid, board, turn, step = game.moveCal(move[0], move[1])
-					if not valid:
-						AI.UpdateInvalidMove(board, move)
+					else:
+						valid, board, turn, step = game.moveCal(move[2], move[3])
+						if not valid:
+							AI.UpdateInvalidMove(board, move)
 					
 				if (not valid):
 					self.PlayAI = False
