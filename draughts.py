@@ -97,7 +97,7 @@ class game(object):
 		outputList = []
 		ToRemoveList = []
 
-		if self.Board[X][Y] == 1:
+		if self.Board[X][Y] == 1 or self.Board[X][Y] == 3:
 			enemyType = 2
 		else:
 			enemyType = 1
@@ -144,6 +144,13 @@ class game(object):
 					ToRemoveList += [[X+1,Y-1]]
 
 		return outputList, ToRemoveList
+	
+def IsEnemyType(allyType, piece):
+	if (allyType == 1 or allyType == 3) and (piece == 2 or piece == 4):
+		return True
+	elif (allyType == 2 or allyType == 4) and (piece == 1 or piece == 3):
+		return True
+	return False
 
 	def possibleMoves(self,X,Y):
 		outputList = self.attackMoves(X,Y)[0]
@@ -186,6 +193,7 @@ class game(object):
 		return outputList
 
 	def FlipBoard(self):
+
 		output = []
 
 		for loop in range(len(self.Board)):
@@ -204,3 +212,12 @@ class game(object):
 					
 			output += [temp]
 		return output
+
+def IsPieceSameSide(piece1, piece2):
+	if (piece1 == 1 or piece1 == 3) and (piece2 == 1 or piece2 == 3):
+		return True
+
+	elif (piece1 == 2 or piece1 == 4) and (piece2 == 2 or piece2 == 4):
+		return True
+		
+	return False

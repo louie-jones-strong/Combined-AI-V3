@@ -1,12 +1,17 @@
+import pickle
+import os
+
 class Main(object):
 
-    def Setup(self, numOfOutputs, maxOutputSize, winningModeON=False):
+    def Setup(self, numOfOutputs, maxOutputSize, winningModeON=False, loadData=True):
         self.NumOfOutputs = numOfOutputs
         self.MaxOutputSize = maxOutputSize
         self.MaxMoveIDs = maxOutputSize ** numOfOutputs
         self.WinningModeON = winningModeON
         self.DataSet = {}
         self.TempDataSet = {}
+        if loadData:
+            self.LoadDataSet()
 
         return
 
@@ -49,6 +54,7 @@ class Main(object):
     
     def UpdateData(self, fitness):
         #need to code
+        self.SaveDataSet()
         return
     
     def AddMoveToDataset(self, key, moveID, fitness, valid=True):
@@ -58,7 +64,14 @@ class Main(object):
         else:
             self.DataSet[key] = {moveID: {"Valid": valid, "TimesPlayed": 1, "Fitness": fitness}}
         return
-
+    
+    def SaveDataSet(self):
+        pickle.dump(self.DataSet, open("DataSet//DataSet.p", "wb"))
+        return
+    def LoadDataSet(self):
+        if os.path.isfile("DataSet//DataSet.p"):
+            self.DataSet = pickle.load(open("DataSet//DataSet.p", "rb"))
+        return
 
 def MoveIDToMove(moveID, numOfOutputs, maxOutputSize):
     move = []

@@ -352,10 +352,7 @@ class renderEngine(object):
 						valid, board, turn, step = game.moveCal(move[0], move[1])
 						if not valid:
 							AI.UpdateInvalidMove(board, move)
-					
-				if (not valid):
-					self.PlayAI = False
-					self.animation = True
+				AI.SaveDataSet()
 
 				object3D_list = self.setup_object3D_list()
 				object3D_list += self.addPieces(board)
