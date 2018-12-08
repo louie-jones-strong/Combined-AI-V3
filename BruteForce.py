@@ -3,7 +3,7 @@ class Main(object):
     def Setup(self, numOfOutputs, maxOutputSize, winningModeON=False):
         self.NumOfOutputs = numOfOutputs
         self.MaxOutputSize = maxOutputSize
-        self.MaxMoveIDs = maxOutputSize * numOfOutputs
+        self.MaxMoveIDs = maxOutputSize ** numOfOutputs
         self.WinningModeON = winningModeON
         self.DataSet = {}
         self.TempDataSet = {}
@@ -20,7 +20,7 @@ class Main(object):
 
             else:  # learning mode
                 dataSetItem = self.DataSet[key]
-                if len(dataSetItem) < self.MaxMoveIDs:
+                if len(dataSetItem) <= self.MaxMoveIDs:
                     moveID = len(dataSetItem)
 
                 else:
@@ -32,10 +32,11 @@ class Main(object):
                             moveID = loop
 
         self.TempDataSet[key] = moveID
-        return MoveIDToMove(moveID, self.NumOfOutputs, self.MaxOutputSize)
+        move = MoveIDToMove(moveID, self.NumOfOutputs, self.MaxOutputSize)
+        return move
     
     def UpdateInvalidMove(self, board, move):
-        print("invalid: " + str(move) + " on board: " + str(board))
+        #print("invalid: " + str(move))
         key = BoardToKey(board)
         moveID = MoveToMoveID(move, self.NumOfOutputs, self.MaxOutputSize)
 
@@ -70,10 +71,8 @@ def MoveToMoveID(move, numOfOutputs, maxOutputSize):
     moveID = 0
     for loop in range(len(move)):
         moveID += move[loop]*(maxOutputSize**((numOfOutputs - loop)-1))
-
-
     return moveID
 
 def BoardToKey(board):
-
-    return str(board)
+    board = str(board)
+    return board.replace(" ", "")

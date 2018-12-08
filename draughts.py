@@ -1,7 +1,7 @@
 class game(object):
 	def start(self):
 		self.Board = self.newBoard()
-		self.turn = 1
+		self.turn = 2
 		self.step = 1
 		self.selectedPos = [0,0]
 		return self.Board, self.turn, 1
@@ -185,18 +185,22 @@ class game(object):
 
 		return outputList
 
-def output(board):
-	for loop in range(8):
-		output = ""
-		for loop2 in range(8):
-			output += str(board[loop2][loop])
-		print(output)
-	print("")
-	return
+	def FlipBoard(self):
+		output = []
 
-if (__name__ == "__main__"):
-	game = game()
-	board = game.start()
-	output(board[0])
-	w, board, e = game.selection(1, 5)
-	output(board)
+		for loop in range(len(self.Board)):
+			temp = []
+			for loop2 in range(len(self.Board[loop])):
+				if self.Board[loop][loop2] == 1:
+					temp += [2]
+				elif self.Board[loop][loop2] == 2:
+					temp += [1]
+				elif self.Board[loop][loop2] == 3:
+					temp += [4]
+				elif self.Board[loop][loop2] == 4:
+					temp += [3]
+				else:
+					temp += [self.Board[loop][loop2]]
+					
+			output += [temp]
+		return output

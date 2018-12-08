@@ -155,6 +155,7 @@ class renderEngine(object):
 		self.viewer_distance = 7
 		self.rotation_multiplier = 2
 		self.render_mode = [False,True,True]
+		self.animation = True
 		self.PlayAI = True
 		self.midMoving = False
 		self.Font = pygame.font.SysFont("monospace", 15)
@@ -166,8 +167,6 @@ class renderEngine(object):
 
 		if self.PlayAI:
 			self.animation = False
-		else:
-			self.animation = True
 
 
 		temp = mouse.get_position()
@@ -342,16 +341,15 @@ class renderEngine(object):
 							object3D_list += self.addPieces(board)
 			
 			elif self.PlayAI and turn == 2:
-				# play ai move
-				print("run ai move!")
+				print("AI move Turn: " + str(turn))
 				valid = False
 				while not valid:
 					move = AI.MoveCal(board)
-					valid, board, step = game.selection(move[0], move[1])
+					valid, board, step = game.selection(move[2], move[3])
 					if not valid:
 						AI.UpdateInvalidMove(board, move)
 					else:
-						valid, board, turn, step = game.moveCal(move[2], move[3])
+						valid, board, turn, step = game.moveCal(move[0], move[1])
 						if not valid:
 							AI.UpdateInvalidMove(board, move)
 					
