@@ -9,7 +9,7 @@ class Main(object):
         self.MaxMoveIDs = maxOutputSize ** numOfOutputs
         self.WinningModeON = winningModeON
         self.DataSet = {}
-        self.TempDataSet = {}
+        self.TempDataSet = []
         if loadData:
             self.LoadDataSet()
 
@@ -36,7 +36,9 @@ class Main(object):
                             leastPlayed = dataSetItem[loop]["TimesPlayed"]
                             moveID = loop
 
-        self.TempDataSet[key] = moveID
+        self.TempDataSet += [{"BoardKey": key, "MoveID": moveID}]
+        self.AddMoveToDataset(key, moveID, 0, valid=True)
+
         move = MoveIDToMove(moveID, self.NumOfOutputs, self.MaxOutputSize)
         return move
     
@@ -45,24 +47,32 @@ class Main(object):
         key = BoardToKey(board)
         moveID = MoveToMoveID(move, self.NumOfOutputs, self.MaxOutputSize)
 
-        if key in self.TempDataSet:
-            if self.TempDataSet[key] == moveID:
-                self.TempDataSet.pop(key)
-
-        self.AddMoveToDataset(key, moveID, 0, valid=False)
+        self.DataSet[key][moveID]["Valid"] = False
+        self.DataSet[key][moveID]["TimesPlayed"] += 1
         return
     
     def UpdateData(self, fitness):
-        #need to code
+        for loop in range(len(self.TempDataSet)):
+            key = self.TempDataSet[loop]["BoardKey"]
+            moveID = self.TempDataSet[loop]["MoveID"]
+            
+            if self.DataSet[key][moveID]["Valid"]:
+                newFitness = self.DataSet[key][moveID]["Fitness"]*self.DataSet[key][moveID]["TimesPlayed"]
+                newFitness += fitness
+                self.DataSet[key][moveID]["TimesPlayed"] += 1
+                newFitness /= self.DataSet[key][moveID]["TimesPlayed"]
+                self.DataSet[key][moveID]["Fitness"] = newFitness
+
+        self.TempDataSet = []
         self.SaveDataSet()
         return
     
     def AddMoveToDataset(self, key, moveID, fitness, valid=True):
         #self.DataSet[key][moveID] = {"Valid": valid, "TimesPlayed": 1, "Fitness": fitness}
         if key in self.DataSet:
-            self.DataSet[key][moveID] = {"Valid": valid, "TimesPlayed": 1, "Fitness": fitness}
+            self.DataSet[key][moveID] = {"Valid": valid, "TimesPlayed": 0, "Fitness": fitness}
         else:
-            self.DataSet[key] = {moveID: {"Valid": valid, "TimesPlayed": 1, "Fitness": fitness}}
+            self.DataSet[key] = {moveID: {"Valid": valid, "TimesPlayed": 0, "Fitness": fitness}}
         return
     
     def SaveDataSet(self):
@@ -71,6 +81,8 @@ class Main(object):
     def LoadDataSet(self):
         if os.path.isfile("DataSet//DataSet.p"):
             self.DataSet = pickle.load(open("DataSet//DataSet.p", "rb"))
+
+        print("DataSet lenght: " + str(len(self.DataSet)))
         return
 
 def MoveIDToMove(moveID, numOfOutputs, maxOutputSize):

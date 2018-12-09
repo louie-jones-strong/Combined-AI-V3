@@ -96,62 +96,51 @@ class game(object):
 	def attackMoves(self,X,Y):
 		outputList = []
 		ToRemoveList = []
-
-		if self.Board[X][Y] == 1 or self.Board[X][Y] == 3:
-			enemyType = 2
-		else:
-			enemyType = 1
+		piece = self.Board[X][Y]
 
 		if self.Board[X][Y] == 3 or self.Board[X][Y] == 4:
 
 			if X >= 2 and Y >= 2:
-				if self.Board[X-1][Y-1] == enemyType and (self.Board[X-2][Y-2] == 0 or self.Board[X-2][Y-2] == -1):
+				if IsPieceEnemySide(piece, self.Board[X-1][Y-1]) and (self.Board[X-2][Y-2] == 0 or self.Board[X-2][Y-2] == -1):
 					outputList += [[X-2,Y-2]]
 					ToRemoveList += [[X-1,Y-1]]
 			if X <= 5 and Y >= 2:
-				if self.Board[X+1][Y-1] == enemyType and (self.Board[X+2][Y-2] == 0 or self.Board[X+2][Y-2] == -1):
+				if IsPieceEnemySide(piece, self.Board[X+1][Y-1]) and (self.Board[X+2][Y-2] == 0 or self.Board[X+2][Y-2] == -1):
 					outputList += [[X+2,Y-2]]
 					ToRemoveList += [[X+1,Y-1]]
 			if X >= 2 and Y <= 5:
-				if self.Board[X-1][Y+1] == enemyType and (self.Board[X-2][Y+2] == 0 or self.Board[X-2][Y+2] == -1):
+				if IsPieceEnemySide(piece, self.Board[X-1][Y+1]) and (self.Board[X-2][Y+2] == 0 or self.Board[X-2][Y+2] == -1):
 					outputList += [[X-2,Y+2]]
 					ToRemoveList += [[X-1,Y+1]]
 			if X <= 5 and Y <= 5:
-				if self.Board[X+1][Y+1] == enemyType and (self.Board[X+2][Y+2] == 0 or self.Board[X+2][Y+2] == -1):
+				if IsPieceEnemySide(piece, self.Board[X+1][Y+1]) and (self.Board[X+2][Y+2] == 0 or self.Board[X+2][Y+2] == -1):
 					outputList += [[X+2,Y+2]]
 					ToRemoveList += [[X+1,Y+1]]
 
 		elif self.Board[X][Y] == 1 or self.Board[X][Y] == 3:
 
 			if X >= 2 and Y <= 5:
-				if self.Board[X-1][Y+1] == enemyType and (self.Board[X-2][Y+2] == 0 or self.Board[X-2][Y+2] == -1):
+				if IsPieceEnemySide(piece, self.Board[X-1][Y+1]) and (self.Board[X-2][Y+2] == 0 or self.Board[X-2][Y+2] == -1):
 					outputList += [[X-2,Y+2]]
 					ToRemoveList += [[X-1,Y+1]]
 			if X <= 5 and Y <= 5:
-				if self.Board[X+1][Y+1] == enemyType and (self.Board[X+2][Y+2] == 0 or self.Board[X+2][Y+2] == -1):
+				if IsPieceEnemySide(piece, self.Board[X+1][Y+1]) and (self.Board[X+2][Y+2] == 0 or self.Board[X+2][Y+2] == -1):
 					outputList += [[X+2,Y+2]]
 					ToRemoveList += [[X+1,Y+1]]
 
 		elif self.Board[X][Y] == 2 or self.Board[X][Y] == 4:
 
 			if X >= 2 and Y >= 2:
-				if self.Board[X-1][Y-1] == enemyType and (self.Board[X-2][Y-2] == 0 or self.Board[X-2][Y-2] == -1):
+				if IsPieceEnemySide(piece, self.Board[X-1][Y-1]) and (self.Board[X-2][Y-2] == 0 or self.Board[X-2][Y-2] == -1):
 					outputList += [[X-2,Y-2]]
 					ToRemoveList += [[X-1,Y-1]]
 			if X <= 5 and Y >= 2:
-				if self.Board[X+1][Y-1] == enemyType and (self.Board[X+2][Y-2] == 0 or self.Board[X+2][Y-2] == -1):
+				if IsPieceEnemySide(piece, self.Board[X+1][Y-1]) and (self.Board[X+2][Y-2] == 0 or self.Board[X+2][Y-2] == -1):
 					outputList += [[X+2,Y-2]]
 					ToRemoveList += [[X+1,Y-1]]
 
 		return outputList, ToRemoveList
 	
-def IsEnemyType(allyType, piece):
-	if (allyType == 1 or allyType == 3) and (piece == 2 or piece == 4):
-		return True
-	elif (allyType == 2 or allyType == 4) and (piece == 1 or piece == 3):
-		return True
-	return False
-
 	def possibleMoves(self,X,Y):
 		outputList = self.attackMoves(X,Y)[0]
 		if len(outputList) == 0:
@@ -192,6 +181,32 @@ def IsEnemyType(allyType, piece):
 
 		return outputList
 
+	def CheckFinished(self):
+		finished = False
+		player1Fitness = 0
+		player2Fitness = 0
+
+		type1Count = 0
+		type2Count = 0
+		for x in range(len(self.Board)):
+			for y in range(len(self.Board[x])):
+				if self.Board[x][y] == 1 or self.Board[x][y] == 3:
+					 type1Count += 1
+				elif self.Board[x][y] == 2 or self.Board[x][y] == 4:
+					type2Count += 1
+		
+		if type1Count == 0:
+			finished = True
+			player1Fitness = -5
+			player2Fitness = 5
+
+		if type2Count == 0:
+			finished = True
+			player1Fitness = 5
+			player2Fitness = -5
+
+		return finished, player1Fitness, player2Fitness
+
 	def FlipBoard(self):
 
 		output = []
@@ -218,6 +233,15 @@ def IsPieceSameSide(piece1, piece2):
 		return True
 
 	elif (piece1 == 2 or piece1 == 4) and (piece2 == 2 or piece2 == 4):
+		return True
+		
+	return False
+
+def IsPieceEnemySide(piece1, piece2):
+	if (piece1 == 1 or piece1 == 3) and (piece2 == 2 or piece2 == 4):
+		return True
+
+	elif (piece1 == 2 or piece1 == 4) and (piece2 == 1 or piece2 == 3):
 		return True
 		
 	return False

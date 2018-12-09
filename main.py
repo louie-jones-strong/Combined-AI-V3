@@ -293,25 +293,26 @@ class renderEngine(object):
 
 		time_taken = time.time()
 		while True:		
-			if turn == 1 and self.animation:  # turn 1
-				if self.globalRotate != [-45,0,0]:
-					self.globalRotate = [self.globalRotate[0]+(-3),self.globalRotate[1]+(-6),self.globalRotate[2]]
-					self.midMoving = True
-				else:
-					self.globalRotate = [-45,0,0]
-					self.midMoving = False
+			if self.animation:
+				if turn == 1:  # turn 1
+					if self.globalRotate != [-45,0,0]:
+						self.globalRotate = [self.globalRotate[0]+(-3),self.globalRotate[1]+(-6),self.globalRotate[2]]
+						self.midMoving = True
+					else:
+						self.globalRotate = [-45,0,0]
+						self.midMoving = False
 
-			elif self.animation: # turn 2
-				if self.globalRotate != [45,180,0]:
-					self.globalRotate = [self.globalRotate[0]+(3),self.globalRotate[1]+(6),self.globalRotate[2]]
-					self.midMoving = True
-				else:
-					self.globalRotate = [45,180,0]
-					self.midMoving = False
+				else: # turn 2
+					if self.globalRotate != [45,180,0]:
+						self.globalRotate = [self.globalRotate[0]+(3),self.globalRotate[1]+(6),self.globalRotate[2]]
+						self.midMoving = True
+					else:
+						self.globalRotate = [45,180,0]
+						self.midMoving = False
 
-			if (self.globalRotate == [0, 90, 0] and self.animation):
-				object3D_list = self.setup_object3D_list()
-				object3D_list += self.addPieces(board)
+				if (self.globalRotate == [0, 90, 0]):
+					object3D_list = self.setup_object3D_list()
+					object3D_list += self.addPieces(board)
 
 			self.update_window(object3D_list,self.globalRotate)
 
@@ -356,6 +357,12 @@ class renderEngine(object):
 
 				object3D_list = self.setup_object3D_list()
 				object3D_list += self.addPieces(board)
+
+			finished, fit1, fit2 = game.CheckFinished()
+			if finished:
+				print("fitness: " + str(fit2))
+				AI.UpdateData(fit2)
+				board, turn, step = game.start()
 
 
 			FPS_count += 1
