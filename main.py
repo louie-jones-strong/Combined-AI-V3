@@ -283,8 +283,10 @@ class renderEngine(object):
 		FPS_count = 0
 
 		game = draughts.game()
-		AI = DraughtsAI.Main()
-		AI.Setup(4,8)
+		AI1 = DraughtsAI.Main()
+		AI2 = DraughtsAI.Main()
+		AI1.Setup(4,8,loadData=False)
+		AI2.Setup(4,8,loadData=False)
 
 		board, turn, step = game.start()
 		object3D_list = self.setup_object3D_list()
@@ -320,7 +322,7 @@ class renderEngine(object):
 				display.quit()
 				break
 
-			if mouse.is_pressed(button="right") and not self.midMoving and not (self.PlayAI and turn == 2):
+			if mouse.is_pressed(button="right") and not self.midMoving and not (self.PlayAI and turn == 2) and False:
 				object3D = self.getObjectClicked(object3D_list, self.globalRotate)
 				if not object3D == None:
 					time.sleep(0.1)
@@ -341,27 +343,43 @@ class renderEngine(object):
 							object3D_list = self.setup_object3D_list()
 							object3D_list += self.addPieces(board)
 			
+			elif self.PlayAI and turn == 1:
+				print("AI move Turn: " + str(turn))
+				valid = False
+				while not valid:
+					move = AI1.MoveCal(game.FlipBoard())
+					valid, board, step = game.selection(move[0], move[1])
+					if not valid:
+						AI1.UpdateInvalidMove(game.FlipBoard(), move)
+					else:
+						valid, board, turn, step = game.moveCal(move[2], move[3])
+						if not valid:
+							AI1.UpdateInvalidMove(game.FlipBoard(), move)
+
+				object3D_list = self.setup_object3D_list()
+				object3D_list += self.addPieces(board)
+
 			elif self.PlayAI and turn == 2:
 				print("AI move Turn: " + str(turn))
 				valid = False
 				while not valid:
-					move = AI.MoveCal(board)
-					valid, board, step = game.selection(move[2], move[3])
+					move = AI2.MoveCal(board)
+					valid, board, step = game.selection(move[0], move[1])
 					if not valid:
-						AI.UpdateInvalidMove(board, move)
+						AI2.UpdateInvalidMove(board, move)
 					else:
-						valid, board, turn, step = game.moveCal(move[0], move[1])
+						valid, board, turn, step = game.moveCal(move[2], move[3])
 						if not valid:
-							AI.UpdateInvalidMove(board, move)
-				AI.SaveDataSet()
+							AI2.UpdateInvalidMove(board, move)
 
 				object3D_list = self.setup_object3D_list()
 				object3D_list += self.addPieces(board)
 
 			finished, fit1, fit2 = game.CheckFinished()
 			if finished:
-				print("fitness: " + str(fit2))
-				AI.UpdateData(fit2)
+				print("finished")
+				AI1.UpdateData(fit1)
+				AI2.UpdateData(fit2)
 				board, turn, step = game.start()
 
 

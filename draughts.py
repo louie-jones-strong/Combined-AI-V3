@@ -181,6 +181,23 @@ class game(object):
 
 		return outputList
 
+	def CheckIfDrawed(self):
+		type1Moves = 0
+		type2Moves = 0
+		for x in range(len(self.Board)):
+			for y in range(len(self.Board[x])):
+				if IsPieceSameSide(self.Board[x][y], 1):
+					if self.possibleMoves(x,y):
+						type1Moves += 1
+
+				elif IsPieceSameSide(self.Board[x][y], 2):
+					if self.possibleMoves(x,y):
+						type2Moves += 1
+
+		if type1Moves == 0 or type2Moves == 0:
+			return True
+		return False
+
 	def CheckFinished(self):
 		finished = False
 		player1Fitness = 0
@@ -204,6 +221,13 @@ class game(object):
 			finished = True
 			player1Fitness = 5
 			player2Fitness = -5
+
+		if self.CheckIfDrawed():
+			finished = True
+			player1Fitness = 3
+			player2Fitness = 3
+
+
 
 		return finished, player1Fitness, player2Fitness
 
