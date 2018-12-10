@@ -1,20 +1,35 @@
 import pickle
 import os
 
+class DataSetmanager(object):
+    DataSet = {}
+    def __init__(self, loadData=True):
+
+        self.DataSet = {}
+        if loadData:
+            self.LoadDataSet()
+
+        return
+    
+    def SaveDataSet(self):
+        pickle.dump(self.DataSet, open("DataSet//DataSet.p", "wb"))
+        return
+    def LoadDataSet(self):
+        if os.path.isfile("DataSet//DataSet.p"):
+            self.DataSet = pickle.load(open("DataSet//DataSet.p", "rb"))
+
+        print("DataSet lenght: " + str(len(self.DataSet)))
+        return
+
 class Main(object):
 
-    def Setup(self, numOfOutputs, maxOutputSize, winningModeON=False, loadData=True):
+    def __init__(self, numOfOutputs, maxOutputSize, winningModeON=False, loadData=True):
         self.NumOfOutputs = numOfOutputs
         self.MaxOutputSize = maxOutputSize
         self.MaxMoveIDs = maxOutputSize ** numOfOutputs
         self.WinningModeON = winningModeON
 
-        #split out the brain
-        self.DataSet = {}
         self.TempDataSet = []
-        if loadData:
-            self.LoadDataSet()
-
         return
 
     def MoveCal(self, board):
@@ -88,16 +103,6 @@ class Main(object):
 
         self.TempDataSet = []
         self.SaveDataSet()
-        return
-
-    def SaveDataSet(self):
-        pickle.dump(self.DataSet, open("DataSet//DataSet.p", "wb"))
-        return
-    def LoadDataSet(self):
-        if os.path.isfile("DataSet//DataSet.p"):
-            self.DataSet = pickle.load(open("DataSet//DataSet.p", "rb"))
-
-        print("DataSet lenght: " + str(len(self.DataSet)))
         return
 
 def MoveIDToMove(moveID, numOfOutputs, maxOutputSize):
