@@ -4,11 +4,15 @@ import os
 class DataSetmanager(object):
     DataSet = {}
     def __init__(self, loadData=True):
-
+        self.RunningAIs = []
         self.DataSet = {}
         if loadData:
             self.LoadDataSet()
 
+        return
+
+    def SetupNewAI(self):
+        self.RunningAIs += []
         return
     
     def SaveDataSet(self):
