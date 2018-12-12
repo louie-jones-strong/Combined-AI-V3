@@ -1,16 +1,31 @@
 import pickle
 import os
 
-class DataSetmanager(object):
+class DataSetManager(object):
     DataSet = {}
-    def __init__(self, loadData=True):
+    MoveIDLookUp = []
+    MaxMoveIDs = 0
+    
+    def __init__(self, numOfOutputs, maxOutputSize, outputResolution, loadData=True):
+        self.NumOfOutputs = numOfOutputs
+        self.MaxOutputSize = maxOutputSize
+        self.MaxMoveIDs = maxOutputSize ** numOfOutputs
+
         self.RunningAIs = []
         self.DataSet = {}
+        self.MoveIDLookUp = self.BuildMoveIDLookUp()
         if loadData:
             self.LoadDataSet()
 
         return
 
+    def BuildMoveIDLookUp(self):
+        moveIDLookUp = []
+        for loop in range(self.MaxMoveIDs):
+            moveIDLookUp += [self.MoveIDToMove(loop)]
+
+        return moveIDLookUp
+    
     def SetupNewAI(self):
         self.RunningAIs += []
         return
@@ -18,35 +33,43 @@ class DataSetmanager(object):
     def SaveDataSet(self):
         pickle.dump(self.DataSet, open("DataSet//DataSet.p", "wb"))
         return
+    
     def LoadDataSet(self):
         if os.path.isfile("DataSet//DataSet.p"):
             self.DataSet = pickle.load(open("DataSet//DataSet.p", "rb"))
 
         print("DataSet lenght: " + str(len(self.DataSet)))
         return
+    
+    def MoveIDToMove(self, moveID):
+        #maybe make this a lookuptabel in stead but will use more memory
+        move = []
+        for loop in range(self.NumOfOutputs):
+            move += [int(moveID / (self.MaxOutputSize)**((self.NumOfOutputs - loop)-1))]
+            moveID = moveID % (self.MaxOutputSize)**((self.NumOfOutputs - loop)-1)
+        return move
+
 
 class Main(object):
 
-    def __init__(self, numOfOutputs, maxOutputSize, winningModeON=False, loadData=True):
-        self.NumOfOutputs = numOfOutputs
-        self.MaxOutputSize = maxOutputSize
-        self.MaxMoveIDs = maxOutputSize ** numOfOutputs
+    def __init__(self, dataSetManager, winningModeON=False):
+        self.DataSetManager = dataSetManager
         self.WinningModeON = winningModeON
 
         self.TempDataSet = []
         return
 
     def MoveCal(self, board):
-        key = BoardToKey(board)
+        key = self.BoardToKey(board)
 
         if self.WinningModeON:
             print("winnning mode!")
 
         else:  # learning mode
-            if key in self.DataSet:
-                dataSetItem = self.DataSet[key]
+            if key in self.DataSetManager.DataSet:
+                dataSetItem = self.DataSetManager.DataSet[key]
 
-                if dataSetItem.NumOfTriedMoves < self.MaxMoveIDs:
+                if dataSetItem.NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
                     moveID = dataSetItem.NumOfTriedMoves
                     dataSetItem.Moves += [MoveInfo(MoveID=moveID)]
                     dataSetItem.NumOfTriedMoves += 1
@@ -64,24 +87,24 @@ class Main(object):
                             pickedItem = loop
                     
                     dataSetItem.Moves[pickedItem].TimesPlayed += 1
-                self.DataSet[key] = dataSetItem
+                self.DataSetManager.DataSet[key] = dataSetItem
 
             else:
                 moveID = 0
-                self.DataSet[key] = BoardInfo(Moves=[MoveInfo(MoveID=0)])
+                self.DataSetManager.DataSet[key] = BoardInfo(Moves=[MoveInfo(MoveID=0)])
 
 
 
 
         self.TempDataSet += [{"BoardKey": key, "MoveID": moveID}]
-        move = MoveIDToMove(moveID, self.NumOfOutputs, self.MaxOutputSize)
+        move = self.DataSetManager.MoveIDLookUp[moveID]
         return move
 
     def UpdateInvalidMove(self, board, move):
-        key = BoardToKey(board)
-        moveID = MoveToMoveID(move, self.NumOfOutputs, self.MaxOutputSize)
+        key = self.BoardToKey(board)
+        moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
-        moves = self.DataSet[key].Moves
+        moves = self.DataSetManager.DataSet[key].Moves
         for loop in range(len(moves)-1, -1, -1):
             if moves[loop].MoveID == moveID:
                 del moves[loop]
@@ -89,7 +112,7 @@ class Main(object):
 
         self.TempDataSet.remove({"BoardKey": key, "MoveID": moveID})
 
-        self.DataSet[key].Moves = moves
+        self.DataSetManager.DataSet[key].Moves = moves
 
         return
     
@@ -109,25 +132,10 @@ class Main(object):
         self.SaveDataSet()
         return
 
-def MoveIDToMove(moveID, numOfOutputs, maxOutputSize):
-    #maybe make this a lookuptabel in stead but will use more memory
-    move = []
-    for loop in range(numOfOutputs):
-        move += [int(moveID / (maxOutputSize)**((numOfOutputs - loop)-1))]
-        moveID = moveID % (maxOutputSize)**((numOfOutputs - loop)-1)
-    return move
-
-def MoveToMoveID(move, numOfOutputs, maxOutputSize):
-    #maybe make this a lookuptabel in stead but will use more memory
-    moveID = 0
-    for loop in range(len(move)):
-        moveID += move[loop]*(maxOutputSize**((numOfOutputs - loop)-1))
-    return moveID
-
-def BoardToKey(board):
-    board = str(board)
-    return board.replace(" ", "")
-
+    def BoardToKey(self, board):
+        board = str(board)
+        return board.replace(" ", "")
+        
 class BoardInfo():
     NumOfTriedMoves = 1
     Moves = []
