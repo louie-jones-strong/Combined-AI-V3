@@ -283,10 +283,9 @@ class renderEngine(object):
 		FPS_count = 0
 
 		game = draughts.game()
-		AI1 = DraughtsAI.Main()
-		AI2 = DraughtsAI.Main()
-		AI1.Setup(4,8,loadData=False)
-		AI2.Setup(4,8,loadData=False)
+		DataSetManager = DraughtsAI.DataSetManager(4,8,loadData=False)
+		AI1 = DraughtsAI.Main(DataSetManager)
+		AI2 = DraughtsAI.Main(DataSetManager)
 
 		board, turn, step = game.start()
 		object3D_list = self.setup_object3D_list()
@@ -391,5 +390,59 @@ class renderEngine(object):
 
 		return	
 
+def GameLoop():
+	game = draughts.game()
+	DataSetManager = DraughtsAI.DataSetManager(4, 8)
+	AI1 = DraughtsAI.Main(DataSetManager)
+	AI2 = DraughtsAI.Main(DataSetManager)
+	board, turn, step = game.start()
+
+	numGames = 0
+	numMoves = 0
+
+	time_taken = time.time()
+	while True:
+		valid = False
+		if turn == 1:
+			while not valid:
+				move = AI1.MoveCal(game.FlipBoard())
+				valid, board, step = game.selection(move[0], move[1])
+				if not valid:
+					AI1.UpdateInvalidMove(game.FlipBoard(), move)
+				else:
+					valid, board, turn, step = game.moveCal(move[2], move[3])
+					if not valid:
+						AI1.UpdateInvalidMove(game.FlipBoard(), move)
+		else:
+			while not valid:
+				move = AI2.MoveCal(board)
+				valid, board, step = game.selection(move[0], move[1])
+				if not valid:
+					AI2.UpdateInvalidMove(board, move)
+				else:
+					valid, board, turn, step = game.moveCal(move[2], move[3])
+					if not valid:
+						AI2.UpdateInvalidMove(board, move)
+
+		
+		numMoves += 1
+		if numMoves % 10 == 0:
+			print("done " + str(numMoves) + " moves in " + str(time.time() - time_taken) + " seconds")
+
+		finished, fit1, fit2 = game.CheckFinished()
+		if finished:
+			print("finished game: " + str(numGames+1))
+			AI1.UpdateData(fit1)
+			AI2.UpdateData(fit2)
+			board, turn, step = game.start()
+			print("finished game: " + str(numGames+1) + " with " + str(numMoves) + "moves made")
+			print("game took: " + str(time.time() - time_taken) + " seconds")
+			time_taken = time.time()
+
+			numGames += 1
+			numMoves = 0
+	return
+
 if __name__ == "__main__":
-	renderEngine()
+	GameLoop()
+	#renderEngine()

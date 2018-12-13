@@ -6,7 +6,7 @@ class DataSetManager(object):
     MoveIDLookUp = []
     MaxMoveIDs = 0
     
-    def __init__(self, numOfOutputs, maxOutputSize, outputResolution, loadData=True):
+    def __init__(self, numOfOutputs, maxOutputSize, outputResolution=1, loadData=True):
         self.NumOfOutputs = numOfOutputs
         self.MaxOutputSize = maxOutputSize
         self.MaxMoveIDs = maxOutputSize ** numOfOutputs
@@ -27,11 +27,23 @@ class DataSetManager(object):
         return moveIDLookUp
     
     def SetupNewAI(self):
-        self.RunningAIs += []
-        return
+        AiNumber = len(self.RunningAIs)
+        self.RunningAIs += [False]
+        return AiNumber
     
-    def SaveDataSet(self):
-        pickle.dump(self.DataSet, open("DataSet//DataSet.p", "wb"))
+    def SaveDataSet(self, AiNumber):
+        self.RunningAIs[AiNumber] = True
+        canSave = True
+
+        for loop in range(len(self.RunningAIs)):
+            if self.RunningAIs[loop] == False:
+                canSave = False
+
+        if canSave:
+            pickle.dump(self.DataSet, open("DataSet//DataSet.p", "wb"))
+            #add a save to save on boards
+            for loop in range(len(self.RunningAIs)):
+                self.RunningAIs[loop] = False
         return
     
     def LoadDataSet(self):
@@ -57,6 +69,8 @@ class Main(object):
         self.WinningModeON = winningModeON
 
         self.TempDataSet = []
+
+        self.AiNumber = self.DataSetManager.SetupNewAI()
         return
 
     def MoveCal(self, board):
@@ -120,22 +134,25 @@ class Main(object):
         for loop in range(len(self.TempDataSet)):
             key = self.TempDataSet[loop]["BoardKey"]
             moveID = self.TempDataSet[loop]["MoveID"]
+
+            datasetItem = self.DataSetManager.DataSet[key].Moves[moveID]
             
-            if self.DataSet[key][moveID]["Valid"]:
-                newFitness = self.DataSet[key][moveID]["Fitness"]*self.DataSet[key][moveID]["TimesPlayed"]
-                newFitness += fitness
-                self.DataSet[key][moveID]["TimesPlayed"] += 1
-                newFitness /= self.DataSet[key][moveID]["TimesPlayed"]
-                self.DataSet[key][moveID]["Fitness"] = newFitness
+            newFitness = datasetItem.AvgFitness*datasetItem.TimesPlayed
+            newFitness += fitness
+            datasetItem.TimesPlayed += 1
+            newFitness /= datasetItem.TimesPlayed
+            datasetItem.AvgFitness = newFitness
+
+            self.DataSetManager.DataSet[key].Moves[moveID] = datasetItem
 
         self.TempDataSet = []
-        self.SaveDataSet()
+        self.DataSetManager.SaveDataSet(self.AiNumber)
         return
 
     def BoardToKey(self, board):
         board = str(board)
         return board.replace(" ", "")
-        
+
 class BoardInfo():
     NumOfTriedMoves = 1
     Moves = []
