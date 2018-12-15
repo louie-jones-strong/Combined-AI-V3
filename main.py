@@ -6,6 +6,7 @@ import keyboard
 import mouse
 import math
 import draughts
+import os
 
 class face(object):
 	def __init__(self, points, colour=[255,255,255]):
@@ -283,11 +284,11 @@ class renderEngine(object):
 		FPS_count = 0
 
 		game = draughts.game()
-		DataSetManager = DraughtsAI.DataSetManager(4,8,loadData=False)
+		DataSetManager = DraughtsAI.DataSetManager(4, 8)
 		AI1 = DraughtsAI.Main(DataSetManager)
 		AI2 = DraughtsAI.Main(DataSetManager)
-
 		board, turn, step = game.start()
+
 		object3D_list = self.setup_object3D_list()
 		object3D_list += self.addPieces(board)
 
@@ -343,7 +344,6 @@ class renderEngine(object):
 							object3D_list += self.addPieces(board)
 			
 			elif self.PlayAI and turn == 1:
-				print("AI move Turn: " + str(turn))
 				valid = False
 				while not valid:
 					move = AI1.MoveCal(game.FlipBoard())
@@ -359,7 +359,6 @@ class renderEngine(object):
 				object3D_list += self.addPieces(board)
 
 			elif self.PlayAI and turn == 2:
-				print("AI move Turn: " + str(turn))
 				valid = False
 				while not valid:
 					move = AI2.MoveCal(board)
@@ -390,6 +389,20 @@ class renderEngine(object):
 
 		return	
 
+def SimpleOutput(board):
+	os.system("cls")
+	for loop in range(len(board)):
+		temp = ""
+		for loop2 in range(len(board[loop])):
+			if board[loop2][loop] == 0:
+				temp += "   "
+			else:
+				temp += " " + str(board[loop2][loop]) + " "
+
+
+		print(temp)
+	return
+
 def GameLoop():
 	game = draughts.game()
 	DataSetManager = DraughtsAI.DataSetManager(4, 8)
@@ -401,6 +414,7 @@ def GameLoop():
 	numMoves = 0
 
 	time_taken = time.time()
+	MoveTime = time.time()
 	while True:
 		valid = False
 		if turn == 1:
@@ -424,23 +438,29 @@ def GameLoop():
 					if not valid:
 						AI2.UpdateInvalidMove(board, move)
 
-		
+		#SimpleOutput(board)
 		numMoves += 1
 		if numMoves % 10 == 0:
-			print("done " + str(numMoves) + " moves in " + str(time.time() - time_taken) + " seconds")
+			print("done " + str(numMoves) + " moves in " + str(time.time() - MoveTime) + " seconds")
+			MoveTime = time.time()
 
 		finished, fit1, fit2 = game.CheckFinished()
 		if finished:
-			print("finished game: " + str(numGames+1))
 			AI1.UpdateData(fit1)
 			AI2.UpdateData(fit2)
 			board, turn, step = game.start()
-			print("finished game: " + str(numGames+1) + " with " + str(numMoves) + "moves made")
-			print("game took: " + str(time.time() - time_taken) + " seconds")
-			time_taken = time.time()
+			print("finished game: " + str(numGames+1) + " with " + str(numMoves) + " moves made")
+			print("each move took on AVG: " + str((time.time() - time_taken)/numMoves) + " seconds")
+			print("game in total took: " + str(time.time() - time_taken) + " seconds")
 
 			numGames += 1
 			numMoves = 0
+
+			input("start next game: ")
+			print("")
+			print("")
+			time_taken = time.time()
+			MoveTime = time.time()
 	return
 
 if __name__ == "__main__":

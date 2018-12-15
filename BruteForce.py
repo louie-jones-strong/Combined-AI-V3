@@ -81,31 +81,35 @@ class Main(object):
 
         else:  # learning mode
             if key in self.DataSetManager.DataSet:
-                dataSetItem = self.DataSetManager.DataSet[key]
+                
+                if not self.DataSetManager.DataSet[key].NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
+                    if len(self.DataSetManager.DataSet[key].Moves) == 0:
+                        print("error!")
+                        self.DataSetManager.DataSet[key].NumOfTriedMoves = 0
 
-                if dataSetItem.NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
-                    moveID = dataSetItem.NumOfTriedMoves
-                    dataSetItem.Moves += [MoveInfo(MoveID=moveID)]
-                    dataSetItem.NumOfTriedMoves += 1
+                if self.DataSetManager.DataSet[key].NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
+                    moveID = self.DataSetManager.DataSet[key].NumOfTriedMoves
+                    self.DataSetManager.DataSet[key].Moves += [MoveInfo(MoveID=moveID)]
+                    self.DataSetManager.DataSet[key].NumOfTriedMoves += 1
 
                 else:
-                    Moves = dataSetItem.Moves
-                    leastPlayed = Moves[0].TimesPlayed
-                    moveID = Moves[0].MoveID
+                    leastPlayed = self.DataSetManager.DataSet[key].Moves[0].TimesPlayed
+                    moveID = self.DataSetManager.DataSet[key].Moves[0].MoveID
+                    pickedItem = 0
 
-                    for loop in range(1,len(Moves)):
+                    for loop in range(1,len(self.DataSetManager.DataSet[key].Moves)):
                         
-                        if Moves[loop].TimesPlayed < leastPlayed:
-                            leastPlayed = Moves[loop].TimesPlayed
-                            moveID = Moves[loop].MoveID
+                        if self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed < leastPlayed:
+                            leastPlayed = self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed
+                            moveID = self.DataSetManager.DataSet[key].Moves[loop].MoveID
                             pickedItem = loop
                     
-                    dataSetItem.Moves[pickedItem].TimesPlayed += 1
-                self.DataSetManager.DataSet[key] = dataSetItem
+                    self.DataSetManager.DataSet[key].Moves[pickedItem].TimesPlayed += 1
 
             else:
                 moveID = 0
-                self.DataSetManager.DataSet[key] = BoardInfo(Moves=[MoveInfo(MoveID=0)])
+                moveInfo = MoveInfo(MoveID=moveID)
+                self.DataSetManager.DataSet[key] = BoardInfo(Moves=[moveInfo])
 
 
 
@@ -118,15 +122,13 @@ class Main(object):
         key = self.BoardToKey(board)
         moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
-        moves = self.DataSetManager.DataSet[key].Moves
-        for loop in range(len(moves)-1, -1, -1):
-            if moves[loop].MoveID == moveID:
-                del moves[loop]
+        for loop in range(len(self.DataSetManager.DataSet[key].Moves)-1, -1, -1):
+            if self.DataSetManager.DataSet[key].Moves[loop].MoveID == moveID:
+                del self.DataSetManager.DataSet[key].Moves[loop]
                 break
 
         self.TempDataSet.remove({"BoardKey": key, "MoveID": moveID})
 
-        self.DataSetManager.DataSet[key].Moves = moves
 
         return
     
@@ -135,15 +137,15 @@ class Main(object):
             key = self.TempDataSet[loop]["BoardKey"]
             moveID = self.TempDataSet[loop]["MoveID"]
 
-            datasetItem = self.DataSetManager.DataSet[key].Moves[moveID]
-            
-            newFitness = datasetItem.AvgFitness*datasetItem.TimesPlayed
-            newFitness += fitness
-            datasetItem.TimesPlayed += 1
-            newFitness /= datasetItem.TimesPlayed
-            datasetItem.AvgFitness = newFitness
+            for loop in range(len(self.DataSetManager.DataSet[key].Moves)-1, -1, -1):
+                if self.DataSetManager.DataSet[key].Moves[loop].MoveID == moveID:
 
-            self.DataSetManager.DataSet[key].Moves[moveID] = datasetItem
+                    newFitness = self.DataSetManager.DataSet[key].Moves[loop].AvgFitness*self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed
+                    newFitness += fitness
+                    self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed += 1
+                    newFitness /= self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed
+                    self.DataSetManager.DataSet[key].Moves[loop].AvgFitness = newFitness
+                    break
 
         self.TempDataSet = []
         self.DataSetManager.SaveDataSet(self.AiNumber)
@@ -158,8 +160,8 @@ class BoardInfo():
     Moves = []
 
     def __init__(self, NumOfTriedMoves=1, Moves=[]):
-        NumOfTriedMoves = NumOfTriedMoves
-        Moves = Moves
+        self.NumOfTriedMoves = NumOfTriedMoves
+        self.Moves = Moves
         return
 
 class MoveInfo():
@@ -168,7 +170,7 @@ class MoveInfo():
     MoveID = 0
 
     def __init__(self, AvgFitness=0.0, TimesPlayed=1, MoveID=0):
-        AvgFitness = AvgFitness
-        TimesPlayed = TimesPlayed
-        MoveID = MoveID
+        self.AvgFitness = AvgFitness
+        self.TimesPlayed = TimesPlayed
+        self.MoveID = MoveID
         return
