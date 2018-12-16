@@ -79,6 +79,26 @@ class BruteForce(object):
 
 		if self.WinningModeON:
 			print("winnning mode!")
+			if key in self.DataSetManager.DataSet:
+				
+				if not self.DataSetManager.DataSet[key].NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
+					if len(self.DataSetManager.DataSet[key].Moves) == 0:
+						print("error!")
+						self.DataSetManager.DataSet[key].NumOfTriedMoves = 0
+
+				else:#played every board once already
+					bestAvgFitness = self.DataSetManager.DataSet[key].Moves[0].AvgFitness
+					moveID = self.DataSetManager.DataSet[key].Moves[0].MoveID
+
+					for loop in range(1,len(self.DataSetManager.DataSet[key].Moves)):
+						
+						if self.DataSetManager.DataSet[key].Moves[loop].AvgFitness > bestAvgFitness:
+							bestAvgFitness = self.DataSetManager.DataSet[key].Moves[loop].AvgFitness
+							moveID = self.DataSetManager.DataSet[key].Moves[loop].MoveID
+
+			else:#never played board before
+				moveID = 0
+				print("new Board!")
 
 		else:  # learning mode
 			if key in self.DataSetManager.DataSet:
@@ -93,7 +113,7 @@ class BruteForce(object):
 					self.DataSetManager.DataSet[key].Moves += [MoveInfo(MoveID=moveID)]
 					self.DataSetManager.DataSet[key].NumOfTriedMoves += 1
 
-				else:
+				else:#played every board once already
 					leastPlayed = self.DataSetManager.DataSet[key].Moves[0].TimesPlayed
 					moveID = self.DataSetManager.DataSet[key].Moves[0].MoveID
 					pickedItem = 0
@@ -107,15 +127,14 @@ class BruteForce(object):
 					
 					self.DataSetManager.DataSet[key].Moves[pickedItem].TimesPlayed += 1
 
-			else:
+			else:#never played board before
 				moveID = 0
 				moveInfo = MoveInfo(MoveID=moveID)
 				self.DataSetManager.DataSet[key] = BoardInfo(Moves=[moveInfo])
 
+			self.TempDataSet += [{"BoardKey": key, "MoveID": moveID}]
 
 
-
-		self.TempDataSet += [{"BoardKey": key, "MoveID": moveID}]
 		move = self.DataSetManager.MoveIDLookUp[moveID]
 		return move
 
