@@ -294,7 +294,7 @@ class RenderEngine(object):
 
 		#AutoMovingCamera
 		self.globalRotate = [-45, 0, 0]
-		self.AutoMovingCameraOn = True
+		self.AutoMovingCameraOn = False
 		self.midMoving = False
 		self.Turn = 1
 

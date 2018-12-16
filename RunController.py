@@ -7,7 +7,7 @@ import os
 class RunController(object):
 	def __init__(self):
 		#setting 
-		self.RenderQuality = 1
+		self.RenderQuality = 0
 		self.NumberOfBots = 2
 
 		self.WinningMode = False
@@ -26,6 +26,7 @@ class RunController(object):
 
 	def Render(self, board=None, turn=None):
 		if self.RenderQuality == 1 and board != None:
+			os.system("cls")
 			Game.SimpleOutput(board)
 
 		elif self.RenderQuality == 2:

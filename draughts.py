@@ -293,3 +293,4 @@ def IsPieceEnemySide(piece1, piece2):
 #todo list 
 #1) must take peice
 #2) take more then one peice at once
+#3) flip in put
