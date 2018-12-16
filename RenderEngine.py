@@ -244,6 +244,26 @@ class RenderEngine(object):
 			self.globalRotate[1] = (self.globalRotate[1] + 360*change[1])%360 
 			self.startPos = finishPos
 		return
+	def AutoMoveCamera(self):
+		if self.Turn == 1:  # turn 1
+			if self.globalRotate != [-45,0,0]:
+				self.globalRotate = [self.globalRotate[0]+(-3),self.globalRotate[1]+(-6),self.globalRotate[2]]
+				self.midMoving = True
+			else:
+				self.globalRotate = [-45,0,0]
+				self.midMoving = False
+				
+		else: # turn 2
+			if self.globalRotate != [45,180,0]:
+				self.globalRotate = [self.globalRotate[0]+(3),self.globalRotate[1]+(6),self.globalRotate[2]]
+				self.midMoving = True
+			else:
+				self.globalRotate = [45,180,0]
+				self.midMoving = False
+		#if (self.globalRotate == [0, 90, 0]):
+		#	object3D_list = self.setup_object3D_list()
+		#	object3D_list += self.addPieces(board)
+		return
 
 	def CheckButtons(self):
 
@@ -272,11 +292,14 @@ class RenderEngine(object):
 		self.ConsoleText = ""
 		self.MaxNumberOfLines = 6
 
+		#AutoMovingCamera
 		self.globalRotate = [-45, 0, 0]
+		self.AutoMovingCameraOn = True
+		self.midMoving = False
+		self.Turn = 1
+
 		self.FOV = 256
 		self.viewer_distance = 7
-		self.animation = True
-		self.midMoving = False
 
 		return
 	def __init__(self):
@@ -287,30 +310,12 @@ class RenderEngine(object):
 
 		self.object3D_list = []
 
-	
-		#if self.animation:
-		#	if turn == 1:  # turn 1
-		#		if self.globalRotate != [-45,0,0]:
-		#			self.globalRotate = [self.globalRotate[0]+(-3),self.globalRotate[1]+(-6),self.globalRotate[2]]
-		#			self.midMoving = True
-		#		else:
-		#			self.globalRotate = [-45,0,0]
-		#			self.midMoving = False
-		#	else: # turn 2
-		#		if self.globalRotate != [45,180,0]:
-		#			self.globalRotate = [self.globalRotate[0]+(3),self.globalRotate[1]+(6),self.globalRotate[2]]
-		#			self.midMoving = True
-		#		else:
-		#			self.globalRotate = [45,180,0]
-		#			self.midMoving = False
-		#	if (self.globalRotate == [0, 90, 0]):
-		#		object3D_list = self.setup_object3D_list()
-		#		object3D_list += self.addPieces(board)
 		return	
 
-	def UpdateBoard(self, board):
+	def UpdateBoard(self, board, turn):
 		self.object3D_list = self.setup_object3D_list()
 		self.object3D_list += self.addPieces(board)
+		self.Turn = turn
 		return
 	def UpdateConsoleText(self, text):
 		if text != "":
@@ -322,7 +327,11 @@ class RenderEngine(object):
 		self.ConsoleText = text
 		return
 	def UpdateFrame(self):
-		self.mouseDraging()
+		if self.AutoMovingCameraOn:
+			self.AutoMoveCamera()
+		else:
+			self.mouseDraging()
+
 		self.CheckButtons()
 		self.UpdateWindow()
 		return

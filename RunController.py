@@ -7,8 +7,15 @@ import os
 
 class RunController(object):
 	def __init__(self):
-		self.AiDataManager = AI.DataSetManager(4, 8)
+		#setting 
 		self.RenderQuality = 2
+		self.NumberOfBots = 1
+
+		self.WinningMode = False
+		if self.NumberOfBots == 1:
+			self.WinningMode = True
+
+		self.AiDataManager = AI.DataSetManager(4, 8)
 		self.RenderEngine = RenderEngine.RenderEngine()
 
 
@@ -20,8 +27,8 @@ class RunController(object):
 			Game.SimpleOutput(board)
 
 		elif self.RenderQuality == 2:
-			if board !=None:
-				self.RenderEngine.UpdateBoard(board)
+			if board !=None and turn != None:
+				self.RenderEngine.UpdateBoard(board, turn)
 			self.RenderEngine.UpdateFrame()
 			self.RenderEngine.UpdateConsoleText("test\ntest")
 
@@ -61,8 +68,8 @@ class RunController(object):
 	def GameLoop(self):
 		game = Game.Draughts()
 		AIs = []
-		AIs += [AI.BruteForce(self.AiDataManager)]
-		AIs += [AI.BruteForce(self.AiDataManager)]
+		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
+		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		board, turn, _ = game.start()
 
 		self.Render(board=board, turn=turn)
@@ -74,10 +81,10 @@ class RunController(object):
 		time_taken = time.time()
 		MoveTime = time.time()
 		while True:
-			if turn == 1 and True:
-				board, turn = self.MakeHumanMove(game)
-			else:
+			if self.NumberOfBots >= turn:
 				board, turn = self.MakeAIMove(turn, board, AIs, game)
+			else:
+				board, turn = self.MakeHumanMove(game)
 
 			self.Render(board=board, turn=turn)
 
@@ -89,7 +96,7 @@ class RunController(object):
 			finished, fit = game.CheckFinished()
 
 			if finished:
-				
+
 				print("")
 				for loop in range(len(AIs)):
 					AIs[loop].UpdateData(fit[loop])

@@ -1,7 +1,7 @@
 class Draughts(object):
 	def start(self):
 		self.Board = self.newBoard()
-		self.turn = 2
+		self.turn = 1
 		self.step = 1
 		self.selectedPos = [0,0]
 		return self.Board, self.turn, 1
