@@ -1,6 +1,5 @@
 import BruteForce as AI
 import Draughts as Game
-import RenderEngine
 import time
 import os
 
@@ -8,15 +7,18 @@ import os
 class RunController(object):
 	def __init__(self):
 		#setting 
-		self.RenderQuality = 2
-		self.NumberOfBots = 1
+		self.RenderQuality = 1
+		self.NumberOfBots = 2
 
 		self.WinningMode = False
 		if self.NumberOfBots == 1:
 			self.WinningMode = True
 
 		self.AiDataManager = AI.DataSetManager(4, 8)
-		self.RenderEngine = RenderEngine.RenderEngine()
+
+		if self.RenderQuality == 2:
+			import RenderEngine
+			self.RenderEngine = RenderEngine.RenderEngine()
 
 
 		self.GameLoop()
