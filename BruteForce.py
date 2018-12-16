@@ -129,8 +129,6 @@ class BruteForce(object):
                 break
 
         self.TempDataSet.remove({"BoardKey": key, "MoveID": moveID})
-
-
         return
     
     def UpdateData(self, fitness):

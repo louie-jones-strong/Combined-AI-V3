@@ -438,14 +438,15 @@ def GameLoop():
 					if not valid:
 						AI2.UpdateInvalidMove(board, move)
 
-		SimpleOutput(board)
+		#SimpleOutput(board)
 		numMoves += 1
-		if numMoves % 1 == 0:
-			print("done " + str(numMoves) + " moves in " + str(time.time() - MoveTime) + " seconds")
+		if numMoves % 50 == 0:
+			print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/50) + " seconds")
 			MoveTime = time.time()
 
 		finished, fit1, fit2 = game.CheckFinished()
 		if finished:
+			print("")
 			AI1.UpdateData(fit1)
 			AI2.UpdateData(fit2)
 			board, turn, step = game.start()
@@ -456,7 +457,7 @@ def GameLoop():
 			numGames += 1
 			numMoves = 0
 
-			input("start next game: ")
+			#input("start next game: ")
 			print("")
 			print("")
 			time_taken = time.time()
