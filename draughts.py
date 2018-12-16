@@ -32,7 +32,7 @@ class Draughts(object):
 	
 		return Board
 
-	def selection(self,X,Y):
+	def MakeSelection(self,X,Y):
 		valid = False
 		if (self.Board[X][Y] == 1 or self.Board[X][Y] == 3) and self.turn == 1:
 			self.selectedPos = [X,Y]
@@ -58,7 +58,7 @@ class Draughts(object):
 
 		return valid, self.Board, self.step
 		
-	def moveCal(self,X,Y):
+	def MakeMove(self,X,Y):
 		valid = False
 		if self.Board[X][Y] == -1:
 
@@ -229,7 +229,7 @@ class Draughts(object):
 
 
 
-		return finished, player1Fitness, player2Fitness
+		return finished, [player1Fitness, player2Fitness]
 
 	def FlipBoard(self):
 
@@ -260,6 +260,17 @@ class Draughts(object):
 			output += [temp]
 
 		return output
+
+def SimpleOutput(board):
+	for loop in range(len(board)):
+		temp = ""
+		for loop2 in range(len(board[loop])):
+			if board[loop2][loop] == 0:
+				temp += "  "
+			else:
+				temp += "" + str(board[loop2][loop]) + " "
+		print(temp)
+	return
 
 def IsPieceSameSide(piece1, piece2):
 	if (piece1 == 1 or piece1 == 3) and (piece2 == 1 or piece2 == 3):
