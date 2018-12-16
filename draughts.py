@@ -1,4 +1,4 @@
-class game(object):
+class Draughts(object):
 	def start(self):
 		self.Board = self.newBoard()
 		self.turn = 2
@@ -233,7 +233,7 @@ class game(object):
 
 	def FlipBoard(self):
 
-		output = []
+		tempBoard = []
 
 		for loop in range(len(self.Board)):
 			temp = []
@@ -249,7 +249,16 @@ class game(object):
 				else:
 					temp += [self.Board[loop][loop2]]
 					
+			tempBoard += [temp]
+
+		output = []
+		for loop in range(len(tempBoard)-1,-1,-1):
+			temp = []
+			for loop2 in range(len(tempBoard[loop])-1,-1,-1):
+				temp += [tempBoard[loop][loop2]]
+
 			output += [temp]
+
 		return output
 
 def IsPieceSameSide(piece1, piece2):
@@ -269,3 +278,7 @@ def IsPieceEnemySide(piece1, piece2):
 		return True
 		
 	return False
+
+#todo list 
+#1) must take peice
+#2) take more then one peice at once

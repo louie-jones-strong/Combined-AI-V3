@@ -44,6 +44,7 @@ class DataSetManager(object):
             #add a save to save on boards
             for loop in range(len(self.RunningAIs)):
                 self.RunningAIs[loop] = False
+            print("DataSet Saved! Size: " + str(len(self.DataSet)))
         return
     
     def LoadDataSet(self):
@@ -62,7 +63,7 @@ class DataSetManager(object):
         return move
 
 
-class Main(object):
+class BruteForce(object):
 
     def __init__(self, dataSetManager, winningModeON=False):
         self.DataSetManager = dataSetManager

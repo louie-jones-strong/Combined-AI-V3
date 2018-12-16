@@ -5,7 +5,7 @@ import time
 import keyboard
 import mouse
 import math
-import draughts
+import Draughts
 import os
 
 class face(object):
@@ -283,10 +283,10 @@ class renderEngine(object):
 		self.setup()
 		FPS_count = 0
 
-		game = draughts.game()
+		game = Draughts.Draughts()
 		DataSetManager = DraughtsAI.DataSetManager(4, 8)
-		AI1 = DraughtsAI.Main(DataSetManager)
-		AI2 = DraughtsAI.Main(DataSetManager)
+		AI1 = DraughtsAI.BruteForce(DataSetManager)
+		AI2 = DraughtsAI.BruteForce(DataSetManager)
 		board, turn, step = game.start()
 
 		object3D_list = self.setup_object3D_list()
@@ -395,19 +395,19 @@ def SimpleOutput(board):
 		temp = ""
 		for loop2 in range(len(board[loop])):
 			if board[loop2][loop] == 0:
-				temp += "   "
+				temp += "  "
 			else:
-				temp += " " + str(board[loop2][loop]) + " "
+				temp += "" + str(board[loop2][loop]) + " "
 
 
 		print(temp)
 	return
 
 def GameLoop():
-	game = draughts.game()
+	game = Draughts.Draughts()
 	DataSetManager = DraughtsAI.DataSetManager(4, 8)
-	AI1 = DraughtsAI.Main(DataSetManager)
-	AI2 = DraughtsAI.Main(DataSetManager)
+	AI1 = DraughtsAI.BruteForce(DataSetManager)
+	AI2 = DraughtsAI.BruteForce(DataSetManager)
 	board, turn, step = game.start()
 
 	numGames = 0
@@ -438,9 +438,9 @@ def GameLoop():
 					if not valid:
 						AI2.UpdateInvalidMove(board, move)
 
-		#SimpleOutput(board)
+		SimpleOutput(board)
 		numMoves += 1
-		if numMoves % 10 == 0:
+		if numMoves % 1 == 0:
 			print("done " + str(numMoves) + " moves in " + str(time.time() - MoveTime) + " seconds")
 			MoveTime = time.time()
 
