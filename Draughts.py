@@ -232,30 +232,22 @@ class Draughts(object):
 		return finished, [player1Fitness, player2Fitness]
 
 	def FlipBoard(self):
-
-		tempBoard = []
-
-		for loop in range(len(self.Board)):
+		output = []
+		for loop in range(len(self.Board)-1,-1,-1):
 			temp = []
-			for loop2 in range(len(self.Board[loop])):
-				if self.Board[loop][loop2] == 1:
+			for loop2 in range(len(self.Board[loop])-1,-1,-1):
+				piece = self.Board[loop][loop2]
+
+				if piece == 1:
 					temp += [2]
-				elif self.Board[loop][loop2] == 2:
+				elif piece == 2:
 					temp += [1]
-				elif self.Board[loop][loop2] == 3:
+				elif piece == 3:
 					temp += [4]
-				elif self.Board[loop][loop2] == 4:
+				elif piece == 4:
 					temp += [3]
 				else:
-					temp += [self.Board[loop][loop2]]
-					
-			tempBoard += [temp]
-
-		output = []
-		for loop in range(len(tempBoard)-1,-1,-1):
-			temp = []
-			for loop2 in range(len(tempBoard[loop])-1,-1,-1):
-				temp += [tempBoard[loop][loop2]]
+					temp += [piece]
 
 			output += [temp]
 
