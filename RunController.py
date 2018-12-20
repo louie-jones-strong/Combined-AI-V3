@@ -140,8 +140,12 @@ class RunController(object):
 		mark2 = time.time()
 		for loop in range(numberToRun):
 			game.FlipBoard()
-			game.FlipInput([0,0,0,0])
 		print("FlipBoard:         " + str((time.time()-mark2)))
+
+		mark2 = time.time()
+		for loop in range(numberToRun):
+			game.FlipInput([0,0,0,0])
+		print("Flipinput:        " + str((time.time()-mark2)))
 
 		mark2 = time.time()
 		for loop in range(numberToRun):
