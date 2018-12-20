@@ -34,24 +34,49 @@ class RunController(object):
 			if board !=None and turn != None:
 				self.RenderEngine.UpdateBoard(board, turn)
 			self.RenderEngine.UpdateFrame()
-			self.RenderEngine.UpdateConsoleText("test\ntest")
 
 		return
 
 	def MakeAIMove(self, turn, board, AIs, game):
+		testing = time.time()
+		temploop = 0
+		testtemp = turn
+
 		AI = AIs[turn-1]
 
 		valid = False
 		if turn == 1:
+			mark1 = time.time()
 			while not valid:
-				move = AI.MoveCal(game.FlipBoard())
+				temploop += 1
+				game.FlipBoard()
+				print("flipboard:          " + str(time.time()-mark1))
+				
+				move = game.FlipInput(AI.MoveCal(game.FlipBoard()))
+				print("ai.movecal:         " + str(time.time()-mark1))
+
+				mark2 = time.time()
 				valid, board, step = game.MakeSelection(move[0], move[1])
+				print("game.MakeSelection: " + str(time.time()-mark2))
+
 				if not valid:
+					mark3 = time.time()
 					AI.UpdateInvalidMove(game.FlipBoard(), move)
+					print("UpdateInvalidMove:  " + str(time.time()-mark3))
 				else:
+					mark4 = time.time()
 					valid, board, turn, step = game.MakeMove(move[2], move[3])
+					print("game.MakeSelection: " + str(time.time()-mark4))
 					if not valid:
+						mark3 = time.time()
 						AI.UpdateInvalidMove(game.FlipBoard(), move)
+						print("UpdateInvalidMove: " + str(time.time()-mark3))
+
+				input("move took:          " + str(time.time()-mark1) + ": ")
+				print("")
+				mark1 = time.time()
+			
+			input("testing input: " + str(time.time()-testing) + " tried: " + str(temploop) + " times turn:" + str(testtemp) + ": ")
 		else:
 			while not valid:
 				move = AI.MoveCal(board)
