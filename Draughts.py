@@ -4,7 +4,7 @@ class Draughts(object):
 		self.turn = 1
 		self.step = 1
 		self.selectedPos = [0,0]
-		return self.Board, self.turn, 1
+		return self.Board, self.turn
 
 	def newBoard(self):
 		Board = []
@@ -56,7 +56,7 @@ class Draughts(object):
 			for loop in range(len(moves)):
 				self.Board[moves[loop][0]][moves[loop][1]] = -1
 
-		return valid, self.Board, self.step
+		return valid, self.Board
 		
 	def MakeMove(self,X,Y):
 		valid = False
@@ -91,7 +91,7 @@ class Draughts(object):
 				self.turn = 2
 			else:
 				self.turn = 1
-		return valid, self.Board, self.turn, self.step
+		return valid, self.Board, self.turn
 
 	def attackMoves(self,X,Y):
 		outputList = []

@@ -134,10 +134,11 @@ class BruteForce(object):
 		key = self.BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
-		for loop in range(len(self.DataSetManager.DataSet[key].Moves)-1, -1, -1):
-			if self.DataSetManager.DataSet[key].Moves[loop].MoveID == moveID:
-				del self.DataSetManager.DataSet[key].Moves[loop]
-				break
+		if key in self.DataSetManager.DataSet:
+			for loop in range(len(self.DataSetManager.DataSet[key].Moves)-1, -1, -1):
+				if self.DataSetManager.DataSet[key].Moves[loop].MoveID == moveID:
+					del self.DataSetManager.DataSet[key].Moves[loop]
+					break
 				
 		if key in self.TempDataSet:
 			self.TempDataSet.remove({"BoardKey": key, "MoveID": moveID})

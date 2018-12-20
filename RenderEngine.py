@@ -336,7 +336,7 @@ class RenderEngine(object):
 		self.UpdateWindow()
 		return
 	def MakeHumanMove(self, game):
-		step = 0
+		selected = False
 		while True:
 			self.UpdateFrame()
 
@@ -346,17 +346,19 @@ class RenderEngine(object):
 				Y = int(object3D.name[8:9])
 
 				if object3D.name[0:6] == "Piece_":
-					valid, board, step = game.MakeSelection(X, Y)
-					if step == 2:
-						self.object3D_list[64:-1] = self.addPieces(board)
+					valid, board = game.MakeSelection(X, Y)
 					if valid:
 						object3D.selected = True
 						self.object3D_list = self.moveableAreas(board, self.object3D_list)
+						self.object3D_list[64:-1] = self.addPieces(board)
+						selected = True
 
-				elif object3D.name[0:6] == "Board_" and step == 2:
-					valid, board, turn, step = game.MakeMove(X, Y)
+				elif object3D.name[0:6] == "Board_" and selected:
+					valid, board, turn = game.MakeMove(X, Y)
 					if valid:
+						selected = False
 						break
+
 
 
 		return board, turn

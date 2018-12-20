@@ -45,25 +45,24 @@ class RunController(object):
 		if turn == 1:
 			while not valid:
 				move = game.FlipInput(AI.MoveCal(game.FlipBoard()))
-				valid, board, step = game.MakeSelection(move[0], move[1])
+				valid, board = game.MakeSelection(move[0], move[1])
 
 				if not valid:
 					AI.UpdateInvalidMove(game.FlipBoard(), move)
 				else:
-					valid, board, turn, step = game.MakeMove(move[2], move[3])
+					valid, board, turn = game.MakeMove(move[2], move[3])
 					if not valid:
 						AI.UpdateInvalidMove(game.FlipBoard(), move)
-				mark1 = time.time()
 			
 		else:
 			while not valid:
 				move = AI.MoveCal(board)
-				valid, board, step = game.MakeSelection(move[0], move[1])
-				
+				valid, board = game.MakeSelection(move[0], move[1])
+
 				if not valid:
 					AI.UpdateInvalidMove(board, move)
 				else:
-					valid, board, turn, step = game.MakeMove(move[2], move[3])
+					valid, board, turn = game.MakeMove(move[2], move[3])
 					if not valid:
 						AI.UpdateInvalidMove(board, move)
 		return board, turn
@@ -78,7 +77,7 @@ class RunController(object):
 		AIs = []
 		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
-		board, turn, _ = game.start()
+		board, turn = game.start()
 
 		self.Render(board=board, turn=turn)
 
@@ -117,7 +116,7 @@ class RunController(object):
 				print("each move took on AVG: " + str((time.time() - time_taken)/numMoves) + " seconds")
 				print("game in total took: " + str(time.time() - time_taken) + " seconds")
 
-				board, turn, _ = game.start()
+				board, turn = game.start()
 				numGames += 1
 				numMoves = 0
 
@@ -130,7 +129,7 @@ class RunController(object):
 	def testingTimes(self):
 		game = Game.Draughts()
 		AIs = [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
-		board, turn, _ = game.start()
+		board, turn = game.start()
 
 		numberToRun = 4000
 		mark1 = time.time()
