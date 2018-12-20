@@ -131,7 +131,9 @@ class RunController(object):
 		AIs = [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		board, turn = game.start()
 
-		numberToRun = 4000
+		numberToRun = 4096
+		print("running each for: " + str(numberToRun))
+
 		mark1 = time.time()
 		for loop in range(numberToRun):
 			move = AIs[0].MoveCal(board)
