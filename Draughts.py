@@ -261,6 +261,10 @@ class Draughts(object):
 
 		return output
 
+	def FlipInput(self, move):
+		temp = [7-move[0], 7-move[1], 7-move[2], 7-move[3]]
+		return temp
+
 def SimpleOutput(board):
 	for loop in range(len(board)):
 		temp = ""

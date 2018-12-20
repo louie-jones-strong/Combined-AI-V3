@@ -14,7 +14,8 @@ class RunController(object):
 		if self.NumberOfBots == 1:
 			self.WinningMode = True
 
-		self.AiDataManager = AI.DataSetManager(4, 8)
+		
+		self.AiDataManager = AI.DataSetManager(4, 8,loadData=False)
 
 		if self.RenderQuality == 2:
 			import RenderEngine
@@ -92,9 +93,13 @@ class RunController(object):
 			self.Render(board=board, turn=turn)
 
 			numMoves += 1
-			if numMoves % 50 == 0:
-				print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/50) + " seconds")
+			if numMoves % 10 == 0:
+				print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/10) + " seconds")
+
 				MoveTime = time.time()
+				
+			if self.RenderQuality == 2:
+				self.RenderEngine.UpdateConsoleText("Game: "+str(numGames)+"\n Move: "+str(numMoves)+"\n AVG time: "+str((time.time() - time_taken)/numMoves))
 
 			finished, fit = game.CheckFinished()
 
