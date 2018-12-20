@@ -21,7 +21,7 @@ class RunController(object):
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
-
+		self.testingTimes()
 		self.GameLoop()
 		return
 
@@ -38,49 +38,28 @@ class RunController(object):
 		return
 
 	def MakeAIMove(self, turn, board, AIs, game):
-		testing = time.time()
-		temploop = 0
-		testtemp = turn
 
 		AI = AIs[turn-1]
 
 		valid = False
 		if turn == 1:
-			mark1 = time.time()
 			while not valid:
-				temploop += 1
-				game.FlipBoard()
-				print("flipboard:          " + str(time.time()-mark1))
-				
 				move = game.FlipInput(AI.MoveCal(game.FlipBoard()))
-				print("ai.movecal:         " + str(time.time()-mark1))
-
-				mark2 = time.time()
 				valid, board, step = game.MakeSelection(move[0], move[1])
-				print("game.MakeSelection: " + str(time.time()-mark2))
 
 				if not valid:
-					mark3 = time.time()
 					AI.UpdateInvalidMove(game.FlipBoard(), move)
-					print("UpdateInvalidMove:  " + str(time.time()-mark3))
 				else:
-					mark4 = time.time()
 					valid, board, turn, step = game.MakeMove(move[2], move[3])
-					print("game.MakeSelection: " + str(time.time()-mark4))
 					if not valid:
-						mark3 = time.time()
 						AI.UpdateInvalidMove(game.FlipBoard(), move)
-						print("UpdateInvalidMove: " + str(time.time()-mark3))
-
-				input("move took:          " + str(time.time()-mark1) + ": ")
-				print("")
 				mark1 = time.time()
 			
-			input("testing input: " + str(time.time()-testing) + " tried: " + str(temploop) + " times turn:" + str(testtemp) + ": ")
 		else:
 			while not valid:
 				move = AI.MoveCal(board)
 				valid, board, step = game.MakeSelection(move[0], move[1])
+				
 				if not valid:
 					AI.UpdateInvalidMove(board, move)
 				else:
@@ -146,6 +125,42 @@ class RunController(object):
 				print("")
 				time_taken = time.time()
 				MoveTime = time.time()
+		return
+
+	def testingTimes(self):
+		game = Game.Draughts()
+		AIs = [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
+		board, turn, _ = game.start()
+
+		numberToRun = 4000
+		mark1 = time.time()
+		for loop in range(numberToRun):
+			move = AIs[0].MoveCal(board)
+		print("ai.movecal:        " + str((time.time()-mark1)))
+
+		mark2 = time.time()
+		for loop in range(numberToRun):
+			game.FlipBoard()
+			game.FlipInput([0,0,0,0])
+		print("FlipBoard:         " + str((time.time()-mark2)))
+
+		mark2 = time.time()
+		for loop in range(numberToRun):
+			AIs[0].UpdateInvalidMove(board, move)
+		print("UpdateInvalidMove: " + str((time.time()-mark2)))
+
+		mark2 = time.time()
+		for loop in range(numberToRun):
+			game.MakeSelection(move[0], move[1])
+		print("MakeSelection:     " + str((time.time()-mark2)))
+
+		mark2 = time.time()
+		for loop in range(numberToRun):
+			game.MakeMove(move[2], move[3])
+		print("MakeMove:          " + str((time.time()-mark2)))
+
+		print("total: " + str((time.time()-mark1)))
+		input()
 		return
 
 if __name__ == "__main__":
