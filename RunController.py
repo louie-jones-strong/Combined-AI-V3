@@ -164,6 +164,11 @@ class RunController(object):
 			game.MakeMove(move[2], move[3])
 		print("MakeMove:          " + str((time.time()-mark2)))
 
+		mark2 = time.time()
+		for loop in range(numberToRun):
+			AIs[0].UpdateData(1)
+		print("UpdateData:          " + str((time.time()-mark2)))
+
 		print("total: " + str((time.time()-mark1)))
 		input()
 		return
