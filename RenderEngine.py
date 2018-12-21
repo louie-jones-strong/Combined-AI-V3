@@ -358,7 +358,4 @@ class RenderEngine(object):
 					if valid:
 						selected = False
 						break
-
-
-
 		return board, turn

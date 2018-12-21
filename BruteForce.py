@@ -1,5 +1,6 @@
 import pickle
 import os
+import sys
 
 class DataSetManager(object):
 	DataSet = {}
@@ -62,7 +63,6 @@ class DataSetManager(object):
 			moveID = moveID % (self.MaxOutputSize)**((self.NumOfOutputs - loop)-1)
 		return move
 
-
 class BruteForce(object):
 
 	def __init__(self, dataSetManager, winningModeON=False):
@@ -80,13 +80,12 @@ class BruteForce(object):
 		if self.WinningModeON:
 			print("winnning mode!")
 			if key in self.DataSetManager.DataSet and len(self.DataSetManager.DataSet[key].Moves) > 0:
-				bestAvgFitness = self.DataSetManager.DataSet[key].Moves[0].AvgFitness
-				moveID = self.DataSetManager.DataSet[key].Moves[0].MoveID
-				for loop in range(1,len(self.DataSetManager.DataSet[key].Moves)):
-					
-					if self.DataSetManager.DataSet[key].Moves[loop].AvgFitness > bestAvgFitness:
-						bestAvgFitness = self.DataSetManager.DataSet[key].Moves[loop].AvgFitness
-						moveID = self.DataSetManager.DataSet[key].Moves[loop].MoveID
+				bestAvgFitness = -sys.maxsize
+				moveID = 0
+				for movekey, moveValue in self.DataSetManager.DataSet[key].Moves.items():
+					if moveValue.AvgFitness > bestAvgFitness:
+						leastPlayed = moveValue.TimesPlayed
+						moveID = movekey
 
 			else:#never played board before
 				moveID = 0
@@ -97,33 +96,29 @@ class BruteForce(object):
 				
 				if not self.DataSetManager.DataSet[key].NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
 					if len(self.DataSetManager.DataSet[key].Moves) == 0:
-						print("error!")
-						self.DataSetManager.DataSet[key].NumOfTriedMoves = 0
+						input("error!!!")
 
 				if self.DataSetManager.DataSet[key].NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
 					moveID = self.DataSetManager.DataSet[key].NumOfTriedMoves
-					self.DataSetManager.DataSet[key].Moves += [MoveInfo(MoveID=moveID)]
+					self.DataSetManager.DataSet[key].Moves[moveID] = MoveInfo(MoveID=moveID)
 					self.DataSetManager.DataSet[key].NumOfTriedMoves += 1
 
 				else:#played every board once already
-					leastPlayed = self.DataSetManager.DataSet[key].Moves[0].TimesPlayed
-					moveID = self.DataSetManager.DataSet[key].Moves[0].MoveID
-					pickedItem = 0
-
-					for loop in range(1,len(self.DataSetManager.DataSet[key].Moves)):
-						
-						if self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed < leastPlayed:
-							leastPlayed = self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed
-							moveID = self.DataSetManager.DataSet[key].Moves[loop].MoveID
-							pickedItem = loop
+					leastPlayed = sys.maxsize
+					moveID = 0
+					for movekey, moveValue in self.DataSetManager.DataSet[key].Moves.items():
+						if moveValue.TimesPlayed < leastPlayed:
+							leastPlayed = moveValue.TimesPlayed
+							moveID = movekey
 					
-					self.DataSetManager.DataSet[key].Moves[pickedItem].TimesPlayed += 1
+					self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed += 1
 
 			else:#never played board before
 				moveID = 0
-				moveInfo = MoveInfo(MoveID=moveID)
-				self.DataSetManager.DataSet[key] = BoardInfo(Moves=[moveInfo])
+				moveInfo = {moveID : MoveInfo(MoveID=moveID)}
+				self.DataSetManager.DataSet[key] = BoardInfo(Moves=moveInfo)
 
+			#cahnge tempdataset to dict so faster to del for bigger lists
 			self.TempDataSet += [{"BoardKey": key, "MoveID": moveID}]
 
 
@@ -135,12 +130,11 @@ class BruteForce(object):
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
 		if key in self.DataSetManager.DataSet:
-			for loop in range(len(self.DataSetManager.DataSet[key].Moves)-1, -1, -1):
-				if self.DataSetManager.DataSet[key].Moves[loop].MoveID == moveID:
-					del self.DataSetManager.DataSet[key].Moves[loop]
-					break
-				
-		if key in self.TempDataSet:
+			if moveID in self.DataSetManager.DataSet[key].Moves:
+				del self.DataSetManager.DataSet[key].Moves[moveID]
+			
+		#cahnge tempdataset to dict so faster to del for bigger lists
+		if {"BoardKey": key, "MoveID": moveID} in self.TempDataSet:
 			self.TempDataSet.remove({"BoardKey": key, "MoveID": moveID})
 		return
 	
@@ -149,15 +143,13 @@ class BruteForce(object):
 			key = self.TempDataSet[loop]["BoardKey"]
 			moveID = self.TempDataSet[loop]["MoveID"]
 
-			for loop in range(len(self.DataSetManager.DataSet[key].Moves)-1, -1, -1):
-				if self.DataSetManager.DataSet[key].Moves[loop].MoveID == moveID:
+			if moveID in self.DataSetManager.DataSet[key].Moves:
+				newFitness = self.DataSetManager.DataSet[key].Moves[moveID].AvgFitness*self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed
+				newFitness += fitness
+				self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed += 1
+				newFitness /= self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed
+				self.DataSetManager.DataSet[key].Moves[moveID].AvgFitness = newFitness
 
-					newFitness = self.DataSetManager.DataSet[key].Moves[loop].AvgFitness*self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed
-					newFitness += fitness
-					self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed += 1
-					newFitness /= self.DataSetManager.DataSet[key].Moves[loop].TimesPlayed
-					self.DataSetManager.DataSet[key].Moves[loop].AvgFitness = newFitness
-					break
 
 		self.TempDataSet = []
 		self.DataSetManager.SaveDataSet(self.AiNumber)
@@ -169,9 +161,9 @@ class BruteForce(object):
 
 class BoardInfo():
 	NumOfTriedMoves = 1
-	Moves = []
+	Moves = {}
 
-	def __init__(self, NumOfTriedMoves=1, Moves=[]):
+	def __init__(self, NumOfTriedMoves=1, Moves={}):
 		self.NumOfTriedMoves = NumOfTriedMoves
 		self.Moves = Moves
 		return

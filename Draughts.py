@@ -287,5 +287,5 @@ def IsPieceEnemySide(piece1, piece2):
 	return False
 
 #todo list 
-#1) must take peice
+#1) must take peice in in offical rules tho
 #2) take more then one peice at once

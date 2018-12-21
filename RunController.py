@@ -15,13 +15,13 @@ class RunController(object):
 			self.WinningMode = True
 
 		
-		self.AiDataManager = AI.DataSetManager(4, 8,loadData=False)
+		self.AiDataManager = AI.DataSetManager(4, 8)
 
 		if self.RenderQuality == 2:
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
-		self.testingTimes()
+		#self.testingTimes()
 		self.GameLoop()
 		return
 
@@ -44,13 +44,14 @@ class RunController(object):
 		valid = False
 		if turn == 1:
 			while not valid:
-				move = game.FlipInput(AI.MoveCal(game.FlipBoard()))
-				valid, board = game.MakeSelection(move[0], move[1])
+				move = AI.MoveCal(game.FlipBoard())
+				flipedMove = game.FlipInput(move)
+				valid, board = game.MakeSelection(flipedMove[0], flipedMove[1])
 
 				if not valid:
 					AI.UpdateInvalidMove(game.FlipBoard(), move)
 				else:
-					valid, board, turn = game.MakeMove(move[2], move[3])
+					valid, board, turn = game.MakeMove(flipedMove[2], flipedMove[3])
 					if not valid:
 						AI.UpdateInvalidMove(game.FlipBoard(), move)
 			
@@ -96,8 +97,11 @@ class RunController(object):
 			self.Render(board=board, turn=turn)
 
 			numMoves += 1
-			if numMoves % 10 == 0:
-				print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/10) + " seconds")
+			if numMoves % 10 == 0 or self.RenderQuality == 1:
+				if self.RenderQuality == 1:
+					print("done " + str(numMoves) + " moves, last took: " + str(time.time() - MoveTime) + " seconds")
+				else: 
+					print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/10) + " seconds")
 
 				MoveTime = time.time()
 				
@@ -105,6 +109,9 @@ class RunController(object):
 				self.RenderEngine.UpdateConsoleText("Game: "+str(numGames)+"\n Move: "+str(numMoves)+"\n AVG time: "+str((time.time() - time_taken)/numMoves))
 
 			finished, fit = game.CheckFinished()
+			if finished == False and numMoves >= 300:
+				finished = True
+				fit = [3,3]
 
 			if finished:
 
@@ -147,7 +154,7 @@ class RunController(object):
 		mark2 = time.time()
 		for loop in range(numberToRun):
 			game.FlipInput([0,0,0,0])
-		print("Flipinput:        " + str((time.time()-mark2)))
+		print("Flipinput:         " + str((time.time()-mark2)))
 
 		mark2 = time.time()
 		for loop in range(numberToRun):
@@ -163,11 +170,12 @@ class RunController(object):
 		for loop in range(numberToRun):
 			game.MakeMove(move[2], move[3])
 		print("MakeMove:          " + str((time.time()-mark2)))
+		print("total: " + str((time.time()-mark1)))
 
 		mark2 = time.time()
 		for loop in range(numberToRun):
 			AIs[0].UpdateData(1)
-		print("UpdateData:          " + str((time.time()-mark2)))
+		print("UpdateData:        " + str((time.time()-mark2)))
 
 		print("total: " + str((time.time()-mark1)))
 		input()
