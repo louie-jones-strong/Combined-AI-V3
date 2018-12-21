@@ -97,11 +97,11 @@ class RunController(object):
 			self.Render(board=board, turn=turn)
 
 			numMoves += 1
-			if numMoves % 10 == 0 or self.RenderQuality == 1:
+			if numMoves % 25 == 0 or self.RenderQuality == 1:
 				if self.RenderQuality == 1:
 					print("done " + str(numMoves) + " moves, last took: " + str(time.time() - MoveTime) + " seconds")
 				else: 
-					print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/10) + " seconds")
+					print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/25) + " seconds")
 
 				MoveTime = time.time()
 				
