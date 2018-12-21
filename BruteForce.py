@@ -178,3 +178,8 @@ class MoveInfo():
 		self.TimesPlayed = TimesPlayed
 		self.MoveID = MoveID
 		return
+
+
+# 1) point to the move that is least played
+# 2) point to the move that has best avg fitness
+# 3) speed up tempdataset (maybe dict) so that it can delete item in invalid wiht O(1) instead of O(N)
