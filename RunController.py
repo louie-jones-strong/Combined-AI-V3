@@ -1,20 +1,39 @@
 import BruteForce as AI
-import Simulation.Draughts as Game
+import importlib
 import time
 import os
 
 
 class RunController(object):
 	def __init__(self):
-		userInput = input("load Dataset[y/n]:")
+		files = os.listdir("Simulations")
+		files.remove("__pycache__")
+		files.remove("SimulationInterface.py")
+
+		for loop in range(len(files)):
+			files[loop] = files[loop][:-3]
+			print(str(loop+1)+") "+ files[loop])
+
+		userInput = int(input("pick Simulation: "))
+		if userInput > len(files):
+			userInput = len(files)
+
+		if userInput < 1:
+			userInput = 1
+
+		simName = files[userInput-1]
+		self.Sim = importlib.import_module("Simulations." + simName)
+		datasetAddress = "DataSets//"+simName+"Dataset"
+
+		userInput = input("load Dataset[Y/N]:")
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager = AI.DataSetManager(4, 8,loadData=False)
+			self.AiDataManager = AI.DataSetManager(4, 8, 1, datasetAddress, loadData=False)
 
 		else:
-			self.AiDataManager = AI.DataSetManager(4, 8,loadData=True)
+			self.AiDataManager = AI.DataSetManager(4, 8, 1, datasetAddress, loadData=True)
 
 		#setting 
-		self.RenderQuality = 2
+		self.RenderQuality = 0
 		self.NumberOfBots = 2
 
 		self.WinningMode = False
@@ -79,11 +98,11 @@ class RunController(object):
 		return board, turn
 
 	def GameLoop(self):
-		game = Game.Simulation()
+		game = self.Sim.Simulation()
 		AIs = []
 		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
-		board, turn = game.start()
+		board, turn = game.Start()
 
 		self.Render(board=board, turn=turn)
 
@@ -128,7 +147,7 @@ class RunController(object):
 				print("each move took on AVG: " + str((time.time() - time_taken)/numMoves) + " seconds")
 				print("game in total took: " + str(time.time() - time_taken) + " seconds")
 
-				board, turn = game.start()
+				board, turn = game.Start()
 				numGames += 1
 				numMoves = 0
 
@@ -139,9 +158,9 @@ class RunController(object):
 		return
 
 	def testingTimes(self):
-		game = Game.Draughts()
+		game = self.Sim.Simulation()
 		AIs = [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
-		board, turn = game.start()
+		board, turn = game.Start()
 
 		numberToRun = 4096
 		print("running each for: " + str(numberToRun))

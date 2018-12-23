@@ -7,10 +7,11 @@ class DataSetManager(object):
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
 	
-	def __init__(self, numOfOutputs, maxOutputSize, outputResolution=1, loadData=True):
+	def __init__(self, numOfOutputs, maxOutputSize, outputResolution, datasetAddress, loadData=True):
 		self.NumOfOutputs = numOfOutputs
 		self.MaxOutputSize = maxOutputSize
 		self.MaxMoveIDs = maxOutputSize ** numOfOutputs
+		self.DatasetAddress = datasetAddress
 
 		self.RunningAIs = []
 		self.DataSet = {}
@@ -41,7 +42,7 @@ class DataSetManager(object):
 				canSave = False
 
 		if canSave:
-			pickle.dump(self.DataSet, open("DataSet//DataSet.p", "wb"))
+			pickle.dump(self.DataSet, open(self.DatasetAddress + ".p", "wb"))
 			#add a save to save on boards
 			for loop in range(len(self.RunningAIs)):
 				self.RunningAIs[loop] = False
@@ -49,8 +50,8 @@ class DataSetManager(object):
 		return
 	
 	def LoadDataSet(self):
-		if os.path.isfile("DataSet//DataSet.p"):
-			self.DataSet = pickle.load(open("DataSet//DataSet.p", "rb"))
+		if os.path.isfile(self.DatasetAddress + ".p"):
+			self.DataSet = pickle.load(open(self.DatasetAddress + ".p", "rb"))
 
 		print("DataSet lenght: " + str(len(self.DataSet)))
 		return
