@@ -1,5 +1,5 @@
 import BruteForce as AI
-import Draughts as Game
+import Simulation.Draughts as Game
 import time
 import os
 
@@ -79,7 +79,7 @@ class RunController(object):
 		return board, turn
 
 	def GameLoop(self):
-		game = Game.Draughts()
+		game = Game.Simulation()
 		AIs = []
 		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
