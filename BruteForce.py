@@ -161,11 +161,17 @@ class BruteForce(object):
 
 class BoardInfo():
 	NumOfTriedMoves = 1
+	MoveIDOfLeastPlayed = 1
+	MoveIDOfBestAvgFitness = 0
+	BestAvgFitness = -sys.maxsize
 	Moves = {}
 
-	def __init__(self, NumOfTriedMoves=1, Moves={}):
+	def __init__(self, NumOfTriedMoves=1, Moves={}, moveIDOfLeastPlayed=1, moveIDOfBestAvgFitness=0, bestAvgFitness=-sys.maxsize):
 		self.NumOfTriedMoves = NumOfTriedMoves
 		self.Moves = Moves
+		self.MoveIDOfLeastPlayed = moveIDOfLeastPlayed
+		self.MoveIDOfBestAvgFitness = moveIDOfBestAvgFitness
+		self.BestAvgFitness = bestAvgFitness
 		return
 
 class MoveInfo():

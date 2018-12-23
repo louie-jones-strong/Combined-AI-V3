@@ -6,16 +6,21 @@ import os
 
 class RunController(object):
 	def __init__(self):
+		userInput = input("load Dataset[y/n]:")
+		if userInput == "n" or userInput == "N":
+			self.AiDataManager = AI.DataSetManager(4, 8,loadData=False)
+
+		else:
+			self.AiDataManager = AI.DataSetManager(4, 8,loadData=True)
+
 		#setting 
-		self.RenderQuality = 0
+		self.RenderQuality = 2
 		self.NumberOfBots = 2
 
 		self.WinningMode = False
 		if self.NumberOfBots == 1:
 			self.WinningMode = True
 
-		
-		self.AiDataManager = AI.DataSetManager(4, 8)
 
 		if self.RenderQuality == 2:
 			import RenderEngine
@@ -97,19 +102,19 @@ class RunController(object):
 			self.Render(board=board, turn=turn)
 
 			numMoves += 1
-			if numMoves % 25 == 0 or self.RenderQuality == 1:
+			if numMoves % 50 == 0 or self.RenderQuality == 1:
 				if self.RenderQuality == 1:
 					print("done " + str(numMoves) + " moves, last took: " + str(time.time() - MoveTime) + " seconds")
 				else: 
-					print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/25) + " seconds")
+					print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/50) + " seconds")
 
 				MoveTime = time.time()
 				
 			if self.RenderQuality == 2:
-				self.RenderEngine.UpdateConsoleText("Game: "+str(numGames)+"\n Move: "+str(numMoves)+"\n AVG time: "+str((time.time() - time_taken)/numMoves))
+				self.RenderEngine.UpdateConsoleText("Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n Game: "+str(numGames)+"\n Move: "+str(numMoves)+"\n AVG time: "+str((time.time() - time_taken)/numMoves))
 
 			finished, fit = game.CheckFinished()
-			if finished == False and numMoves >= 300:
+			if finished == False and numMoves >= 1000:
 				finished = True
 				fit = [3,3]
 
@@ -170,7 +175,7 @@ class RunController(object):
 		for loop in range(numberToRun):
 			game.MakeMove(move[2], move[3])
 		print("MakeMove:          " + str((time.time()-mark2)))
-		print("total: " + str((time.time()-mark1)))
+		input("total: " + str((time.time()-mark1)))
 
 		mark2 = time.time()
 		for loop in range(numberToRun):
