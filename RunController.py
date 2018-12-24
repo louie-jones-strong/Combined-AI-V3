@@ -12,9 +12,13 @@ class RunController(object):
 
 		for loop in range(len(files)):
 			files[loop] = files[loop][:-3]
-			print(str(loop+1)+") "+ files[loop])
+			if len(files) > 1:
+				print(str(loop+1)+") "+ files[loop])
 
-		userInput = int(input("pick Simulation: "))
+		userInput = 1
+		if len(files) > 1:
+			userInput = int(input("pick Simulation: "))
+			
 		if userInput > len(files):
 			userInput = len(files)
 
