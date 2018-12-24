@@ -1,27 +1,43 @@
 class Simulation(object):
-	Info = {}
+	Info = {"Name":"Dad's Cool Mystery Game",
+	        "MinPlayers":1,"MaxPlayers":2,
+	        "NumInputs":1,"MinInputSize":1,"MaxInputSize":3,
+			"Resolution":0.1}
 
-	def Start(self):
+	def Start(self, numPlayers):
+		if numPlayers > self.Info["MaxPlayers"] or numPlayers < self.Info["MinPlayers"]:
+			self.Finished = True
+			input("ERROR!! "+str(numPlayers))
+		else:
+			self.Finished = False
+
 		self.Board = []
 		self.Turn = 1
-		self.Finished = False
+		self.NumPlayers = numPlayers
 		return self.Board, self.Turn
 
-	def MakeSelection(self,X,Y):
+	# inputs is an array of size NumInputs
+	# Each element of which is between MinInputSize to MaxInputSize
+	# and resolution Resolution
+	def MakeSelection(self,inputs):
 		valid = True
 		return valid, self.Board
 
-	def MakeMove(self,X,Y):
+	# inputs is an array of size NumInputs
+	# Each element of which is between MinInputSize to MaxInputSize
+	# and resolution Resolution
+	def MakeMove(self,inputs):
 		valid = True
+		# remember to update turn and board
 		return valid, self.Board, self.Turn
 
 	def CheckFinished(self):
 		player1Fitness, player2Fitness = 0,0
 		return self.Finished, [player1Fitness, player2Fitness]
 
-	def FlipBoard(self):
+	def FlipBoard(self, board):
 
-		return self.Board
+		return board
 
 	def FlipInput(self, move):
 		return move
