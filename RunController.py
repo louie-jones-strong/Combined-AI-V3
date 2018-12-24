@@ -18,7 +18,7 @@ class RunController(object):
 		userInput = 1
 		if len(files) > 1:
 			userInput = int(input("pick Simulation: "))
-			
+
 		if userInput > len(files):
 			userInput = len(files)
 
@@ -54,11 +54,7 @@ class RunController(object):
 		return
 
 	def Render(self, board=None, turn=None):
-		if self.RenderQuality == 1 and board != None:
-			os.system("cls")
-			Game.SimpleOutput(board)
-
-		elif self.RenderQuality == 2:
+		if self.RenderQuality == 2:
 			if board !=None and turn != None:
 				self.RenderEngine.UpdateBoard(board, turn)
 			self.RenderEngine.UpdateFrame()

@@ -232,17 +232,6 @@ class Simulation(object):
 			return True
 		return False
 
-def SimpleOutput(board):
-	for loop in range(len(board)):
-		temp = ""
-		for loop2 in range(len(board[loop])):
-			if board[loop2][loop] == 0:
-				temp += "  "
-			else:
-				temp += "" + str(board[loop2][loop]) + " "
-		print(temp)
-	return
-
 def IsPieceSameSide(piece1, piece2):
 	if (piece1 == 1 or piece1 == 3) and (piece2 == 1 or piece2 == 3):
 		return True
@@ -288,5 +277,5 @@ def NewBoard():
 	return Board
 
 #todo list 
-#1) must take peice in in offical rules tho
+#1) must take peice not in offical rules tho
 #2) take more then one peice at once

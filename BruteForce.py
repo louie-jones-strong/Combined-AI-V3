@@ -1,6 +1,7 @@
 import pickle
 import os
 import sys
+import random
 
 class DataSetManager(object):
 	DataSet = {}
@@ -89,7 +90,7 @@ class BruteForce(object):
 						moveID = movekey
 
 			else:#never played board before
-				moveID = 0
+				moveID = random.randint(0,self.DataSetManager.MaxMoveIDs)
 				print("new Board!")
 
 		else:  # learning mode
