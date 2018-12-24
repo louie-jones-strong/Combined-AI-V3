@@ -47,14 +47,14 @@ class DataSetManager(object):
 			#add a save to save on boards
 			for loop in range(len(self.RunningAIs)):
 				self.RunningAIs[loop] = False
-			print("DataSet Saved! Size: " + str(len(self.DataSet)))
+			#print("DataSet Saved! Size: " + str(len(self.DataSet)))
 		return
 	
 	def LoadDataSet(self):
 		if os.path.isfile(self.DatasetAddress + ".p"):
 			self.DataSet = pickle.load(open(self.DatasetAddress + ".p", "rb"))
 
-		print("DataSet lenght: " + str(len(self.DataSet)))
+		#print("DataSet lenght: " + str(len(self.DataSet)))
 		return
 	
 	def MoveIDToMove(self, moveID):
@@ -71,7 +71,7 @@ class BruteForce(object):
 		self.DataSetManager = dataSetManager
 		self.WinningModeON = winningModeON
 
-		self.TempDataSet = []
+		self.TempDataSet = {}
 
 		self.AiNumber = self.DataSetManager.SetupNewAI()
 		return
@@ -121,7 +121,7 @@ class BruteForce(object):
 				self.DataSetManager.DataSet[key] = BoardInfo(Moves=moveInfo)
 
 			#cahnge tempdataset to dict so faster to del for bigger lists
-			self.TempDataSet += [{"BoardKey": key, "MoveID": moveID}]
+			self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID}
 
 
 		move = self.DataSetManager.MoveIDLookUp[moveID]
@@ -134,16 +134,15 @@ class BruteForce(object):
 		if key in self.DataSetManager.DataSet:
 			if moveID in self.DataSetManager.DataSet[key].Moves:
 				del self.DataSetManager.DataSet[key].Moves[moveID]
-			
-		#cahnge tempdataset to dict so faster to del for bigger lists
-		if {"BoardKey": key, "MoveID": moveID} in self.TempDataSet:
-			self.TempDataSet.remove({"BoardKey": key, "MoveID": moveID})
+
+		if str(key)+str(moveID) in self.TempDataSet:
+			del self.TempDataSet[str(key)+str(moveID)]
 		return
 	
 	def UpdateData(self, fitness):
-		for loop in range(len(self.TempDataSet)):
-			key = self.TempDataSet[loop]["BoardKey"]
-			moveID = self.TempDataSet[loop]["MoveID"]
+		for tempKey in self.TempDataSet:
+			key = self.TempDataSet[tempKey]["BoardKey"]
+			moveID = self.TempDataSet[tempKey]["MoveID"]
 
 			if moveID in self.DataSetManager.DataSet[key].Moves:
 				newFitness = self.DataSetManager.DataSet[key].Moves[moveID].AvgFitness*self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed
@@ -153,7 +152,7 @@ class BruteForce(object):
 				self.DataSetManager.DataSet[key].Moves[moveID].AvgFitness = newFitness
 
 
-		self.TempDataSet = []
+		self.TempDataSet = {}
 		self.DataSetManager.SaveDataSet(self.AiNumber)
 		return
 
