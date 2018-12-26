@@ -146,7 +146,7 @@ class BruteForce(object):
 				newFitness /= self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed
 				self.DataSetManager.DataSet[key].Moves[moveID].AvgFitness = newFitness
 
-				if newFitness > self.DataSetManager.DataSet[key].bestAvgFitness:
+				if newFitness > self.DataSetManager.DataSet[key].BestAvgFitness:
 					self.DataSetManager.DataSet[key].MoveIDOfBestAvgFitness = moveID
 					self.DataSetManager.DataSet[key].bestAvgFitness = newFitness
 
@@ -188,5 +188,3 @@ class MoveInfo():
 
 
 # 1) point to the move that is least played
-# 2) point to the move that has best avg fitness
-# 3) speed up tempdataset (maybe dict) so that it can delete item in invalid wiht O(1) instead of O(N)

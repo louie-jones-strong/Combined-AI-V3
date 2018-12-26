@@ -52,7 +52,6 @@ class RunController(object):
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
-		#self.testingTimes()
 		self.GameLoop()
 		return
 
@@ -146,6 +145,7 @@ class RunController(object):
 				for loop in range(len(AIs)):
 					AIs[loop].UpdateData(fit[loop])
 
+				print("Dataset size: " + str(len(self.AiDataManager.DataSet)) + " = " + str( int(sys.getsizeof(self.AiDataManager.DataSet)/1024 )) + " KBs" )
 				print("finished game: " + str(numGames+1) + " with " + str(numMoves) + " moves made")
 				print("each move took on AVG: " + str((time.time() - time_taken)/numMoves) + " seconds")
 				print("game in total took: " + str(time.time() - time_taken) + " seconds")
@@ -158,54 +158,6 @@ class RunController(object):
 				print("")
 				time_taken = time.time()
 				MoveTime = time.time()
-		return
-
-	def testingTimes(self):
-		game = self.Sim.Simulation()
-		AIs = [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
-		board, turn = game.Start()
-
-		numberToRun = 4096
-		print("running each for: " + str(numberToRun))
-
-		mark1 = time.time()
-		for loop in range(numberToRun):
-			move = AIs[0].MoveCal(board)
-		print("ai.movecal:        " + str((time.time()-mark1)))
-
-		mark2 = time.time()
-		for loop in range(numberToRun):
-			game.FlipBoard()
-		print("FlipBoard:         " + str((time.time()-mark2)))
-
-		mark2 = time.time()
-		for loop in range(numberToRun):
-			game.FlipInput([0,0,0,0])
-		print("Flipinput:         " + str((time.time()-mark2)))
-
-		mark2 = time.time()
-		for loop in range(numberToRun):
-			AIs[0].UpdateInvalidMove(board, move)
-		print("UpdateInvalidMove: " + str((time.time()-mark2)))
-
-		mark2 = time.time()
-		for loop in range(numberToRun):
-			game.MakeSelection(move[0], move[1])
-		print("MakeSelection:     " + str((time.time()-mark2)))
-
-		mark2 = time.time()
-		for loop in range(numberToRun):
-			game.MakeMove(move[2], move[3])
-		print("MakeMove:          " + str((time.time()-mark2)))
-		input("total: " + str((time.time()-mark1)))
-
-		mark2 = time.time()
-		for loop in range(numberToRun):
-			AIs[0].UpdateData(1)
-		print("UpdateData:        " + str((time.time()-mark2)))
-
-		print("total: " + str((time.time()-mark1)))
-		input()
 		return
 
 if __name__ == "__main__":
