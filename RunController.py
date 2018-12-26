@@ -7,8 +7,11 @@ import os
 class RunController(object):
 	def __init__(self):
 		files = os.listdir("Simulations")
-		files.remove("__pycache__")
-		files.remove("SimulationInterface.py")
+		if "__pycache__" in files:
+			files.remove("__pycache__")
+
+		if "SimulationInterface.py" in files:
+			files.remove("SimulationInterface.py")
 
 		for loop in range(len(files)):
 			files[loop] = files[loop][:-3]
