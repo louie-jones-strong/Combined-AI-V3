@@ -82,12 +82,7 @@ class BruteForce(object):
 		if self.WinningModeON:
 			print("winnning mode!")
 			if key in self.DataSetManager.DataSet and len(self.DataSetManager.DataSet[key].Moves) > 0:
-				bestAvgFitness = -sys.maxsize
-				moveID = 0
-				for movekey, moveValue in self.DataSetManager.DataSet[key].Moves.items():
-					if moveValue.AvgFitness > bestAvgFitness:
-						leastPlayed = moveValue.TimesPlayed
-						moveID = movekey
+				moveID = self.DataSetManager.DataSet[key].moveIDOfBestAvgFitness
 
 			else:#never played board before
 				moveID = random.randint(0,self.DataSetManager.MaxMoveIDs)
@@ -151,6 +146,11 @@ class BruteForce(object):
 				newFitness /= self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed
 				self.DataSetManager.DataSet[key].Moves[moveID].AvgFitness = newFitness
 
+				if newFitness > self.DataSetManager.DataSet[key].bestAvgFitness:
+					self.DataSetManager.DataSet[key].MoveIDOfBestAvgFitness = moveID
+					self.DataSetManager.DataSet[key].bestAvgFitness = newFitness
+
+
 
 		self.TempDataSet = {}
 		self.DataSetManager.SaveDataSet(self.AiNumber)
@@ -158,11 +158,11 @@ class BruteForce(object):
 
 	def BoardToKey(self, board):
 		board = str(board)
-		return board.replace(" ", "")
+		board = board.replace(" ", "")
+		return board
 
 class BoardInfo():
 	NumOfTriedMoves = 1
-	MoveIDOfLeastPlayed = 1
 	MoveIDOfBestAvgFitness = 0
 	BestAvgFitness = -sys.maxsize
 	Moves = {}
