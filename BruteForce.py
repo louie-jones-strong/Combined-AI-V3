@@ -82,10 +82,10 @@ class BruteForce(object):
 		if self.WinningModeON:
 			print("winnning mode!")
 			if key in self.DataSetManager.DataSet and len(self.DataSetManager.DataSet[key].Moves) > 0:
-				moveID = self.DataSetManager.DataSet[key].moveIDOfBestAvgFitness
+				moveID = self.DataSetManager.DataSet[key].MoveIDOfBestAvgFitness
 
 			else:#never played board before
-				moveID = random.randint(0,self.DataSetManager.MaxMoveIDs)
+				moveID = random.randint(0,self.DataSetManager.MaxMoveIDs-1)
 				print("new Board!")
 
 		else:  # learning mode
