@@ -334,7 +334,7 @@ class RenderEngine(object):
 
 		self.CheckButtons()
 		self.UpdateWindow()
-		pygame.event.wait()
+		pygame.event.get()
 		return
 	def MakeHumanMove(self, game):
 		selected = False
