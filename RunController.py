@@ -2,7 +2,34 @@ import BruteForce as AI
 import importlib
 import time
 import os
+import sys
 
+def MakeAIMove(turn, board, AIs, game):
+	AI = AIs[turn-1]
+	valid = False
+	if turn == 1:
+		while not valid:
+			move = AI.MoveCal(game.FlipBoard())
+			flipedMove = game.FlipInput(move)
+			valid, board = game.MakeSelection(flipedMove[0], flipedMove[1])
+			if not valid:
+				AI.UpdateInvalidMove(game.FlipBoard(), move)
+			else:
+				valid, board, turn = game.MakeMove(flipedMove[2], flipedMove[3])
+				if not valid:
+					AI.UpdateInvalidMove(game.FlipBoard(), move)
+		
+	else:
+		while not valid:
+			move = AI.MoveCal(board)
+			valid, board = game.MakeSelection(move[0], move[1])
+			if not valid:
+				AI.UpdateInvalidMove(board, move)
+			else:
+				valid, board, turn = game.MakeMove(move[2], move[3])
+				if not valid:
+					AI.UpdateInvalidMove(board, move)
+	return board, turn
 
 class RunController(object):
 	def __init__(self):
@@ -62,37 +89,6 @@ class RunController(object):
 			self.RenderEngine.UpdateFrame()
 
 		return
-
-	def MakeAIMove(self, turn, board, AIs, game):
-
-		AI = AIs[turn-1]
-
-		valid = False
-		if turn == 1:
-			while not valid:
-				move = AI.MoveCal(game.FlipBoard())
-				flipedMove = game.FlipInput(move)
-				valid, board = game.MakeSelection(flipedMove[0], flipedMove[1])
-
-				if not valid:
-					AI.UpdateInvalidMove(game.FlipBoard(), move)
-				else:
-					valid, board, turn = game.MakeMove(flipedMove[2], flipedMove[3])
-					if not valid:
-						AI.UpdateInvalidMove(game.FlipBoard(), move)
-			
-		else:
-			while not valid:
-				move = AI.MoveCal(board)
-				valid, board = game.MakeSelection(move[0], move[1])
-
-				if not valid:
-					AI.UpdateInvalidMove(board, move)
-				else:
-					valid, board, turn = game.MakeMove(move[2], move[3])
-					if not valid:
-						AI.UpdateInvalidMove(board, move)
-		return board, turn
 	
 	def MakeHumanMove(self, game):
 		if self.RenderQuality == 2:
@@ -116,7 +112,7 @@ class RunController(object):
 		MoveTime = time.time()
 		while True:
 			if self.NumberOfBots >= turn:
-				board, turn = self.MakeAIMove(turn, board, AIs, game)
+				board, turn = MakeAIMove(turn, board, AIs, game)
 			else:
 				board, turn = self.MakeHumanMove(game)
 
