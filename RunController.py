@@ -4,6 +4,8 @@ import time
 import os
 import sys
 
+from threading import Thread
+
 def MakeAIMove(turn, board, AIs, game):
 	AI = AIs[turn-1]
 	valid = False
@@ -67,7 +69,7 @@ class RunController(object):
 			self.AiDataManager = AI.DataSetManager(4, 8, 1, datasetAddress, loadData=True)
 
 		#setting 
-		self.RenderQuality = 0
+		self.RenderQuality = 2
 		self.NumberOfBots = 2
 
 		self.WinningMode = False
@@ -79,15 +81,15 @@ class RunController(object):
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
-		self.GameLoop()
+		self.RunGame()
 		return
 
 	def Render(self, board=None, turn=None):
 		if self.RenderQuality == 2:
 			if board !=None and turn != None:
 				self.RenderEngine.UpdateBoard(board, turn)
-			self.RenderEngine.UpdateFrame()
-
+			#self.RenderEngine.UpdateFrame()
+			Thread(target=self.RenderEngine.UpdateFrame()).start()
 		return
 	
 	def MakeHumanMove(self, game):
@@ -95,7 +97,7 @@ class RunController(object):
 			board, turn = self.RenderEngine.MakeHumanMove(game)
 		return board, turn
 
-	def GameLoop(self):
+	def RunGame(self):
 		game = self.Sim.Simulation()
 		AIs = []
 		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
@@ -108,6 +110,9 @@ class RunController(object):
 		numGames = 0
 		numMoves = 0
 
+		timeSampleSize = 50
+		moveTook = 0
+
 		time_taken = time.time()
 		MoveTime = time.time()
 		while True:
@@ -118,17 +123,19 @@ class RunController(object):
 
 			self.Render(board=board, turn=turn)
 
+			if self.RenderQuality == 2:
+				self.RenderEngine.UpdateConsoleText("Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n Game: "+str(numGames)+"\n Move: "+str(numMoves)+"\n AVG time: "+str(moveTook))
+
 			numMoves += 1
-			if numMoves % 50 == 0 or self.RenderQuality == 1:
+			if numMoves % timeSampleSize == 0 or self.RenderQuality == 1:
+				moveTook = (time.time() - MoveTime)/timeSampleSize
+
 				if self.RenderQuality == 1:
 					print("done " + str(numMoves) + " moves, last took: " + str(time.time() - MoveTime) + " seconds")
 				else: 
-					print("done " + str(numMoves) + " moves took on AVG: " + str((time.time() - MoveTime)/50) + " seconds")
+					print("done " + str(numMoves) + " moves took on AVG: " + str(moveTook) + " seconds")
 
 				MoveTime = time.time()
-				
-			if self.RenderQuality == 2:
-				self.RenderEngine.UpdateConsoleText("Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n Game: "+str(numGames)+"\n Move: "+str(numMoves)+"\n AVG time: "+str((time.time() - time_taken)/numMoves))
 
 			finished, fit = game.CheckFinished()
 			if finished == False and numMoves >= 1000:
