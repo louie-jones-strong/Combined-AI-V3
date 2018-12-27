@@ -145,7 +145,7 @@ class RunController(object):
 				for loop in range(len(AIs)):
 					AIs[loop].UpdateData(fit[loop])
 
-				print("Dataset size: " + str(len(self.AiDataManager.DataSet)) + " = " + str( int(sys.getsizeof(self.AiDataManager.DataSet)/1024 )) + " KBs" )
+				print("Dataset size: " + str(len(self.AiDataManager.DataSet)))
 				print("finished game: " + str(numGames+1) + " with " + str(numMoves) + " moves made")
 				print("each move took on AVG: " + str((time.time() - time_taken)/numMoves) + " seconds")
 				print("game in total took: " + str(time.time() - time_taken) + " seconds")
