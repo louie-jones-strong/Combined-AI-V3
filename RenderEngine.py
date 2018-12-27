@@ -221,7 +221,7 @@ class RenderEngine(object):
 			p1x, p1y = p2x, p2y
 		return inside
 	def getObjectClicked(self):
-		if mouse.is_pressed(button="right"):
+		if mouse.is_pressed(button="left"):
 			pos = mouse.get_position()
 			pos = [pos[0]-self.windowPostion[0],pos[1]-self.windowPostion[1]]
 			face2DList = self.objects_to_2DFaceList(self.object3D_list,self.globalRotate)
