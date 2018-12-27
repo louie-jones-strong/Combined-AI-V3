@@ -84,12 +84,21 @@ class RunController(object):
 		self.RunGame()
 		return
 
-	def Render(self, board=None, turn=None):
+	def Output(self, numGames, numMoves, timeMoveTook, board=None, turn=None):
 		if self.RenderQuality == 2:
+			text = "Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n"
+			text += "Game: "+str(numGames)+"\n"
+			text += "Move: "+str(numMoves)+"\n"
+			text += "AVG time: "+str(timeMoveTook)
+			self.RenderEngine.UpdateConsoleText(text)
+
 			if board !=None and turn != None:
 				self.RenderEngine.UpdateBoard(board, turn)
-			#self.RenderEngine.UpdateFrame()
-			Thread(target=self.RenderEngine.UpdateFrame()).start()
+			self.RenderEngine.UpdateFrame()
+
+		if (numMoves % 50 == 0):
+			print("done " + str(numMoves) + " moves last took: " + str(timeMoveTook) + " seconds")
+
 		return
 	
 	def MakeHumanMove(self, game):
@@ -104,14 +113,10 @@ class RunController(object):
 		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		board, turn = game.Start()
 
-		self.Render(board=board, turn=turn)
-
-		
 		numGames = 0
 		numMoves = 0
 
-		timeSampleSize = 50
-		moveTook = 0
+		self.Output(numGames, numMoves, 0, board=board, turn=turn)
 
 		time_taken = time.time()
 		MoveTime = time.time()
@@ -121,21 +126,10 @@ class RunController(object):
 			else:
 				board, turn = self.MakeHumanMove(game)
 
-			self.Render(board=board, turn=turn)
-
-			if self.RenderQuality == 2:
-				self.RenderEngine.UpdateConsoleText("Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n Game: "+str(numGames)+"\n Move: "+str(numMoves)+"\n AVG time: "+str(moveTook))
-
 			numMoves += 1
-			if numMoves % timeSampleSize == 0 or self.RenderQuality == 1:
-				moveTook = (time.time() - MoveTime)/timeSampleSize
 
-				if self.RenderQuality == 1:
-					print("done " + str(numMoves) + " moves, last took: " + str(time.time() - MoveTime) + " seconds")
-				else: 
-					print("done " + str(numMoves) + " moves took on AVG: " + str(moveTook) + " seconds")
-
-				MoveTime = time.time()
+			Thread(target=self.Output(numGames, numMoves, (time.time() - MoveTime), board=board, turn=turn)).start()
+			MoveTime = time.time()
 
 			finished, fit = game.CheckFinished()
 			if finished == False and numMoves >= 1000:
