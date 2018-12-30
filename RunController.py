@@ -81,10 +81,13 @@ class RunController(object):
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
+		NumberOfThreads = 1
+		for loop in range(NumberOfThreads-1):
+			Thread(target=self.RunGame).start()
 		self.RunGame()
 		return
 
-	def Output(self, numGames, numMoves, timeMoveTook, board=None, turn=None):
+	def Output(self, numGames, numMoves, timeMoveTook, board, turn):
 		if self.RenderQuality == 2:
 			text = "Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n"
 			text += "Game: "+str(numGames)+"\n"
@@ -92,7 +95,7 @@ class RunController(object):
 			text += "AVG time: "+str(timeMoveTook)
 			self.RenderEngine.UpdateConsoleText(text)
 
-			if board !=None and turn != None:
+			if board != None and turn != None:
 				self.RenderEngine.UpdateBoard(board, turn)
 			self.RenderEngine.UpdateFrame()
 
@@ -101,22 +104,33 @@ class RunController(object):
 
 		return
 	
+	def EndOutput(self, numGames, numMoves, timeTaken):
+		print("")
+		print("Dataset size: " + str(len(self.AiDataManager.DataSet)))
+		print("finished game: " + str(numGames+1) + " with " + str(numMoves) + " moves made")
+		print("each move took on AVG: " + str((time.time() - timeTaken)/numMoves) + " seconds")
+		print("game in total took: " + str(time.time() - timeTaken) + " seconds")
+		print("")
+		print("")
+		return
+
 	def MakeHumanMove(self, game):
 		if self.RenderQuality == 2:
 			board, turn = self.RenderEngine.MakeHumanMove(game)
 		return board, turn
 
 	def RunGame(self):
+		print("thread started")
 		game = self.Sim.Simulation()
 		AIs = []
-		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
-		AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
+		for loop in range(2):
+			AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		board, turn = game.Start()
 
 		numGames = 0
 		numMoves = 0
 
-		self.Output(numGames, numMoves, 0, board=board, turn=turn)
+		self.Output(numGames, numMoves, 0, board, turn)
 
 		time_taken = time.time()
 		MoveTime = time.time()
@@ -128,7 +142,8 @@ class RunController(object):
 
 			numMoves += 1
 
-			Thread(target=self.Output(numGames, numMoves, (time.time() - MoveTime), board=board, turn=turn)).start()
+			self.Output(numGames, numMoves, (time.time() - MoveTime), board, turn)
+			#Thread(target=self.Output, args=(numGames, numMoves, (time.time() - MoveTime), board, turn,)).start()
 			MoveTime = time.time()
 
 			finished, fit = game.CheckFinished()
@@ -137,22 +152,14 @@ class RunController(object):
 				fit = [3,3]
 
 			if finished:
-
-				print("")
 				for loop in range(len(AIs)):
 					AIs[loop].UpdateData(fit[loop])
 
-				print("Dataset size: " + str(len(self.AiDataManager.DataSet)))
-				print("finished game: " + str(numGames+1) + " with " + str(numMoves) + " moves made")
-				print("each move took on AVG: " + str((time.time() - time_taken)/numMoves) + " seconds")
-				print("game in total took: " + str(time.time() - time_taken) + " seconds")
+				Thread(target=self.EndOutput, args=(numGames, numMoves, time_taken,)).start()
 
 				board, turn = game.Start()
 				numGames += 1
 				numMoves = 0
-
-				print("")
-				print("")
 				time_taken = time.time()
 				MoveTime = time.time()
 		return
