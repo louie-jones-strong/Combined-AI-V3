@@ -95,7 +95,7 @@ class RunController(object):
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
-		NumberOfThreads = 2
+		NumberOfThreads = 1
 		for loop in range(NumberOfThreads-1):
 			Thread(target=self.RunGame, args=("Thread"+str(loop),)).start()
 		self.RunGame("main   ")
