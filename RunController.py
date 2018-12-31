@@ -69,8 +69,22 @@ class RunController(object):
 			self.AiDataManager = AI.DataSetManager(4, 8, 1, datasetAddress, loadData=True)
 
 		#setting 
-		self.RenderQuality = 2
-		self.NumberOfBots = 2
+		userInput = input("Render[Y/N]:")
+		if userInput == "y" or userInput == "Y":
+			self.RenderQuality = 2
+
+			userInput = input("Human Player[Y/N]:")
+			if userInput == "y" or userInput == "Y":
+				self.NumberOfBots = 1
+
+
+			else:
+				self.NumberOfBots = 2
+			
+
+		else:
+			self.RenderQuality = 0
+			self.NumberOfBots = 2
 
 		self.WinningMode = False
 		if self.NumberOfBots == 1:
@@ -81,10 +95,10 @@ class RunController(object):
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
-		NumberOfThreads = 1
+		NumberOfThreads = 2
 		for loop in range(NumberOfThreads-1):
-			Thread(target=self.RunGame).start()
-		self.RunGame()
+			Thread(target=self.RunGame, args=("Thread"+str(loop),)).start()
+		self.RunGame("main   ")
 		return
 
 	def Output(self, numGames, numMoves, timeMoveTook, board, turn):
@@ -119,8 +133,8 @@ class RunController(object):
 			board, turn = self.RenderEngine.MakeHumanMove(game)
 		return board, turn
 
-	def RunGame(self):
-		print("thread started")
+	def RunGame(self, name):
+		print("thread started: " + name)
 		game = self.Sim.Simulation()
 		AIs = []
 		for loop in range(2):
@@ -142,8 +156,7 @@ class RunController(object):
 
 			numMoves += 1
 
-			self.Output(numGames, numMoves, (time.time() - MoveTime), board, turn)
-			#Thread(target=self.Output, args=(numGames, numMoves, (time.time() - MoveTime), board, turn,)).start()
+			Thread(target=self.Output, args=(numGames, numMoves, (time.time() - MoveTime), board, turn,)).start()
 			MoveTime = time.time()
 
 			finished, fit = game.CheckFinished()

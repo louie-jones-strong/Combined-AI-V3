@@ -140,6 +140,8 @@ class RenderEngine(object):
 			self.window.blit(label, [10,22])
 			label = self.Font.render("Objects:"+str(len(self.object3D_list)), 1,(255,255,255))
 			self.window.blit(label, [10,34])
+			label = self.Font.render("Angle:"+str(self.globalRotate), 1,(255,255,255))
+			self.window.blit(label, [10,46])
 
 		if self.ConsoleText != "":
 			temp = self.ConsoleText.split("\n")
@@ -293,7 +295,7 @@ class RenderEngine(object):
 		self.MaxNumberOfLines = 6
 
 		#AutoMovingCamera
-		self.globalRotate = [-45, 0, 0]
+		self.globalRotate = [45,180,0]
 		self.AutoMovingCameraOn = False
 		self.midMoving = False
 		self.Turn = 1

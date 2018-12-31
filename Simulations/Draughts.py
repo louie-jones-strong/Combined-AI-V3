@@ -277,5 +277,4 @@ def NewBoard():
 	return Board
 
 #todo list 
-#1) must take peice not in offical rules tho
-#2) take more then one peice at once
+#1) take more then one peice at once
