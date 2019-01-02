@@ -1,5 +1,8 @@
 class Simulation(object):
-	Info = {}
+	Info = {"Name":"Draughts",
+	        "MinPlayers":2,"MaxPlayers":2,
+	        "NumInputs":1,"MinInputSize":1,"MaxInputSize":3,
+			"Resolution":1}
 	
 	def Start(self):
 		self.Board = NewBoard()
@@ -27,7 +30,7 @@ class Simulation(object):
 		if valid:
 			self.step = 2
 
-			moves = self.possibleMoves(X,Y)
+			moves = PossibleMoves(self.Board, X, Y)
 
 			for loop in range(len(moves)):
 				self.Board[moves[loop][0]][moves[loop][1]] = -1
@@ -39,7 +42,7 @@ class Simulation(object):
 		if self.Board[X][Y] == -1:
 
 			if abs(X - self.selectedPos[0] > 1) or abs(Y - self.selectedPos[1]) > 1:
-				output = self.attackMoves(self.selectedPos[0],self.selectedPos[1])
+				output = AttackMoves(self.Board, self.selectedPos[0], self.selectedPos[1])
 				for loop in range(len(output[0])):
 					if output[0][loop][0] == X and output[0][loop][1] == Y:
 						temp = output[1][loop]
@@ -93,7 +96,7 @@ class Simulation(object):
 			player1Fitness = 5
 			player2Fitness = -5
 
-		if self.CheckIfDrawed():
+		if CheckIfDrawed(self.Board):
 			finished = True
 			player1Fitness = 3
 			player2Fitness = 3
@@ -128,109 +131,93 @@ class Simulation(object):
 		temp = [7-move[0], 7-move[1], 7-move[2], 7-move[3]]
 		return temp
 
+def CheckIfDrawed(board):
+	type1Moves = 0
+	type2Moves = 0
+	for x in range(len(board)):
+		for y in range(len(board[x])):
+			if IsPieceSameSide(board[x][y], 1):
+				if PossibleMoves(board, x, y):
+					type1Moves += 1
+			elif IsPieceSameSide(board[x][y], 2):
+				if PossibleMoves(board, x, y):
+					type2Moves += 1
+	if type1Moves == 0 or type2Moves == 0:
+		return True
+	return False
 
-	def attackMoves(self,X,Y):
-		outputList = []
-		ToRemoveList = []
-		piece = self.Board[X][Y]
-
-		if self.Board[X][Y] == 3 or self.Board[X][Y] == 4:
-
-			if X >= 2 and Y >= 2:
-				if IsPieceEnemySide(piece, self.Board[X-1][Y-1]) and (self.Board[X-2][Y-2] == 0 or self.Board[X-2][Y-2] == -1):
-					outputList += [[X-2,Y-2]]
-					ToRemoveList += [[X-1,Y-1]]
-			if X <= 5 and Y >= 2:
-				if IsPieceEnemySide(piece, self.Board[X+1][Y-1]) and (self.Board[X+2][Y-2] == 0 or self.Board[X+2][Y-2] == -1):
-					outputList += [[X+2,Y-2]]
-					ToRemoveList += [[X+1,Y-1]]
-			if X >= 2 and Y <= 5:
-				if IsPieceEnemySide(piece, self.Board[X-1][Y+1]) and (self.Board[X-2][Y+2] == 0 or self.Board[X-2][Y+2] == -1):
-					outputList += [[X-2,Y+2]]
-					ToRemoveList += [[X-1,Y+1]]
-			if X <= 5 and Y <= 5:
-				if IsPieceEnemySide(piece, self.Board[X+1][Y+1]) and (self.Board[X+2][Y+2] == 0 or self.Board[X+2][Y+2] == -1):
-					outputList += [[X+2,Y+2]]
-					ToRemoveList += [[X+1,Y+1]]
-
-		elif self.Board[X][Y] == 1 or self.Board[X][Y] == 3:
-
-			if X >= 2 and Y <= 5:
-				if IsPieceEnemySide(piece, self.Board[X-1][Y+1]) and (self.Board[X-2][Y+2] == 0 or self.Board[X-2][Y+2] == -1):
-					outputList += [[X-2,Y+2]]
-					ToRemoveList += [[X-1,Y+1]]
-			if X <= 5 and Y <= 5:
-				if IsPieceEnemySide(piece, self.Board[X+1][Y+1]) and (self.Board[X+2][Y+2] == 0 or self.Board[X+2][Y+2] == -1):
-					outputList += [[X+2,Y+2]]
-					ToRemoveList += [[X+1,Y+1]]
-
-		elif self.Board[X][Y] == 2 or self.Board[X][Y] == 4:
-
-			if X >= 2 and Y >= 2:
-				if IsPieceEnemySide(piece, self.Board[X-1][Y-1]) and (self.Board[X-2][Y-2] == 0 or self.Board[X-2][Y-2] == -1):
-					outputList += [[X-2,Y-2]]
-					ToRemoveList += [[X-1,Y-1]]
-			if X <= 5 and Y >= 2:
-				if IsPieceEnemySide(piece, self.Board[X+1][Y-1]) and (self.Board[X+2][Y-2] == 0 or self.Board[X+2][Y-2] == -1):
-					outputList += [[X+2,Y-2]]
-					ToRemoveList += [[X+1,Y-1]]
-
-		return outputList, ToRemoveList
-	def possibleMoves(self,X,Y):
-		outputList = self.attackMoves(X,Y)[0]
-		if len(outputList) == 0:
-
-			if self.Board[X][Y] == 3 or self.Board[X][Y] == 4:
-
-				if X >= 1 and Y >= 1:
-					if self.Board[X-1][Y-1] == 0:
-						outputList += [[X-1,Y-1]]
-				if X <= 6 and Y >= 1:
-					if self.Board[X+1][Y-1] == 0:
-						outputList += [[X+1,Y-1]]
-				if X >= 1 and Y <= 6:
-					if self.Board[X-1][Y+1] == 0:
-						outputList += [[X-1,Y+1]]
-				if X <= 6 and Y <= 6:
-					if self.Board[X+1][Y+1] == 0:
-						outputList += [[X+1,Y+1]]
-
-			elif self.Board[X][Y] == 1:
-
-				if X >= 1 and Y <= 6:
-					if self.Board[X-1][Y+1] == 0:
-						outputList += [[X-1,Y+1]]
-				if X <= 6 and Y <= 6:
-					if self.Board[X+1][Y+1] == 0:
-						outputList += [[X+1,Y+1]]
-
-			elif self.Board[X][Y] == 2:
-
-				if X >= 1 and Y >= 1:
-					if self.Board[X-1][Y-1] == 0:
-						outputList += [[X-1,Y-1]]
-				if X <= 6 and Y >= 1:
-					if self.Board[X+1][Y-1] == 0:
-						outputList += [[X+1,Y-1]]
-
-
-		return outputList
-	def CheckIfDrawed(self):
-		type1Moves = 0
-		type2Moves = 0
-		for x in range(len(self.Board)):
-			for y in range(len(self.Board[x])):
-				if IsPieceSameSide(self.Board[x][y], 1):
-					if self.possibleMoves(x,y):
-						type1Moves += 1
-
-				elif IsPieceSameSide(self.Board[x][y], 2):
-					if self.possibleMoves(x,y):
-						type2Moves += 1
-
-		if type1Moves == 0 or type2Moves == 0:
-			return True
-		return False
+def PossibleMoves(board, X, Y):
+	outputList = AttackMoves(board,X,Y)[0]
+	if len(outputList) == 0:
+		if board[X][Y] == 3 or board[X][Y] == 4:
+			if X >= 1 and Y >= 1:
+				if board[X-1][Y-1] == 0:
+					outputList += [[X-1,Y-1]]
+			if X <= 6 and Y >= 1:
+				if board[X+1][Y-1] == 0:
+					outputList += [[X+1,Y-1]]
+			if X >= 1 and Y <= 6:
+				if board[X-1][Y+1] == 0:
+					outputList += [[X-1,Y+1]]
+			if X <= 6 and Y <= 6:
+				if board[X+1][Y+1] == 0:
+					outputList += [[X+1,Y+1]]
+		elif board[X][Y] == 1:
+			if X >= 1 and Y <= 6:
+				if board[X-1][Y+1] == 0:
+					outputList += [[X-1,Y+1]]
+			if X <= 6 and Y <= 6:
+				if board[X+1][Y+1] == 0:
+					outputList += [[X+1,Y+1]]
+		elif board[X][Y] == 2:
+			if X >= 1 and Y >= 1:
+				if board[X-1][Y-1] == 0:
+					outputList += [[X-1,Y-1]]
+			if X <= 6 and Y >= 1:
+				if board[X+1][Y-1] == 0:
+					outputList += [[X+1,Y-1]]
+	return outputList
+		
+def AttackMoves(board, X, Y):
+	outputList = []
+	ToRemoveList = []
+	piece = board[X][Y]
+	if board[X][Y] == 3 or board[X][Y] == 4:
+		if X >= 2 and Y >= 2:
+			if IsPieceEnemySide(piece, board[X-1][Y-1]) and (board[X-2][Y-2] == 0 or board[X-2][Y-2] == -1):
+				outputList += [[X-2,Y-2]]
+				ToRemoveList += [[X-1,Y-1]]
+		if X <= 5 and Y >= 2:
+			if IsPieceEnemySide(piece, board[X+1][Y-1]) and (board[X+2][Y-2] == 0 or board[X+2][Y-2] == -1):
+				outputList += [[X+2,Y-2]]
+				ToRemoveList += [[X+1,Y-1]]
+		if X >= 2 and Y <= 5:
+			if IsPieceEnemySide(piece, board[X-1][Y+1]) and (board[X-2][Y+2] == 0 or board[X-2][Y+2] == -1):
+				outputList += [[X-2,Y+2]]
+				ToRemoveList += [[X-1,Y+1]]
+		if X <= 5 and Y <= 5:
+			if IsPieceEnemySide(piece, board[X+1][Y+1]) and (board[X+2][Y+2] == 0 or board[X+2][Y+2] == -1):
+				outputList += [[X+2,Y+2]]
+				ToRemoveList += [[X+1,Y+1]]
+	elif board[X][Y] == 1 or board[X][Y] == 3:
+		if X >= 2 and Y <= 5:
+			if IsPieceEnemySide(piece, board[X-1][Y+1]) and (board[X-2][Y+2] == 0 or board[X-2][Y+2] == -1):
+				outputList += [[X-2,Y+2]]
+				ToRemoveList += [[X-1,Y+1]]
+		if X <= 5 and Y <= 5:
+			if IsPieceEnemySide(piece, board[X+1][Y+1]) and (board[X+2][Y+2] == 0 or board[X+2][Y+2] == -1):
+				outputList += [[X+2,Y+2]]
+				ToRemoveList += [[X+1,Y+1]]
+	elif board[X][Y] == 2 or board[X][Y] == 4:
+		if X >= 2 and Y >= 2:
+			if IsPieceEnemySide(piece, board[X-1][Y-1]) and (board[X-2][Y-2] == 0 or board[X-2][Y-2] == -1):
+				outputList += [[X-2,Y-2]]
+				ToRemoveList += [[X-1,Y-1]]
+		if X <= 5 and Y >= 2:
+			if IsPieceEnemySide(piece, board[X+1][Y-1]) and (board[X+2][Y-2] == 0 or board[X+2][Y-2] == -1):
+				outputList += [[X+2,Y-2]]
+				ToRemoveList += [[X+1,Y-1]]
+	return outputList, ToRemoveList
 
 def IsPieceSameSide(piece1, piece2):
 	if (piece1 == 1 or piece1 == 3) and (piece2 == 1 or piece2 == 3):
