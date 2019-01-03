@@ -13,24 +13,16 @@ def MakeAIMove(turn, board, AIs, game):
 		while not valid:
 			move = AI.MoveCal(game.FlipBoard())
 			flipedMove = game.FlipInput(move)
-			valid, board = game.MakeSelection(flipedMove[0], flipedMove[1])
+			valid, board, turn = game.MakeMove(flipedMove)
 			if not valid:
 				AI.UpdateInvalidMove(game.FlipBoard(), move)
-			else:
-				valid, board, turn = game.MakeMove(flipedMove[2], flipedMove[3])
-				if not valid:
-					AI.UpdateInvalidMove(game.FlipBoard(), move)
 		
 	else:
 		while not valid:
 			move = AI.MoveCal(board)
-			valid, board = game.MakeSelection(move[0], move[1])
+			valid, board, turn = game.MakeMove(move)
 			if not valid:
 				AI.UpdateInvalidMove(board, move)
-			else:
-				valid, board, turn = game.MakeMove(move[2], move[3])
-				if not valid:
-					AI.UpdateInvalidMove(board, move)
 	return board, turn
 
 class RunController(object):

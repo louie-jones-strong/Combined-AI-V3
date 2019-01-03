@@ -10,15 +10,15 @@ class Simulation(object):
 		self.step = 1
 		self.selectedPos = [0,0]
 		return self.Board, self.Turn
-
-	def MakeSelection(self,X,Y):
+		
+	def MakeMove(self,moveArray):
 		valid = False
-		if (self.Board[X][Y] == 1 or self.Board[X][Y] == 3) and self.Turn == 1:
-			self.selectedPos = [X,Y]
+		if (self.Board[moveArray[0]][moveArray[1]] == 1 or self.Board[moveArray[0]][moveArray[1]] == 3) and self.Turn == 1:
+			self.selectedPos = [moveArray[0],moveArray[1]]
 			valid = True
 
-		elif (self.Board[X][Y] == 2 or self.Board[X][Y] == 4) and self.Turn == 2:
-			self.selectedPos = [X,Y]
+		elif (self.Board[moveArray[0]][moveArray[1]] == 2 or self.Board[moveArray[0]][moveArray[1]] == 4) and self.Turn == 2:
+			self.selectedPos = [moveArray[0],moveArray[1]]
 			valid = True
 
 		if self.step == 2 and valid:
@@ -30,32 +30,31 @@ class Simulation(object):
 		if valid:
 			self.step = 2
 
-			moves = PossibleMoves(self.Board, X, Y)
+			moves = PossibleMoves(self.Board, moveArray[0], moveArray[1])
 
 			for loop in range(len(moves)):
 				self.Board[moves[loop][0]][moves[loop][1]] = -1
+		else:
+			return valid, self.Board, self.Turn
 
-		return valid, self.Board
-		
-	def MakeMove(self,X,Y):
-		valid = False
-		if self.Board[X][Y] == -1:
+		#move
+		if self.Board[moveArray[2]][moveArray[3]] == -1:
 
-			if abs(X - self.selectedPos[0] > 1) or abs(Y - self.selectedPos[1]) > 1:
+			if abs(moveArray[2] - self.selectedPos[0] > 1) or abs(moveArray[3] - self.selectedPos[1]) > 1:
 				output = AttackMoves(self.Board, self.selectedPos[0], self.selectedPos[1])
 				for loop in range(len(output[0])):
-					if output[0][loop][0] == X and output[0][loop][1] == Y:
+					if output[0][loop][0] == moveArray[2] and output[0][loop][1] == moveArray[3]:
 						temp = output[1][loop]
 						self.Board[temp[0]][temp[1]] = 0
 
-			self.Board[X][Y] = self.Board[self.selectedPos[0]][self.selectedPos[1]]
+			self.Board[moveArray[2]][moveArray[3]] = self.Board[self.selectedPos[0]][self.selectedPos[1]]
 			self.Board[self.selectedPos[0]][self.selectedPos[1]] = 0
 
-			if self.Board[X][Y] == 1 or self.Board[X][Y] == 2:
-				if self.Board[X][Y] == 1 and Y == 7:
-					self.Board[X][Y] = 3
-				elif self.Board[X][Y] == 2 and Y == 0 :
-					self.Board[X][Y] = 4
+			if self.Board[moveArray[2]][moveArray[3]] == 1 or self.Board[moveArray[2]][moveArray[3]] == 2:
+				if self.Board[moveArray[2]][moveArray[3]] == 1 and moveArray[3] == 7:
+					self.Board[moveArray[2]][moveArray[3]] = 3
+				elif self.Board[moveArray[2]][moveArray[3]] == 2 and moveArray[3] == 0 :
+					self.Board[moveArray[2]][moveArray[3]] = 4
 
 			valid = True
 			self.step = 1

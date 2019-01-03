@@ -352,15 +352,12 @@ class RenderEngine(object):
 				Y = int(object3D.name[8:9])
 
 				if object3D.name[0:6] == "Piece_":
-					valid, board = game.MakeSelection(X, Y)
-					if valid:
-						object3D.selected = True
-						self.object3D_list = self.moveableAreas(board, self.object3D_list)
-						self.object3D_list[64:-1] = self.addPieces(board)
-						selected = True
+					x1 = X
+					y1 = Y
+					selected = True
 
 				elif object3D.name[0:6] == "Board_" and selected:
-					valid, board, turn = game.MakeMove(X, Y)
+					valid, board, turn = game.MakeMove([x1, y1, X, Y])
 					if valid:
 						selected = False
 						break
