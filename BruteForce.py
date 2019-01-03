@@ -52,7 +52,8 @@ class DataSetManager(object):
 	
 	def LoadDataSet(self):
 		if os.path.isfile(self.DatasetAddress + ".p"):
-			self.DataSet = pickle.load(open(self.DatasetAddress + ".p", "rb"))
+			file = open(self.DatasetAddress + ".p", "rb")
+			self.DataSet = pickle.load(file)
 
 		#print("DataSet lenght: " + str(len(self.DataSet)))
 		return
