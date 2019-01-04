@@ -1,7 +1,7 @@
 class Simulation(object):
 	Info = {"Name":"Draughts",
 	        "MinPlayers":2,"MaxPlayers":2,
-	        "NumInputs":1,"MinInputSize":1,"MaxInputSize":3,
+	        "NumInputs":4,"MinInputSize":0,"MaxInputSize":7,
 			"Resolution":1}
 	
 	def Start(self):
@@ -97,12 +97,12 @@ class Simulation(object):
 
 		return finished, [player1Fitness, player2Fitness]
 
-	def FlipBoard(self):
+	def FlipBoard(self, board):
 		output = []
-		for loop in range(len(self.Board)-1,-1,-1):
+		for loop in range(len(board)-1,-1,-1):
 			temp = []
-			for loop2 in range(len(self.Board[loop])-1,-1,-1):
-				piece = self.Board[loop][loop2]
+			for loop2 in range(len(board[loop])-1,-1,-1):
+				piece = board[loop][loop2]
 
 				if piece == 1:
 					temp += [2]

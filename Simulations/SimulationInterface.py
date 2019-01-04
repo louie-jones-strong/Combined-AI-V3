@@ -20,7 +20,7 @@ class Simulation(object):
 	# Each element of which is between MinInputSize to MaxInputSize
 	# and resolution Resolution
 	def MakeMove(self,inputs):
-		valid = True
+		valid = False
 		# remember to update turn and board
 		return valid, self.Board, self.Turn
 

@@ -11,11 +11,11 @@ def MakeAIMove(turn, board, AIs, game):
 	valid = False
 	if turn == 1:
 		while not valid:
-			move = AI.MoveCal(game.FlipBoard())
+			move = AI.MoveCal(game.FlipBoard(board))
 			flipedMove = game.FlipInput(move)
 			valid, board, turn = game.MakeMove(flipedMove)
 			if not valid:
-				AI.UpdateInvalidMove(game.FlipBoard(), move)
+				AI.UpdateInvalidMove(game.FlipBoard(board), move)
 		
 	else:
 		while not valid:
