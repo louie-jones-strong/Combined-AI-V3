@@ -19,13 +19,6 @@ class Simulation(object):
 	# inputs is an array of size NumInputs
 	# Each element of which is between MinInputSize to MaxInputSize
 	# and resolution Resolution
-	def MakeSelection(self,inputs):
-		valid = True
-		return valid, self.Board
-
-	# inputs is an array of size NumInputs
-	# Each element of which is between MinInputSize to MaxInputSize
-	# and resolution Resolution
 	def MakeMove(self,inputs):
 		valid = True
 		# remember to update turn and board
