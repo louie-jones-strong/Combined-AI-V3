@@ -54,11 +54,13 @@ class RunController(object):
 		datasetAddress = "DataSets//"+simName+"Dataset"
 
 		userInput = input("load Dataset[Y/N]:")
+
+		info = self.Sim.Simulation().Info
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager = AI.DataSetManager(4, 8, 1, datasetAddress, loadData=False)
+			self.AiDataManager = AI.DataSetManager(info["NumInputs"], info["MaxInputSize"], 1, datasetAddress, loadData=False)
 
 		else:
-			self.AiDataManager = AI.DataSetManager(4, 8, 1, datasetAddress, loadData=True)
+			self.AiDataManager = AI.DataSetManager(info["NumInputs"], info["MaxInputSize"], 1, datasetAddress, loadData=True)
 
 		#setting 
 		userInput = input("Render[Y/N]:")

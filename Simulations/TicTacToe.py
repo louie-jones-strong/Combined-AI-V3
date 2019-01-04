@@ -1,7 +1,7 @@
 class Simulation(object):
 	Info = {"Name":"TicTacToe",
 	        "MinPlayers":2,"MaxPlayers":2,
-	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":8,
+	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":9,#need to be range until coded so put back
 			"Resolution":1}
 
 	def Start(self):
