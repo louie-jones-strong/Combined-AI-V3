@@ -3,7 +3,7 @@ import importlib
 import time
 import os
 import sys
-
+import keyboard
 from threading import Thread
 
 def MakeAIMove(turn, board, AIs, game):
@@ -162,6 +162,9 @@ class RunController(object):
 
 			self.Output(numGames, numMoves, gameStartTime, board, turn)
 
+			if keyboard.is_pressed("esc"):
+				break
+
 			finished, fit = game.CheckFinished()
 			if finished == False and numMoves >= 1000:
 				finished = True
@@ -177,6 +180,7 @@ class RunController(object):
 				numGames += 1
 				numMoves = 0
 				gameStartTime = time.time()
+
 		return
 
 if __name__ == "__main__":
