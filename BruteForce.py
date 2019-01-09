@@ -8,10 +8,14 @@ class DataSetManager(object):
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
 	
-	def __init__(self, numOfOutputs, maxOutputSize, outputResolution, datasetAddress, loadData=True):
+	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, datasetAddress, loadData=True):
 		self.NumOfOutputs = numOfOutputs
+
+		self.MinOutputSize = minOutputSize
 		self.MaxOutputSize = maxOutputSize
-		self.MaxMoveIDs = maxOutputSize ** numOfOutputs
+		self.OutputResolution = outputResolution
+
+		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
 		self.DatasetAddress = datasetAddress
 
 		self.RunningAIs = []
@@ -60,10 +64,11 @@ class DataSetManager(object):
 	
 	def MoveIDToMove(self, moveID):
 		#maybe make this a lookuptabel in stead but will use more memory
+		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
 		move = []
 		for loop in range(self.NumOfOutputs):
-			move += [int(moveID / (self.MaxOutputSize)**((self.NumOfOutputs - loop)-1))]
-			moveID = moveID % (self.MaxOutputSize)**((self.NumOfOutputs - loop)-1)
+			move += [int(moveID / (temp)**((self.NumOfOutputs - loop)-1))]
+			moveID = moveID % (temp)**((self.NumOfOutputs - loop)-1)
 		return move
 
 class BruteForce(object):

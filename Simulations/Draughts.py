@@ -1,7 +1,7 @@
 class Simulation(object):
 	Info = {"Name":"Draughts",
 	        "MinPlayers":2,"MaxPlayers":2,
-	        "NumInputs":4,"MinInputSize":0,"MaxInputSize":8,#need to be range until coded so put back
+	        "NumInputs":4,"MinInputSize":0,"MaxInputSize":7,#need to be range until coded so put back
 			"Resolution":1}
 	
 	def Start(self):
@@ -122,6 +122,18 @@ class Simulation(object):
 	def FlipInput(self, move):
 		temp = [7-move[0], 7-move[1], 7-move[2], 7-move[3]]
 		return temp
+
+	def SimpleOutput(self, board):
+		for loop in range(len(board)):
+			temp = ""
+			for loop2 in range(len(board[loop])):
+				if (board[loop2][loop] == 0):
+					temp += "  "
+				else:
+					temp += str(board[loop2][loop])
+				
+			print(temp)
+		return
 
 def CheckIfDrawed(board):
 	type1Moves = 0

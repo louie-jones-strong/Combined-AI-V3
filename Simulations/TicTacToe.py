@@ -1,7 +1,7 @@
 class Simulation(object):
 	Info = {"Name":"TicTacToe",
 	        "MinPlayers":2,"MaxPlayers":2,
-	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":9,#need to be range until coded so put back
+	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":8,#need to be range until coded so put back
 			"Resolution":1}
 
 	def Start(self):
@@ -58,6 +58,16 @@ class Simulation(object):
 	def FlipInput(self, move):
 		return move
 
+	def SimpleOutput(self, board):
+		loop = 0
+		for y in range(3):
+			temp = ""
+			for x in range(3):
+				temp += str(board[loop])
+				loop += 1
+
+			print(temp)
+		return
 
 def CheckWin(board, player):
 	if    (board[0] == player and board[1] == player and board[2] == player) \

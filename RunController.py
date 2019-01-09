@@ -55,31 +55,24 @@ class RunController(object):
 
 		userInput = input("load Dataset[Y/N]:")
 
-		info = self.Sim.Simulation().Info
+		self.SimInfo = self.Sim.Simulation().Info
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager = AI.DataSetManager(info["NumInputs"], info["MaxInputSize"], 1, datasetAddress, loadData=False)
+			self.AiDataManager = AI.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], datasetAddress, loadData=False)
 
 		else:
-			self.AiDataManager = AI.DataSetManager(info["NumInputs"], info["MaxInputSize"], 1, datasetAddress, loadData=True)
+			self.AiDataManager = AI.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], datasetAddress, loadData=True)
 
 		#setting 
-		userInput = input("Render[Y/N]:")
+		self.RenderQuality = int(input("Render level[0][1][2]: "))
+		self.NumberOfBots = self.SimInfo["MaxPlayers"]
 		self.LastOutputTime = time.time()
-		if userInput == "y" or userInput == "Y":
-			self.RenderQuality = 2
+
+		if self.RenderQuality != 0:
 
 			userInput = input("Human Player[Y/N]:")
 			if userInput == "y" or userInput == "Y":
 				self.NumberOfBots = 1
 
-
-			else:
-				self.NumberOfBots = 2
-			
-
-		else:
-			self.RenderQuality = 0
-			self.NumberOfBots = 2
 
 		self.WinningMode = False
 		if self.NumberOfBots == 1:
@@ -132,9 +125,36 @@ class RunController(object):
 
 		return
 
-	def MakeHumanMove(self, game):
+	def MakeHumanMove(self, game, board):
 		if self.RenderQuality == 1:
-			input("need code")
+
+			valid = False
+			while not valid:
+				print("")
+				game.SimpleOutput(board)
+				move = []
+
+				for loop in range(self.SimInfo["NumInputs"]):
+					validMove = False
+
+					while not validMove:
+						userInput = float(input("input["+ str(loop) +"]: "))
+						userInput = self.SimInfo["Resolution"] * round(float(userInput)/self.SimInfo["Resolution"])
+						print(userInput)
+
+						if userInput >= self.SimInfo["MinInputSize"] and userInput <= self.SimInfo["MaxInputSize"]:
+							validMove = True
+							move += [userInput]
+						else:
+							print("not in the range!")
+
+				valid, board, turn = game.MakeMove(move)
+				if not valid:
+					print("that move was not vaild")
+						
+			print("")
+			game.SimpleOutput(board)
+		
 		elif self.RenderQuality == 2:
 			board, turn = self.RenderEngine.MakeHumanMove(game)
 		return board, turn
@@ -154,9 +174,11 @@ class RunController(object):
 		gameStartTime = time.time()
 		while True:
 			if self.NumberOfBots >= turn:
+				game.SimpleOutput(board)
 				board, turn = MakeAIMove(turn, board, AIs, game)
+				game.SimpleOutput(board)
 			else:
-				board, turn = self.MakeHumanMove(game)
+				board, turn = self.MakeHumanMove(game, board)
 
 			numMoves += 1
 
