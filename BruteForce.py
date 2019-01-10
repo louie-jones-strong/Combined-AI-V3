@@ -62,6 +62,17 @@ class DataSetManager(object):
 		#print("DataSet lenght: " + str(len(self.DataSet)))
 		return
 	
+	def ExportDataset(self):
+		X = []
+		Y = []
+		for key, value in self.DataSet.items():
+			move = self.MoveIDLookUp[value.moveIDOfBestAvgFitness]
+			
+			X += [key]
+			Y += [move]
+
+		return X, Y
+
 	def MoveIDToMove(self, moveID):
 		#maybe make this a lookuptabel in stead but will use more memory
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
