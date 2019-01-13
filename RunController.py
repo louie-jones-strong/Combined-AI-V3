@@ -71,7 +71,7 @@ class RunController(object):
 
 			userInput = input("Human Player[Y/N]:")
 			if userInput == "y" or userInput == "Y":
-				self.NumberOfBots = 1
+				self.NumberOfBots -= 1
 
 
 		self.WinningMode = False
@@ -89,11 +89,11 @@ class RunController(object):
 		self.RunGame("main   ")
 		return
 
-	def Output(self, numGames, numMoves, gameStartTime, board, turn):
+	def Output(self, game, numGames, numMoves, gameStartTime, totalStartTime, board, turn):
 		avgMoveTime = 0
 		if numMoves != 0:
-			avgMoveTime = gameStartTime/numMoves
-
+			avgMoveTime = (time.time() - gameStartTime)/numMoves
+		
 		if self.RenderQuality == 2:
 			text = "Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n"
 			text += "Game: "+str(numGames)+"\n"
@@ -106,31 +106,26 @@ class RunController(object):
 			self.RenderEngine.UpdateFrame()
 
 		if (time.time() - self.LastOutputTime) >= 2.5:
-			print("done " + str(numMoves) + " moves avg took: " + str(avgMoveTime) + " seconds")
+			if self.RenderQuality == 1 and self.NumberOfBots >= turn:
+				os.system("cls")
+				game.SimpleOutput(board)
+
+			print("Dataset size: " + str(len(self.AiDataManager.DataSet)))
+			print("game: " + str(numGames+1) + " move: " + str(numMoves))
+			print("moves avg took: " + str(avgMoveTime) + " seconds")
+			print("Games avg took: " + str((time.time() - totalStartTime)/(numGames+1)) + " seconds")
+			print("time since start: " + str(time.time() - totalStartTime) + " seconds")
+			
 			self.LastOutputTime = time.time()
 
 		return
 	
-	def EndOutput(self, numGames, numMoves, timeTaken, totalStartTime):
-		if (time.time() - self.LastOutputTime) >= 2.5:
-			print("")
-			print("Dataset size: " + str(len(self.AiDataManager.DataSet)))
-			print("finished game: " + str(numGames+1) + " with " + str(numMoves) + " moves made")
-			print("each move took on AVG: " + str((time.time() - timeTaken)/numMoves) + " seconds")
-			print("game in total took: " + str(time.time() - timeTaken) + " seconds")
-			print("time since start: " + str(time.time() - totalStartTime) + " seconds")
-			print("")
-			print("")
-			self.LastOutputTime = time.time()
-
-		return
-
 	def MakeHumanMove(self, game, board):
 		if self.RenderQuality == 1:
 
 			valid = False
 			while not valid:
-				print("")
+				os.system("cls")
 				game.SimpleOutput(board)
 				move = []
 
@@ -174,15 +169,13 @@ class RunController(object):
 		gameStartTime = time.time()
 		while True:
 			if self.NumberOfBots >= turn:
-				game.SimpleOutput(board)
 				board, turn = MakeAIMove(turn, board, AIs, game)
-				game.SimpleOutput(board)
 			else:
 				board, turn = self.MakeHumanMove(game, board)
 
 			numMoves += 1
 
-			self.Output(numGames, numMoves, gameStartTime, board, turn)
+			self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn)
 
 			if keyboard.is_pressed("esc"):
 				break
@@ -196,7 +189,7 @@ class RunController(object):
 				for loop in range(len(AIs)):
 					AIs[loop].UpdateData(fit[loop])
 
-				self.EndOutput(numGames, numMoves, gameStartTime, totalStartTime)
+				self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn)
 
 				board, turn = game.Start()
 				numGames += 1
