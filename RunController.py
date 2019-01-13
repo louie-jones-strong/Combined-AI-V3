@@ -132,6 +132,7 @@ class RunController(object):
 				game.SimpleOutput(board)
 
 			print("Dataset size: " + str(SplitNumber(len(self.AiDataManager.DataSet))))
+			print("Number Of Complete Boards: " + str(SplitNumber(self.AiDataManager.NumberOfCompleteBoards)))
 			if finished:
 				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)) + " finished game")
 			else:

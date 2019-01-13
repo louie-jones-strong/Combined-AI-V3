@@ -6,6 +6,7 @@ import time
 
 class DataSetManager(object):
 	DataSet = {}
+	NumberOfCompleteBoards = 0
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
 	
@@ -26,7 +27,6 @@ class DataSetManager(object):
 			self.LoadDataSet()
 
 		self.LastSaveTime = time.time()
-
 		return
 
 	def BuildMoveIDLookUp(self):
@@ -51,10 +51,8 @@ class DataSetManager(object):
 
 		if canSave and (time.time()-self.LastSaveTime) >= 5:
 			pickle.dump(self.DataSet, open(self.DatasetAddress + ".p", "wb"))
-			#add a save to save on boards
 			for loop in range(len(self.RunningAIs)):
 				self.RunningAIs[loop] = False
-			#print("DataSet Saved! Size: " + str(len(self.DataSet)))
 			self.LastSaveTime = time.time()
 		return
 	
@@ -63,7 +61,6 @@ class DataSetManager(object):
 			file = open(self.DatasetAddress + ".p", "rb")
 			self.DataSet = pickle.load(file)
 
-		#print("DataSet lenght: " + str(len(self.DataSet)))
 		return
 	
 	def ExportDataset(self):
@@ -120,6 +117,9 @@ class BruteForce(object):
 					moveID = self.DataSetManager.DataSet[key].NumOfTriedMoves
 					self.DataSetManager.DataSet[key].Moves[moveID] = MoveInfo(MoveID=moveID)
 					self.DataSetManager.DataSet[key].NumOfTriedMoves += 1
+
+					if self.DataSetManager.DataSet[key].NumOfTriedMoves >= self.DataSetManager.MaxMoveIDs:
+						self.DataSetManager.NumberOfCompleteBoards += 1
 
 				else:#played every board once already
 					leastPlayed = sys.maxsize
