@@ -1,6 +1,5 @@
 class Simulation(object):
-	Info = {"Name":"Dad's Cool Mystery Game",
-	        "MinPlayers":1,"MaxPlayers":2,
+	Info = {"MinPlayers":1,"MaxPlayers":2,
 	        "NumInputs":1,"MinInputSize":1,"MaxInputSize":3,
 			"Resolution":0.1}
 

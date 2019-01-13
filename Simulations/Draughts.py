@@ -1,7 +1,6 @@
 class Simulation(object):
-	Info = {"Name":"Draughts",
-	        "MinPlayers":2,"MaxPlayers":2,
-	        "NumInputs":4,"MinInputSize":0,"MaxInputSize":7,#need to be range until coded so put back
+	Info = {"MinPlayers":2,"MaxPlayers":2,
+	        "NumInputs":4,"MinInputSize":0,"MaxInputSize":7,
 			"Resolution":1}
 	
 	def Start(self):
