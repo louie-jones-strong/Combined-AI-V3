@@ -27,7 +27,7 @@ class Simulation(object):
 
 	def CheckFinished(self):
 		player1Fitness, player2Fitness = 0,0
-
+		
 		if CheckWin(self.Board, 1) == True:#win
 			self.Finished = True
 			player1Fitness = 5
@@ -36,7 +36,7 @@ class Simulation(object):
 		elif CheckWin(self.Board, 2) == True:#loss
 			self.Finished = True
 			player1Fitness = -5
-			player2Fitness = -5
+			player2Fitness = 5
 
 		elif not(0 in self.Board):#draw
 			self.Finished = True
@@ -47,11 +47,14 @@ class Simulation(object):
 		return self.Finished, [player1Fitness, player2Fitness]
 
 	def FlipBoard(self, board):
+		output = []
 		for loop in range(len(board)):
 			if board[loop] == 1:
-				board[loop] = 2
+				output += [2]
 			elif board[loop] == 2:
-				board[loop] = 1
+				output += [1]
+			else:
+				output += [0]
 
 		return board
 
