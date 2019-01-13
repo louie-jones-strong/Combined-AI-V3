@@ -89,7 +89,7 @@ class RunController(object):
 		self.RunGame("main   ")
 		return
 
-	def Output(self, game, numGames, numMoves, gameStartTime, totalStartTime, board, turn):
+	def Output(self, game, numGames, numMoves, gameStartTime, totalStartTime, board, turn, finished=False):
 		avgMoveTime = 0
 		if numMoves != 0:
 			avgMoveTime = (time.time() - gameStartTime)/numMoves
@@ -111,7 +111,10 @@ class RunController(object):
 				game.SimpleOutput(board)
 
 			print("Dataset size: " + str(len(self.AiDataManager.DataSet)))
-			print("game: " + str(numGames+1) + " move: " + str(numMoves))
+			if finished:
+				print("game: " + str(numGames+1) + " move: " + str(numMoves) + " finished game")
+			else:
+				print("game: " + str(numGames+1) + " move: " + str(numMoves))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
 			print("Games avg took: " + str((time.time() - totalStartTime)/(numGames+1)) + " seconds")
 			print("time since start: " + str(time.time() - totalStartTime) + " seconds")
@@ -189,7 +192,7 @@ class RunController(object):
 				for loop in range(len(AIs)):
 					AIs[loop].UpdateData(fit[loop])
 
-				self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn)
+				self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn, finished=True)
 
 				board, turn = game.Start()
 				numGames += 1
