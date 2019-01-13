@@ -205,10 +205,6 @@ class RunController(object):
 				break
 
 			finished, fit = game.CheckFinished()
-			if finished == False and numMoves >= 1000:
-				finished = True
-				fit = [3,3]
-
 			if finished:
 				for loop in range(len(AIs)):
 					AIs[loop].UpdateData(fit[loop])
