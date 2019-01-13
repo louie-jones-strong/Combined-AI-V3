@@ -63,10 +63,20 @@ class Simulation(object):
 		for y in range(3):
 			temp = ""
 			for x in range(3):
-				temp += str(board[loop])
+				if board[loop] == 0:
+					temp += " "
+				elif board[loop] == 1:
+					temp += "X"
+				else:
+					temp += "O"
+
 				loop += 1
+				if x < 2:
+					temp += "|"
 
 			print(temp)
+			if y < 2:
+				print("-+-+-")
 		return
 
 def CheckWin(board, player):
