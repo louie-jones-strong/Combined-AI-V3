@@ -126,7 +126,7 @@ class RunController(object):
 				self.RenderEngine.UpdateBoard(board, turn)
 			self.RenderEngine.UpdateFrame()
 
-		if (time.time() - self.LastOutputTime) >= 2.5:
+		if (time.time() - self.LastOutputTime) >= 1:
 			if self.RenderQuality == 1 and self.NumberOfBots >= turn:
 				os.system("cls")
 				game.SimpleOutput(board)
@@ -191,6 +191,7 @@ class RunController(object):
 
 		totalStartTime = time.time()
 		gameStartTime = time.time()
+		lastSaveTime = time.time()
 		while True:
 			if self.NumberOfBots >= turn:
 				board, turn = MakeAIMove(turn, board, AIs, game)
@@ -206,8 +207,11 @@ class RunController(object):
 
 			finished, fit = game.CheckFinished()
 			if finished:
-				for loop in range(len(AIs)):
-					AIs[loop].UpdateData(fit[loop])
+
+				if time.time() - lastSaveTime > 5:
+					for loop in range(len(AIs)):
+						AIs[loop].UpdateData(fit[loop])
+					lastSaveTime = time.time()
 
 				self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn, finished=True)
 

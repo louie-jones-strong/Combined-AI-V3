@@ -2,7 +2,6 @@ import pickle
 import os
 import sys
 import random
-import time
 
 class DataSetManager(object):
 	DataSet = {}
@@ -25,8 +24,6 @@ class DataSetManager(object):
 		self.MoveIDLookUp = self.BuildMoveIDLookUp()
 		if loadData:
 			self.LoadDataSet()
-
-		self.LastSaveTime = time.time()
 		return
 
 	def BuildMoveIDLookUp(self):
@@ -49,11 +46,10 @@ class DataSetManager(object):
 			if self.RunningAIs[loop] == False:
 				canSave = False
 
-		if canSave and (time.time()-self.LastSaveTime) >= 5:
+		if canSave:
 			pickle.dump(self.DataSet, open(self.DatasetAddress + ".p", "wb"))
 			for loop in range(len(self.RunningAIs)):
 				self.RunningAIs[loop] = False
-			self.LastSaveTime = time.time()
 		return
 	
 	def LoadDataSet(self):
