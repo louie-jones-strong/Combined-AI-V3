@@ -25,6 +25,25 @@ def MakeAIMove(turn, board, AIs, game):
 				AI.UpdateInvalidMove(board, move)
 	return board, turn
 
+def SplitNumber(number):
+	output = ""
+	number = str(number)
+	lenght = len(number)
+	if lenght < 4:
+		output += str(number)
+	else:
+		start = lenght % 3
+		if start > 0:
+			output += str(number[:start]) + ","
+		gap = 0
+		for loop in range(start, lenght):
+			output += str(number[loop])
+			gap += 1
+			if gap == 3 and loop < lenght-1:
+				output += ","
+				gap = 0
+	return output
+
 class RunController(object):
 	def __init__(self):
 		files = os.listdir("Simulations")
@@ -90,9 +109,11 @@ class RunController(object):
 		return
 
 	def Output(self, game, numGames, numMoves, gameStartTime, totalStartTime, board, turn, finished=False):
+		numGames += 1
 		avgMoveTime = 0
 		if numMoves != 0:
 			avgMoveTime = (time.time() - gameStartTime)/numMoves
+			avgMoveTime = round(avgMoveTime,6)
 		
 		if self.RenderQuality == 2:
 			text = "Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n"
@@ -110,17 +131,16 @@ class RunController(object):
 				os.system("cls")
 				game.SimpleOutput(board)
 
-			print("Dataset size: " + str(len(self.AiDataManager.DataSet)))
+			print("Dataset size: " + str(SplitNumber(len(self.AiDataManager.DataSet))))
 			if finished:
-				print("game: " + str(numGames+1) + " move: " + str(numMoves) + " finished game")
+				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)) + " finished game")
 			else:
-				print("game: " + str(numGames+1) + " move: " + str(numMoves))
+				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
-			print("Games avg took: " + str((time.time() - totalStartTime)/(numGames+1)) + " seconds")
-			print("time since start: " + str(time.time() - totalStartTime) + " seconds")
+			print("Games avg took: " + str( round((time.time() - totalStartTime)/(numGames),6)) + " seconds")
+			print("time since start: " + str(round(time.time() - totalStartTime, 2)) + " seconds")
 			
 			self.LastOutputTime = time.time()
-
 		return
 	
 	def MakeHumanMove(self, game, board):
