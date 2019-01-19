@@ -6,7 +6,6 @@ import sys
 import keyboard
 from threading import Thread
 
-
 def MakeAIMove(turn, board, AIs, game):
 	AI = AIs[turn-1]
 	valid = False
@@ -45,34 +44,6 @@ def SplitNumber(number):
 				gap = 0
 	return output
 
-def LoadMetaData(address):
-	file=open(address, "r")
-	metaData = file.readlines()
-	file.close()
-	for loop in range(len(metaData)):
-		metaData[loop] = metaData[loop].split(",")
-		for loop2 in range(len(metaData[loop])):
-			metaData[loop][loop2] = int(metaData[loop][loop2])
-
-	return metaData
-
-def SaveMetaData(address, data):
-	file=open(address, "w")
-	for loop in range(len(data)):
-		temp = ""
-		for loop2 in range(len(data[loop])):
-			temp += str(data[loop][loop2])
-			if loop2 < len(data[loop])-1:
-				temp += ","
-
-			else:
-				temp += "\n"
-
-		file.write(temp)
-
-	file.close()
-	return
-
 class RunController(object):
 	def __init__(self):
 		files = os.listdir("Simulations")
@@ -99,35 +70,16 @@ class RunController(object):
 
 		simName = files[userInput-1]
 		self.Sim = importlib.import_module("Simulations." + simName)
+		datasetAddress = "DataSets//"+simName+"Dataset"
 
-		address = "DataSets"
-		if not os.path.isdir(address):
-			os.mkdir(address)
-
-		address += "//"+simName
-		if not os.path.isdir(address):
-			os.mkdir(address)
-
-		address += "//"+simName
-
-		self.MetaData = []
-		self.MetaDataAddress = address+"MetaData"+".csv"
-		if os.path.isfile(self.MetaDataAddress):
-			self.MetaData = LoadMetaData(self.MetaDataAddress)
-
-			print("info from MetaData! needs code")
-			userInput = input("load Dataset[Y/N]:")
-			print("setting up AI...")
-		else:
-			userInput = "N"
+		userInput = input("load Dataset[Y/N]:")
 
 		self.SimInfo = self.Sim.Simulation().Info
 		if userInput == "n" or userInput == "N":
-			self.MetaData = []
-			self.AiDataManager = AI.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], address+"Dataset", loadData=False)
+			self.AiDataManager = AI.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], datasetAddress, loadData=False)
 
 		else:
-			self.AiDataManager = AI.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], address+"Dataset", loadData=True)
+			self.AiDataManager = AI.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], datasetAddress, loadData=True)
 
 		#setting 
 		self.RenderQuality = int(input("Render level[0][1][2]: "))
@@ -149,7 +101,6 @@ class RunController(object):
 		if self.RenderQuality == 2:
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
-
 
 		NumberOfThreads = 1
 		for loop in range(NumberOfThreads-1):
@@ -251,17 +202,15 @@ class RunController(object):
 
 			self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn)
 
-			#if keyboard.is_pressed("esc"):
-			#	break
+			if keyboard.is_pressed("esc"):
+				break
 
 			finished, fit = game.CheckFinished()
 			if finished:
+
 				if time.time() - lastSaveTime > 5:
 					for loop in range(len(AIs)):
 						AIs[loop].UpdateData(fit[loop])
-					self.MetaData += [[numGames, len(self.AiDataManager.DataSet), self.AiDataManager.NumberOfCompleteBoards]]
-				
-					SaveMetaData(self.MetaDataAddress, self.MetaData)
 					lastSaveTime = time.time()
 
 				self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn, finished=True)
