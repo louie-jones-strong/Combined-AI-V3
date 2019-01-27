@@ -1,29 +1,75 @@
-import BruteForce as AI
+import BruteForce
+import NeuralNetwork
 import importlib
 import time
 import os
 import sys
-import keyboard
 from threading import Thread
 
 def MakeAIMove(turn, board, AIs, game):
+	time1 = 0
+	time2 = 0
+	time3 = 0
+	time4 = 0
+
 	AI = AIs[turn-1]
 	valid = False
 	if turn == 1:
 		while not valid:
-			move = AI.MoveCal(game.FlipBoard(board))
+			mark = time.time()
+			flippedBoard = game.FlipBoard(board)
+			time1 += time.time()-mark
+
+			mark = time.time()
+			move = AI.MoveCal(flippedBoard)
+			time2 += time.time()-mark
+			
 			flipedMove = game.FlipInput(move)
+
+			mark = time.time()
 			valid, board, turn = game.MakeMove(flipedMove)
+			time3 += time.time()-mark
+
 			if not valid:
-				AI.UpdateInvalidMove(game.FlipBoard(board), move)
-		
+				mark = time.time()
+				AI.UpdateInvalidMove(flippedBoard, move)
+				time4 += time.time()-mark
+		#print("time1: "+str(time1))
+		#print("time2: "+str(time2))
+		#print("time3: "+str(time3))
+		#print("time4: "+str(time4))
+		#input("next: ")
+		#0.08
 	else:
 		while not valid:
 			move = AI.MoveCal(board)
 			valid, board, turn = game.MakeMove(move)
 			if not valid:
 				AI.UpdateInvalidMove(board, move)
+
 	return board, turn
+
+def SaveMetaData(metaData, address):
+	file = open(address, "w")
+	for key, value in metaData.items():
+		file.write(str(key)+":"+str(value)+"/n")
+	file.close() 
+	return
+
+def LoadMetaData(address):
+	metaData = {}
+
+	file = open(address, "r")
+	lines = file.readlines()
+	file.close() 
+	for loop in range(len(lines)):
+		line = lines[loop].split(":")
+		key = line[0]
+		value = line[1]
+		metaData[key] = value
+	
+
+	return metaData
 
 def SplitNumber(number):
 	output = ""
@@ -42,6 +88,20 @@ def SplitNumber(number):
 			if gap == 3 and loop < lenght-1:
 				output += ","
 				gap = 0
+	return output
+
+def SplitTime(seconds, roundTo=0):
+	#Convert seconds to string "[[[DD:]HH:]MM:]SS"
+	output = ""
+	for scale in 86400, 3600, 60:
+		result, seconds = divmod(seconds, scale)
+		if output != "" or result > 0:
+			if output != "":
+				output += ":"
+			output += str(int(result))
+	if output != "":
+		output += ":"
+	output += str(round(seconds, roundTo))
 	return output
 
 class RunController(object):
@@ -70,16 +130,16 @@ class RunController(object):
 
 		simName = files[userInput-1]
 		self.Sim = importlib.import_module("Simulations." + simName)
-		datasetAddress = "DataSets//"+simName+"Dataset"
+		self.DatasetAddress = "DataSets//"+simName+"//"+simName+"Dataset"
 
 		userInput = input("load Dataset[Y/N]:")
 
 		self.SimInfo = self.Sim.Simulation().Info
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager = AI.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], datasetAddress, loadData=False)
+			self.AiDataManager = BruteForce.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress, loadData=False)
 
 		else:
-			self.AiDataManager = AI.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], datasetAddress, loadData=True)
+			self.AiDataManager = BruteForce.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress, loadData=True)
 
 		#setting 
 		self.RenderQuality = int(input("Render level[0][1][2]: "))
@@ -102,10 +162,8 @@ class RunController(object):
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
-		NumberOfThreads = 1
-		for loop in range(NumberOfThreads-1):
-			Thread(target=self.RunGame, args=("Thread"+str(loop),)).start()
-		self.RunGame("main   ")
+		#Thread(target=self.NetworkTrain).start()
+		self.BruteForceRun()
 		return
 
 	def Output(self, game, numGames, numMoves, gameStartTime, totalStartTime, board, turn, finished=False):
@@ -138,8 +196,9 @@ class RunController(object):
 			else:
 				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
-			print("Games avg took: " + str( round((time.time() - totalStartTime)/(numGames),6)) + " seconds")
-			print("time since start: " + str(round(time.time() - totalStartTime, 2)) + " seconds")
+			totalTime = time.time() - totalStartTime
+			print("Games avg took: " + str(SplitTime(totalTime/numGames, roundTo=6)))
+			print("time since start: " + str(SplitTime(totalTime, roundTo=2)))
 			
 			self.LastOutputTime = time.time()
 		return
@@ -178,12 +237,11 @@ class RunController(object):
 			board, turn = self.RenderEngine.MakeHumanMove(game)
 		return board, turn
 
-	def RunGame(self, name):
-		print("thread started: " + name)
+	def BruteForceRun(self):
 		game = self.Sim.Simulation()
 		AIs = []
 		for loop in range(2):
-			AIs += [AI.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
+			AIs += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		board, turn = game.Start()
 
 		numGames = 0
@@ -202,9 +260,6 @@ class RunController(object):
 
 			self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn)
 
-			if keyboard.is_pressed("esc"):
-				break
-
 			finished, fit = game.CheckFinished()
 			if finished:
 
@@ -222,5 +277,17 @@ class RunController(object):
 
 		return
 
+	def NetworkTrain(self):
+		Ai = NeuralNetwork.NeuralNetwork(self.DatasetAddress)
+		while True:
+			Ai.ImportDataSet()
+			Ai.Train(20)
+
+		return
+
+
+address = "test.txt"
+SaveMetaData({"test1":7, "test2":5}, address)
+LoadMetaData(address)
 if __name__ == "__main__":
 	RunController()

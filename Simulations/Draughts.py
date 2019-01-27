@@ -115,23 +115,12 @@ class Simulation(object):
 		return finished, [player1Fitness, player2Fitness]
 
 	def FlipBoard(self, board):
+		lookup = {0:0,1:2,2:1,3:4,4:3}
 		output = []
 		for loop in range(len(board)-1,-1,-1):
 			temp = []
 			for loop2 in range(len(board[loop])-1,-1,-1):
-				piece = board[loop][loop2]
-
-				if piece == 1:
-					temp += [2]
-				elif piece == 2:
-					temp += [1]
-				elif piece == 3:
-					temp += [4]
-				elif piece == 4:
-					temp += [3]
-				else:
-					temp += [piece]
-
+				temp += [lookup[board[loop][loop2]]]
 			output += [temp]
 
 		return output
