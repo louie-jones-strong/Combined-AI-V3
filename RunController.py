@@ -24,10 +24,10 @@ def MakeAIMove(turn, board, AIs, game):
 			move = AI.MoveCal(flippedBoard)
 			time2 += time.time()-mark
 			
-			flipedMove = game.FlipInput(move)
+			flippedMove = game.FlipInput(move)
 
 			mark = time.time()
-			valid, board, turn = game.MakeMove(flipedMove)
+			valid, board, turn = game.MakeMove(flippedMove)
 			time3 += time.time()-mark
 
 			if not valid:
@@ -52,10 +52,9 @@ def MakeAIMove(turn, board, AIs, game):
 def SaveMetaData(metaData, address):
 	file = open(address, "w")
 	for key, value in metaData.items():
-		file.write(str(key)+":"+str(value)+"/n")
+		file.write(str(key)+":"+str(value)+"\n")
 	file.close() 
 	return
-
 def LoadMetaData(address):
 	metaData = {}
 
@@ -63,9 +62,14 @@ def LoadMetaData(address):
 	lines = file.readlines()
 	file.close() 
 	for loop in range(len(lines)):
-		line = lines[loop].split(":")
+		line = lines[loop][:-1]
+		line = line.split(":")
 		key = line[0]
 		value = line[1]
+		if "." in value:
+			value = float(value)
+		else:
+			value = int(value)
 		metaData[key] = value
 	
 
@@ -89,7 +93,6 @@ def SplitNumber(number):
 				output += ","
 				gap = 0
 	return output
-
 def SplitTime(seconds, roundTo=0):
 	#Convert seconds to string "[[[DD:]HH:]MM:]SS"
 	output = ""
@@ -130,16 +133,22 @@ class RunController(object):
 
 		simName = files[userInput-1]
 		self.Sim = importlib.import_module("Simulations." + simName)
-		self.DatasetAddress = "DataSets//"+simName+"//"+simName+"Dataset"
+		temp = "DataSets//"+simName
+		if not os.path.exists(temp):
+			os.makedirs(temp)
+		self.MetaDataAddress = temp+"//"+simName+"MetaData.txt"
+		self.DatasetAddress = temp+"//"+simName+"Dataset"
 
 		userInput = input("load Dataset[Y/N]:")
 
 		self.SimInfo = self.Sim.Simulation().Info
 		if userInput == "n" or userInput == "N":
 			self.AiDataManager = BruteForce.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress, loadData=False)
-
+			self.MetaData = {"NumberOfCompleteBoards":0, "NumberOfGames": 0, "TotalTime":0}
 		else:
 			self.AiDataManager = BruteForce.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress, loadData=True)
+			self.MetaData = LoadMetaData(self.MetaDataAddress)
+			self.AiDataManager.NumberOfCompleteBoards = self.MetaData["NumberOfCompleteBoards"]
 
 		#setting 
 		self.RenderQuality = int(input("Render level[0][1][2]: "))
@@ -166,8 +175,8 @@ class RunController(object):
 		self.BruteForceRun()
 		return
 
-	def Output(self, game, numGames, numMoves, gameStartTime, totalStartTime, board, turn, finished=False):
-		numGames += 1
+	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
+		numGames = self.MetaData["NumberOfGames"]+1
 		avgMoveTime = 0
 		if numMoves != 0:
 			avgMoveTime = (time.time() - gameStartTime)/numMoves
@@ -196,7 +205,7 @@ class RunController(object):
 			else:
 				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
-			totalTime = time.time() - totalStartTime
+			totalTime = self.MetaData["TotalTime"]
 			print("Games avg took: " + str(SplitTime(totalTime/numGames, roundTo=6)))
 			print("time since start: " + str(SplitTime(totalTime, roundTo=2)))
 			
@@ -244,7 +253,6 @@ class RunController(object):
 			AIs += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		board, turn = game.Start()
 
-		numGames = 0
 		numMoves = 0
 
 		totalStartTime = time.time()
@@ -257,21 +265,24 @@ class RunController(object):
 				board, turn = self.MakeHumanMove(game, board)
 
 			numMoves += 1
-
-			self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn)
+			self.MetaData["TotalTime"] += time.time()-totalStartTime
+			totalStartTime = time.time()
+			self.Output(game, numMoves, gameStartTime, board, turn)
 
 			finished, fit = game.CheckFinished()
 			if finished:
-
 				if time.time() - lastSaveTime > 5:
 					for loop in range(len(AIs)):
 						AIs[loop].UpdateData(fit[loop])
+
+					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
+					SaveMetaData(self.MetaData, self.MetaDataAddress)
 					lastSaveTime = time.time()
 
-				self.Output(game, numGames, numMoves, gameStartTime, totalStartTime, board, turn, finished=True)
+				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 
 				board, turn = game.Start()
-				numGames += 1
+				self.MetaData["NumberOfGames"] += 1
 				numMoves = 0
 				gameStartTime = time.time()
 
@@ -285,9 +296,5 @@ class RunController(object):
 
 		return
 
-
-address = "test.txt"
-SaveMetaData({"test1":7, "test2":5}, address)
-LoadMetaData(address)
 if __name__ == "__main__":
 	RunController()
