@@ -5,6 +5,7 @@ import time
 import os
 import sys
 from threading import Thread
+import keyboard
 
 def MakeAIMove(turn, board, AIs, game):
 	time1 = 0
@@ -138,6 +139,7 @@ class RunController(object):
 			os.makedirs(temp)
 		self.MetaDataAddress = temp+"//"+simName+"MetaData.txt"
 		self.DatasetAddress = temp+"//"+simName+"Dataset"
+		os.system("title "+"AI Playing:"+simName)
 
 		userInput = input("load Dataset[Y/N]:")
 
@@ -208,6 +210,7 @@ class RunController(object):
 			totalTime = self.MetaData["TotalTime"]
 			print("Games avg took: " + str(SplitTime(totalTime/numGames, roundTo=6)))
 			print("time since start: " + str(SplitTime(totalTime, roundTo=2)))
+			print("press CTRl+Q to quit...")
 			
 			self.LastOutputTime = time.time()
 		return
@@ -278,6 +281,9 @@ class RunController(object):
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					SaveMetaData(self.MetaData, self.MetaDataAddress)
 					lastSaveTime = time.time()
+
+				if keyboard.is_pressed("CTRl+Q"):
+					break
 
 				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 
