@@ -177,8 +177,9 @@ class RunController(object):
 		self.AiDataManager = BruteForce.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 
+		Test(self.AiDataManager)
 		self.SetUpMetaData()
-		
+
 		self.WinningMode = False
 		if self.NumberOfBots == 1:
 			self.WinningMode = True
@@ -314,6 +315,20 @@ class RunController(object):
 			Ai.Train(20)
 
 		return
+
+
+def Test(AiDataManager):
+	timeMark = time.time()
+	AiDataManager.LoadDataSet()
+	print("time taken to load: "+str(time.time()-timeMark))
+
+	num = AiDataManager.SetupNewAI()
+	timeMark = time.time()
+	AiDataManager.SaveDataSet(num)
+	print("time taken to save: "+str(time.time()-timeMark))
+
+	input("testing finished: ")
+	return
 
 if __name__ == "__main__":
 	RunController()
