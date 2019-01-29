@@ -138,11 +138,12 @@ class RunController(object):
 
 		if os.path.isfile(self.MetaDataAddress):
 			self.MetaData = LoadMetaData(self.MetaDataAddress)
-
+			print("")
 			print("SizeOfDataSet: "+str(self.MetaData["SizeOfDataSet"]))
 			print("NumberOfCompleteBoards: "+str(self.MetaData["NumberOfCompleteBoards"]))
 			print("NumberOfGames: "+str(self.MetaData["NumberOfGames"]))
 			print("TotalTime: "+SplitTime(self.MetaData["TotalTime"], roundTo=2))
+			print("")
 
 			userInput = input("load Dataset[Y/N]:")
 
@@ -294,6 +295,7 @@ class RunController(object):
 						AIs[loop].UpdateData(fit[loop])
 
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
+					self.MetaData["SizeOfDataSet"] = len(self.AiDataManager.DataSet)
 					SaveMetaData(self.MetaData, self.MetaDataAddress)
 					lastSaveTime = time.time()
 
