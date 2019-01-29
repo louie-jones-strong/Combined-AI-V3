@@ -9,7 +9,7 @@ class DataSetManager(object):
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
 	
-	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, datasetAddress, loadData=True):
+	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, datasetAddress):
 		self.NumOfOutputs = numOfOutputs
 
 		self.MinOutputSize = minOutputSize
@@ -22,8 +22,6 @@ class DataSetManager(object):
 		self.RunningAIs = []
 		self.DataSet = {}
 		self.MoveIDLookUp = self.BuildMoveIDLookUp()
-		if loadData:
-			self.LoadDataSet()
 		return
 
 	def BuildMoveIDLookUp(self):
@@ -56,19 +54,10 @@ class DataSetManager(object):
 		if os.path.isfile(self.DatasetAddress + ".p"):
 			file = open(self.DatasetAddress + ".p", "rb")
 			self.DataSet = pickle.load(file)
-
-		return
-	
-	def ExportDataset(self):
-		X = []
-		Y = []
-		for key, value in self.DataSet.items():
-			move = self.MoveIDLookUp[value.moveIDOfBestAvgFitness]
 			
-			X += [key]
-			Y += [move]
-
-		return X, Y
+			return True
+		else:
+			return False
 
 	def MoveIDToMove(self, moveID):
 		#maybe make this a lookuptabel in stead but will use more memory

@@ -109,65 +109,79 @@ def SplitTime(seconds, roundTo=0):
 	return output
 
 class RunController(object):
-	def __init__(self):
+	def PickSimulation(self):
 		files = os.listdir("Simulations")
 		if "__pycache__" in files:
 			files.remove("__pycache__")
-
 		if "SimulationInterface.py" in files:
 			files.remove("SimulationInterface.py")
-
 		for loop in range(len(files)):
 			files[loop] = files[loop][:-3]
 			if len(files) > 1:
-				print(str(loop+1)+") "+ files[loop])
-
+				print(str(loop+1)+") " + files[loop])
 		userInput = 1
 		if len(files) > 1:
 			userInput = int(input("pick Simulation: "))
-
 		if userInput > len(files):
 			userInput = len(files)
-
 		if userInput < 1:
 			userInput = 1
-
 		simName = files[userInput-1]
+
+		os.system("title "+"AI Playing:"+simName)
 		self.Sim = importlib.import_module("Simulations." + simName)
+		self.SimInfo = self.Sim.Simulation().Info
+
+		return simName
+	def SetUpMetaData(self):
+		userInput = "N"
+
+		if os.path.isfile(self.MetaDataAddress):
+			self.MetaData = LoadMetaData(self.MetaDataAddress)
+
+			print("SizeOfDataSet: "+str(self.MetaData["SizeOfDataSet"]))
+			print("NumberOfCompleteBoards: "+str(self.MetaData["NumberOfCompleteBoards"]))
+			print("NumberOfGames: "+str(self.MetaData["NumberOfGames"]))
+			print("TotalTime: "+SplitTime(self.MetaData["TotalTime"], roundTo=2))
+
+			userInput = input("load Dataset[Y/N]:")
+
+		if userInput == "n" or userInput == "N":
+			self.MetaData = {"SizeOfDataSet":0, "NumberOfCompleteBoards": 0, "NumberOfGames": 0, "TotalTime": 0}
+		else:
+			self.AiDataManager.LoadDataSet()
+			self.AiDataManager.NumberOfCompleteBoards = self.MetaData["NumberOfCompleteBoards"]
+
+		return
+
+	def __init__(self):
+		simName = self.PickSimulation()
+
+		#setup dataset address
 		temp = "DataSets//"+simName
 		if not os.path.exists(temp):
 			os.makedirs(temp)
 		self.MetaDataAddress = temp+"//"+simName+"MetaData.txt"
 		self.DatasetAddress = temp+"//"+simName+"Dataset"
-		os.system("title "+"AI Playing:"+simName)
 
-		userInput = input("load Dataset[Y/N]:")
-
-		self.SimInfo = self.Sim.Simulation().Info
-		if userInput == "n" or userInput == "N":
-			self.AiDataManager = BruteForce.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress, loadData=False)
-			self.MetaData = {"NumberOfCompleteBoards":0, "NumberOfGames": 0, "TotalTime":0}
-		else:
-			self.AiDataManager = BruteForce.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress, loadData=True)
-			self.MetaData = LoadMetaData(self.MetaDataAddress)
-			self.AiDataManager.NumberOfCompleteBoards = self.MetaData["NumberOfCompleteBoards"]
-
-		#setting 
+		#setting
 		self.RenderQuality = int(input("Render level[0][1][2]: "))
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
 		self.LastOutputTime = time.time()
 
 		if self.RenderQuality != 0:
-
 			userInput = input("Human Player[Y/N]:")
 			if userInput == "y" or userInput == "Y":
 				self.NumberOfBots -= 1
 
+		self.AiDataManager = BruteForce.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
+														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 
+		self.SetUpMetaData()
+		
 		self.WinningMode = False
 		if self.NumberOfBots == 1:
 			self.WinningMode = True
-
 
 		if self.RenderQuality == 2:
 			import RenderEngine
@@ -291,7 +305,6 @@ class RunController(object):
 				self.MetaData["NumberOfGames"] += 1
 				numMoves = 0
 				gameStartTime = time.time()
-
 		return
 
 	def NetworkTrain(self):
