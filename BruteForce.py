@@ -54,13 +54,13 @@ class DataSetManager(object):
 		if os.path.isfile(self.DatasetAddress + ".p"):
 			file = open(self.DatasetAddress + ".p", "rb")
 			self.DataSet = pickle.load(file)
+			file.close()
 			
 			return True
 		else:
 			return False
 
 	def MoveIDToMove(self, moveID):
-		#maybe make this a lookuptabel in stead but will use more memory
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
 		move = []
 		for loop in range(self.NumOfOutputs):

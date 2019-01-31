@@ -164,7 +164,7 @@ class RunController(object):
 			os.makedirs(temp)
 		self.MetaDataAddress = temp+"//"+simName+"MetaData.txt"
 		self.DatasetAddress = temp+"//"+simName+"Dataset"
-
+		self.NetworkTrain()
 		#setting
 		self.RenderQuality = int(input("Render level[0][1][2]: "))
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
@@ -314,7 +314,8 @@ class RunController(object):
 		return
 
 	def NetworkTrain(self):
-		Ai = NeuralNetwork.NeuralNetwork(self.DatasetAddress)
+		Ai = NeuralNetwork.NeuralNetwork(	self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
+                                   			self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 		while True:
 			Ai.ImportDataSet()
 			Ai.Train(20)
