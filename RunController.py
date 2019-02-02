@@ -318,6 +318,7 @@ class RunController(object):
                                    			self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 		while True:
 			Ai.ImportDataSet()
+			Ai.SaveDataSet("test")
 			Ai.Train(20)
 
 		return

@@ -37,10 +37,13 @@ class NeuralNetwork(object):
 				print(str(temp)+"% "+str(loop)+"/"+str(len(dataSet)))
 			loop += 1
 
+		
+
 		return 
 
-	def SaveDataSet(self):
-
+	def SaveDataSet(self, path):
+		pickle.dump(self.DataSetX, open(path + "X.p", "wb"))
+		pickle.dump(self.DataSetY, open(path + "Y.p", "wb"))
 		return
 
 	def Train(self, epochs):
