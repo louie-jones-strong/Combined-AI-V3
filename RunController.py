@@ -316,9 +316,9 @@ class RunController(object):
 	def NetworkTrain(self):
 		Ai = NeuralNetwork.NeuralNetwork(	self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                    			self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
+		Ai.ImportDataSet()
+		Ai.SaveDataSet("test")
 		while True:
-			Ai.ImportDataSet()
-			Ai.SaveDataSet("test")
 			Ai.Train(20)
 
 		return
