@@ -163,8 +163,8 @@ class BruteForce(object):
 		return
 
 	def BoardToKey(self, board):
-		board = str(board)
-		board = board.replace(" ", "")
+		#board = str(board)
+		#board = board.replace(" ", "")
 		return board
 
 class BoardInfo():
