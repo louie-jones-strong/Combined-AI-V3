@@ -7,6 +7,7 @@ class DataSetManager(object):
 	DataSet = {}
 	NumberOfCompleteBoards = 0
 	MoveIDLookUp = []
+	BoardToHashLookUp = {}
 	MaxMoveIDs = 0
 	
 	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, datasetAddress):
@@ -163,9 +164,13 @@ class BruteForce(object):
 		return
 
 	def BoardToKey(self, board):
-		#board = str(board)
-		#board = board.replace(" ", "")
-		return board
+		key = str(board)
+		key = key.replace(" ", "")
+
+		if not key in self.DataSetManager.BoardToHashLookUp:
+			self.DataSetManager.BoardToHashLookUp[key] = board
+
+		return key
 
 class BoardInfo():
 	NumOfTriedMoves = 1
