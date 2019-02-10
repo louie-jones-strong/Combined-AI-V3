@@ -16,7 +16,6 @@ class Simulation(object):
 			inputs[3]<0 or inputs[3]>7):
 			return False, self.Board, self.Turn
 		
-
 		if inputs[0] == inputs[1] and inputs[2] == inputs[3]:
 			return False, self.Board, self.Turn
 
@@ -56,8 +55,14 @@ class Simulation(object):
 		return finished, [player1Fitness, player2Fitness]
 
 	def FlipBoard(self, board):
+		output = []
+		for loop in range(len(board)-1,-1,-1):
+			temp = []
+			for loop2 in range(len(board[loop])-1,-1,-1):
+				temp += [board[loop][loop2]*-1]
+			output += [temp]
 
-		return board
+		return output
 
 	def FlipInput(self, move):
 		temp = [7-move[0], 7-move[1], 7-move[2], 7-move[3]]
@@ -115,7 +120,6 @@ def PiceMoveRulesCheck(move, board, turn ):
 
 	else:
 		return False
-
 
 def kingCheck(move, board, turn):
 	change_x = abs(move[0] - move[2])
