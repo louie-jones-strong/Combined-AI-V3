@@ -136,8 +136,8 @@ class RunController(object):
 	def SetUpMetaData(self):
 		userInput = "N"
 
-		if os.path.isfile(self.MetaDataAddress):
-			self.MetaData = LoadMetaData(self.MetaDataAddress)
+		if os.path.isfile(self.DatasetAddress+"MetaData.txt"):
+			self.MetaData = LoadMetaData(self.DatasetAddress+"MetaData.txt")
 			print("")
 			print("SizeOfDataSet: "+str(self.MetaData["SizeOfDataSet"]))
 			print("NumberOfCompleteBoards: "+str(self.MetaData["NumberOfCompleteBoards"]))
@@ -162,8 +162,7 @@ class RunController(object):
 		temp = "DataSets//"+simName
 		if not os.path.exists(temp):
 			os.makedirs(temp)
-		self.MetaDataAddress = temp+"//"+simName+"MetaData.txt"
-		self.DatasetAddress = temp+"//"+simName+"Dataset"
+		self.DatasetAddress = temp+"//"+simName
 		#self.NetworkTrain()
 		#setting
 		self.RenderQuality = int(input("Render level[0][1][2]: "))
@@ -299,7 +298,7 @@ class RunController(object):
 
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = len(self.AiDataManager.DataSet)
-					SaveMetaData(self.MetaData, self.MetaDataAddress)
+					SaveMetaData(self.MetaData, self.DatasetAddress+"MetaData.txt")
 					lastSaveTime = time.time()
 
 				if keyboard.is_pressed("CTRl+Q"):
