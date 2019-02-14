@@ -163,7 +163,7 @@ class RunController(object):
 		if not os.path.exists(temp):
 			os.makedirs(temp)
 		self.DatasetAddress = temp+"//"+simName
-		#self.NetworkTrain()
+
 		#setting
 		self.RenderQuality = int(input("Render level[0][1][2]: "))
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
@@ -186,9 +186,10 @@ class RunController(object):
 		if self.RenderQuality == 2:
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
-
+		
 		#Thread(target=self.NetworkTrain).start()
-		self.BruteForceRun()
+		#self.BruteForceRun()
+		self.NetworkTrain()
 		return
 
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
@@ -315,7 +316,7 @@ class RunController(object):
 	def NetworkTrain(self):
 		Ai = NeuralNetwork.NeuralNetwork(	self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                    			self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
-		Ai.SaveDataSet("test")
+		Ai.SaveDataSet()
 		while True:
 			Ai.Train(20)
 

@@ -19,16 +19,27 @@ class NeuralNetwork(object):
 		return
 
 	def ImportDataSet(self):
-		if not os.path.isfile(self.DataSetPath + ".p"):
+		if not os.path.isfile(self.DataSetPath+"Dataset" + ".p"):
+			return
+		
+		if not os.path.isfile(self.DataSetPath+"BoardHashLookup" + ".p"):
 			return
 
-		file = open(self.DataSetPath + ".p", "rb")
+		file = open(self.DataSetPath+"Dataset" + ".p", "rb")
 		dataSet = pickle.load(file)
+		file.close()
+		
+		file = open(self.DataSetPath+"BoardHashLookup" + ".p", "rb")
+		boardToHashLookUp = pickle.load(file)
 		file.close()
 
 		loop = 0
 		for key, value in dataSet.items():
-			self.DataSetX += [key]
+			if key in boardToHashLookUp:
+				self.DataSetX += [boardToHashLookUp[key]]
+			else:
+				input("board hash missing")
+
 
 			temp = []
 			for loop2 in range(4096):#len of move to move ids list
@@ -44,14 +55,13 @@ class NeuralNetwork(object):
 				os.system("cls")
 				print(str(temp)+"% "+str(loop)+"/"+str(len(dataSet)))
 			loop += 1
-
-		
-
+		os.system("cls")
+		print("100% "+str(len(dataSet))+"/"+str(len(dataSet)))
 		return 
 
-	def SaveDataSet(self, path):
-		pickle.dump(self.DataSetX, open(path + "X.p", "wb"))
-		pickle.dump(self.DataSetY, open(path + "Y.p", "wb"))
+	def SaveDataSet(self):
+		pickle.dump(self.DataSetX, open(self.DataSetPath+"X.p", "wb"))
+		pickle.dump(self.DataSetY, open(self.DataSetPath+"Y.p", "wb"))
 		return
 
 	def Train(self, epochs):
@@ -126,7 +136,7 @@ def GetWeights(model, numberOfLayers):
 			temp[0] = tflearn.variables.get_value(temp[0])
 			temp[1] = tflearn.variables.get_value(temp[1])
 			weightsValue += [temp]
-	return weights_value
+	return weightsValue
 
 def SetWeights(model, numberOfLayers, newWeights):
 
