@@ -8,6 +8,7 @@ class NeuralNetwork(object):
 	DataSetY = []
 
 	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, dataSetPath):
+		self.OutputResolution = outputResolution
 		self.DataSetPath = dataSetPath
 		self.ImportDataSet()
 
@@ -15,7 +16,17 @@ class NeuralNetwork(object):
 		structreArray += [["ann", 100, "Tanh"]]
 		structreArray += [["ann", len(self.DataSetY[0]), "Sigmoid"]]
 
-		self.NetworkModel = ModelMaker([len(self.DataSetX[0])], structreArray)
+		inputShape = [len(self.DataSetX[0])]
+		if hasattr(self.DataSetX[0][0], "__len__"):
+			inputShape += [len(self.DataSetX[0][0])]
+
+			if hasattr(self.DataSetX[0][0][0], "__len__"):
+				inputShape += [len(self.DataSetX[0][0][0])]
+
+				if hasattr(self.DataSetX[0][0][0][0], "__len__"):
+					inputShape += [len(self.DataSetX[0][0][0][0])]
+
+		self.NetworkModel = ModelMaker(inputShape, structreArray)
 		return
 
 	def ImportDataSet(self):
@@ -25,12 +36,19 @@ class NeuralNetwork(object):
 		if not os.path.isfile(self.DataSetPath+"BoardHashLookup" + ".p"):
 			return
 
+		if not os.path.isfile(self.DataSetPath+"MoveIdLookUp" + ".p"):
+			return
+
 		file = open(self.DataSetPath+"Dataset" + ".p", "rb")
 		dataSet = pickle.load(file)
 		file.close()
 		
 		file = open(self.DataSetPath+"BoardHashLookup" + ".p", "rb")
 		boardToHashLookUp = pickle.load(file)
+		file.close()
+
+		file = open(self.DataSetPath+"MoveIdLookUp" + ".p", "rb")
+		self.MoveIdLookUp = pickle.load(file)
 		file.close()
 
 		loop = 0
@@ -42,7 +60,7 @@ class NeuralNetwork(object):
 
 
 			temp = []
-			for loop2 in range(4096):#len of move to move ids list
+			for loop2 in range(len(self.MoveIdLookUp)):#len of move to move ids list
 				if loop2 in value.Moves:
 					temp += [1]
 				else:
@@ -69,9 +87,22 @@ class NeuralNetwork(object):
 		#self.NetworkModel.fit( X , Y , n_epoch=epochs , validation_set=( testX , testY ) , show_metric=metrics_on , snapshot_epoch=checkpoints_on , run_id=run_ID )
 		return
 
-	def Run(self, inputs):
-		output = self.NetworkModel.predict(inputs)
-		return output
+	def MoveCal(self, inputs):
+		outputs = self.NetworkModel.predict([inputs])[0]
+
+		largest = 0
+		moveId = 0
+		for loop in range(len(outputs)):
+			if outputs[loop] > largest:
+				moveId = loop
+				largest = outputs[loop]
+		
+		outputMove = self.MoveIdLookUp[moveId]
+		return outputMove
+
+	def UpdateInvalidMove(self, board, move):
+		print("played invalid!!")
+		return
 
 def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam"):
 	tflearn.config.init_graph(gpu_memory_fraction=0.95, soft_placement=True)
@@ -137,7 +168,6 @@ def GetWeights(model, numberOfLayers):
 			temp[1] = tflearn.variables.get_value(temp[1])
 			weightsValue += [temp]
 	return weightsValue
-
 def SetWeights(model, numberOfLayers, newWeights):
 
 	for loop in range(numberOfLayers):

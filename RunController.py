@@ -177,8 +177,6 @@ class RunController(object):
 		self.AiDataManager = BruteForce.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 
-		self.SetUpMetaData()
-
 		self.WinningMode = False
 		if self.NumberOfBots == 1:
 			self.WinningMode = True
@@ -187,9 +185,12 @@ class RunController(object):
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 		
-		#Thread(target=self.NetworkTrain).start()
-		#self.BruteForceRun()
-		self.NetworkTrain()
+		userInput = input("Brute b) network n):")
+		if userInput == "B" or userInput == "b":
+			self.SetUpMetaData()
+			self.BruteForceRun()
+		else:
+			self.NetworkTrain()
 		return
 
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
@@ -317,9 +318,38 @@ class RunController(object):
 		Ai = NeuralNetwork.NeuralNetwork(	self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                    			self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 		Ai.SaveDataSet()
+		Ai.Train(1)
+		game = self.Sim.Simulation()
+		board, turn = game.Start()
 		while True:
-			Ai.Train(20)
+			
+			valid = False
+			if turn == 1:
+				flippedBoard = game.FlipBoard(board)
+				move = Ai.MoveCal(flippedBoard)
+				flippedMove = game.FlipInput(move)
+				valid, board, turn = game.MakeMove(flippedMove)
+				if not valid:
+					Ai.UpdateInvalidMove(flippedBoard, move)
+			else:
+				move = Ai.MoveCal(board)
+				valid, board, turn = game.MakeMove(move)
+				if not valid:
+					Ai.UpdateInvalidMove(board, move)
 
+			if not valid:
+				Ai.Train(1)
+
+			os.system("cls")
+			game.SimpleOutput(board)
+
+			finished, fit = game.CheckFinished()
+			
+			#if keyboard.is_pressed("CTRl+Q"):
+			#	break
+
+			if finished:
+				board, turn = game.Start()
 		return
 
 if __name__ == "__main__":

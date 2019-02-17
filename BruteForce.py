@@ -20,6 +20,7 @@ class DataSetManager(object):
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
 		self.DatasetAddress = datasetAddress+"Dataset"
 		self.BoardHashLookUpAddress = datasetAddress+"BoardHashLookup"
+		self.MoveIDLookUpAdress = datasetAddress+"MoveIdLookUp"
 
 		self.RunningAIs = []
 		self.DataSet = {}
@@ -47,6 +48,7 @@ class DataSetManager(object):
 				canSave = False
 
 		if canSave:
+			pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
 			pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
 			pickle.dump(self.DataSet, open(self.DatasetAddress + ".p", "wb"))
 			for loop in range(len(self.RunningAIs)):
