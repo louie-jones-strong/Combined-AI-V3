@@ -8,39 +8,17 @@ from threading import Thread
 import keyboard
 
 def MakeAIMove(turn, board, AIs, game):
-	time1 = 0
-	time2 = 0
-	time3 = 0
-	time4 = 0
-
 	AI = AIs[turn-1]
 	valid = False
 	if turn == 1:
 		while not valid:
-			mark = time.time()
 			flippedBoard = game.FlipBoard(board)
-			time1 += time.time()-mark
-
-			mark = time.time()
-			move = AI.MoveCal(flippedBoard)
-			time2 += time.time()-mark
-			
+			move = AI.MoveCal(flippedBoard)		
 			flippedMove = game.FlipInput(move)
-
-			mark = time.time()
 			valid, board, turn = game.MakeMove(flippedMove)
-			time3 += time.time()-mark
 
 			if not valid:
-				mark = time.time()
 				AI.UpdateInvalidMove(flippedBoard, move)
-				time4 += time.time()-mark
-		#print("time1: "+str(time1))
-		#print("time2: "+str(time2))
-		#print("time3: "+str(time3))
-		#print("time4: "+str(time4))
-		#input("next: ")
-		#0.08
 	else:
 		while not valid:
 			move = AI.MoveCal(board)
@@ -294,7 +272,7 @@ class RunController(object):
 				break
 
 			if finished:
-				if time.time() - lastSaveTime > 60:
+				if time.time() - lastSaveTime > 10:
 					for loop in range(len(AIs)):
 						AIs[loop].UpdateData(fit[loop])
 
@@ -315,10 +293,10 @@ class RunController(object):
 		return
 
 	def NetworkTrain(self):
-		Ai = NeuralNetwork.NeuralNetwork(	self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
+		AnnAi = NeuralNetwork.NeuralNetwork(	self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                    			self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
-		Ai.SaveDataSet()
-		Ai.Train(1)
+		BruteAi = BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)
+		AnnAi.SaveDataSet()
 		game = self.Sim.Simulation()
 		board, turn = game.Start()
 		while True:
@@ -326,19 +304,19 @@ class RunController(object):
 			valid = False
 			if turn == 1:
 				flippedBoard = game.FlipBoard(board)
-				move = Ai.MoveCal(flippedBoard)
+				move = AnnAi.MoveCal(flippedBoard)
 				flippedMove = game.FlipInput(move)
 				valid, board, turn = game.MakeMove(flippedMove)
 				if not valid:
-					Ai.UpdateInvalidMove(flippedBoard, move)
+					AnnAi.UpdateInvalidMove(flippedBoard, move)
+					print(move)
+					AnnAi.ImportDataSet()
+					AnnAi.Train(100)
 			else:
-				move = Ai.MoveCal(board)
+				move = BruteAi.MoveCal(board)
 				valid, board, turn = game.MakeMove(move)
 				if not valid:
-					Ai.UpdateInvalidMove(board, move)
-
-			if not valid:
-				Ai.Train(1)
+					BruteAi.UpdateInvalidMove(board, move)
 
 			os.system("cls")
 			game.SimpleOutput(board)

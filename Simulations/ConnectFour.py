@@ -96,6 +96,7 @@ class Simulation(object):
 				temp += "|"
 
 			print(temp)
+		print("|0|1|2|3|4|5|6|")
 		return
 
 def WinCheck(board):

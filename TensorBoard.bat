@@ -1,0 +1,1 @@
+tensorboard --log=foo:C:\Users\louie\Documents\GitHub\3Dmath_render\log

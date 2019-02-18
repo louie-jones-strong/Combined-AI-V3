@@ -1,7 +1,7 @@
 import os
 import pickle
 import tflearn
-
+import time
 
 class NeuralNetwork(object):
 	DataSetX = []
@@ -10,7 +10,13 @@ class NeuralNetwork(object):
 	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, dataSetPath):
 		self.OutputResolution = outputResolution
 		self.DataSetPath = dataSetPath
-		self.ImportDataSet()
+		self.LastImportTime = 0
+
+		print("Waiting for DataSet")
+		while len(self.DataSetY) == 0:
+			self.ImportDataSet()
+			if len(self.DataSetY) == 0:
+				time.sleep(1)
 
 		structreArray = []
 		structreArray += [["ann", 100, "Tanh"]]
@@ -26,7 +32,7 @@ class NeuralNetwork(object):
 				if hasattr(self.DataSetX[0][0][0][0], "__len__"):
 					inputShape += [len(self.DataSetX[0][0][0][0])]
 
-		self.NetworkModel = ModelMaker(inputShape, structreArray)
+		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520)
 		return
 
 	def ImportDataSet(self):
@@ -37,6 +43,12 @@ class NeuralNetwork(object):
 			return
 
 		if not os.path.isfile(self.DataSetPath+"MoveIdLookUp" + ".p"):
+			return
+
+		if time.time() - self.LastImportTime < 60:
+			return
+
+		if self.LastImportTime >= os.path.getmtime(self.DataSetPath+"Dataset"+".p"):
 			return
 
 		file = open(self.DataSetPath+"Dataset" + ".p", "rb")
@@ -50,6 +62,8 @@ class NeuralNetwork(object):
 		file = open(self.DataSetPath+"MoveIdLookUp" + ".p", "rb")
 		self.MoveIdLookUp = pickle.load(file)
 		file.close()
+
+		self.LastImportTime = time.time()
 
 		loop = 0
 		for key, value in dataSet.items():
@@ -89,6 +103,11 @@ class NeuralNetwork(object):
 
 	def MoveCal(self, inputs):
 		outputs = self.NetworkModel.predict([inputs])[0]
+
+		temp =""
+		for loop in range(len(outputs)):
+			temp += str(loop)+": "+str(round(outputs[loop],2))+" "
+		print(temp)
 
 		largest = 0
 		moveId = 0
@@ -135,9 +154,8 @@ def LayerMaker(network, structreArray, layerNumber=0):
 		network = tflearn.conv_2d(network, layerInfo[1], 3, activation=layerInfo[2], regularizer="L2", name=layerName)
 
 	elif layerInfo[0] == "ann":
-		network = tflearn.fully_connected(network, layerInfo[1] , activation=layerInfo[2], bias=True, bias_init="Normal", name=layerName)
-		if len(layerInfo) > 1 and True:
-			network = tflearn.dropout(network, 0.8)
+		network = tflearn.fully_connected(network, layerInfo[1], activation=layerInfo[2], bias=False, name=layerName)
+		network = tflearn.dropout(network, 0.8)
 
 	elif layerInfo[0] == "maxpool":
 		network = tflearn.max_pool_2d(network, layerInfo[1], name=layerName)
