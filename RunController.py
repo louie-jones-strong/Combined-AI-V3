@@ -156,18 +156,25 @@ class RunController(object):
 
 		self.AiDataManager = BruteForce.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
-	
+
+		self.SetUpMetaData()
 		userInput = input("Brute b) network n):")
+		if userInput == "N" or userInput == "n":
+			Ais = [NeuralNetwork.NeuralNetwork(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
+												self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)]
+
+			for loop in range(self.NumberOfBots-1):
+				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
+		else:
+			Ais = []
+			for loop in range(self.NumberOfBots):
+				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 
 		if self.RenderQuality == 2:
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
-		if userInput == "B" or userInput == "b":
-			self.SetUpMetaData()
-			self.BruteForceRun()
-		else:
-			self.NetworkTrain()
+		self.RunSimMatch(Ais)
 		return
 
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
@@ -189,8 +196,8 @@ class RunController(object):
 			self.RenderEngine.UpdateFrame()
 
 		if (time.time() - self.LastOutputTime) >= 1:
+			os.system("cls")
 			if self.RenderQuality == 1 and self.NumberOfBots >= turn:
-				os.system("cls")
 				game.SimpleOutput(board)
 
 			print("Dataset size: " + str(SplitNumber(len(self.AiDataManager.DataSet))))
@@ -242,21 +249,17 @@ class RunController(object):
 			board, turn = self.RenderEngine.MakeHumanMove(game)
 		return board, turn
 
-	def BruteForceRun(self):
+	def RunSimMatch(self, Ais):
 		game = self.Sim.Simulation()
-		AIs = []
-		for loop in range(self.NumberOfBots):
-			AIs += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		board, turn = game.Start()
 
 		numMoves = 0
-
 		totalStartTime = time.time()
 		gameStartTime = time.time()
 		lastSaveTime = time.time()
 		while True:
 			if self.NumberOfBots >= turn:
-				board, turn = MakeAIMove(turn, board, AIs, game)
+				board, turn = MakeAIMove(turn, board, Ais, game)
 			else:
 				board, turn = self.MakeHumanMove(game, board)
 
@@ -272,8 +275,8 @@ class RunController(object):
 
 			if finished:
 				if time.time() - lastSaveTime > 10:
-					for loop in range(len(AIs)):
-						AIs[loop].SaveData(fit[loop])
+					for loop in range(len(Ais)):
+						Ais[loop].SaveData(fit[loop])
 
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = len(self.AiDataManager.DataSet)
@@ -289,46 +292,6 @@ class RunController(object):
 				self.MetaData["NumberOfGames"] += 1
 				numMoves = 0
 				gameStartTime = time.time()
-		return
-
-	def NetworkTrain(self):
-		AnnAi = NeuralNetwork.NeuralNetwork(	self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
-                                   			self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
-		BruteAi = BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)
-		game = self.Sim.Simulation()
-		board, turn = game.Start()
-		os.system("cls")
-		game.SimpleOutput(board)
-		while True:
-			valid = False
-			if turn == 1:
-				flippedBoard = game.FlipBoard(board)
-				move = AnnAi.MoveCal(flippedBoard)
-				flippedMove = game.FlipInput(move)
-				valid, board, turn = game.MakeMove(flippedMove)
-				print(flippedMove)
-
-				if not valid:
-					AnnAi.UpdateInvalidMove(flippedBoard, move)
-					AnnAi.ImportDataSet()
-			else:
-				move = BruteAi.MoveCal(board)
-				valid, board, turn = game.MakeMove(move)
-				if not valid:
-					BruteAi.UpdateInvalidMove(board, move)
-
-			os.system("cls")
-			game.SimpleOutput(board)
-
-			finished, fit = game.CheckFinished()
-			
-			#if keyboard.is_pressed("CTRl+Q"):
-			#	break
-
-			if finished:
-				board, turn = game.Start()
-				os.system("cls")
-				game.SimpleOutput(board)
 		return
 
 if __name__ == "__main__":

@@ -127,7 +127,7 @@ class NeuralNetwork(object):
 		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=100, run_id=self.RunId)
 		return
 
-	def SaveData(self):
+	def SaveData(self, fitness):
 
 		return
 
