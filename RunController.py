@@ -146,24 +146,23 @@ class RunController(object):
 		self.RenderQuality = int(input("Render level[0][1][2]: "))
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
 		self.LastOutputTime = time.time()
+		self.WinningMode = False
 
-		if self.RenderQuality != 0:
+		if self.RenderQuality != 0 and self.NumberOfBots >= 1:
 			userInput = input("Human Player[Y/N]:")
 			if userInput == "y" or userInput == "Y":
+				self.WinningMode = True
 				self.NumberOfBots -= 1
 
 		self.AiDataManager = BruteForce.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
-
-		self.WinningMode = False
-		if self.NumberOfBots == 1:
-			self.WinningMode = True
+	
+		userInput = input("Brute b) network n):")
 
 		if self.RenderQuality == 2:
 			import RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
-		
-		userInput = input("Brute b) network n):")
+
 		if userInput == "B" or userInput == "b":
 			self.SetUpMetaData()
 			self.BruteForceRun()
@@ -246,7 +245,7 @@ class RunController(object):
 	def BruteForceRun(self):
 		game = self.Sim.Simulation()
 		AIs = []
-		for loop in range(2):
+		for loop in range(self.NumberOfBots):
 			AIs += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 		board, turn = game.Start()
 
@@ -274,7 +273,7 @@ class RunController(object):
 			if finished:
 				if time.time() - lastSaveTime > 10:
 					for loop in range(len(AIs)):
-						AIs[loop].UpdateData(fit[loop])
+						AIs[loop].SaveData(fit[loop])
 
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = len(self.AiDataManager.DataSet)
@@ -296,22 +295,22 @@ class RunController(object):
 		AnnAi = NeuralNetwork.NeuralNetwork(	self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                    			self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 		BruteAi = BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)
-		AnnAi.SaveDataSet()
 		game = self.Sim.Simulation()
 		board, turn = game.Start()
+		os.system("cls")
+		game.SimpleOutput(board)
 		while True:
-			
 			valid = False
 			if turn == 1:
 				flippedBoard = game.FlipBoard(board)
 				move = AnnAi.MoveCal(flippedBoard)
 				flippedMove = game.FlipInput(move)
 				valid, board, turn = game.MakeMove(flippedMove)
+				print(flippedMove)
+
 				if not valid:
 					AnnAi.UpdateInvalidMove(flippedBoard, move)
-					print(move)
 					AnnAi.ImportDataSet()
-					AnnAi.Train(100)
 			else:
 				move = BruteAi.MoveCal(board)
 				valid, board, turn = game.MakeMove(move)
@@ -328,6 +327,8 @@ class RunController(object):
 
 			if finished:
 				board, turn = game.Start()
+				os.system("cls")
+				game.SimpleOutput(board)
 		return
 
 if __name__ == "__main__":

@@ -8,7 +8,10 @@ class NeuralNetwork(object):
 	DataSetY = []
 
 	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, dataSetPath):
+		self.MinOutputSize = minOutputSize
+		self.MaxOutputSize = maxOutputSize
 		self.OutputResolution = outputResolution
+
 		self.DataSetPath = dataSetPath
 		self.LastImportTime = 0
 
@@ -18,10 +21,12 @@ class NeuralNetwork(object):
 			if len(self.DataSetY) == 0:
 				time.sleep(1)
 
-		structreArray = []
-		structreArray += [["ann", 100, "Tanh"]]
-		structreArray += [["ann", len(self.DataSetY[0]), "Sigmoid"]]
+		inputShape, structreArray = self.PredictNetworkStructre()
 
+		self.RunId = "test2"
+		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520, lr=0.001)#, optimizer="sgd")
+		return
+	def PredictNetworkStructre(self):
 		inputShape = [len(self.DataSetX[0])]
 		if hasattr(self.DataSetX[0][0], "__len__"):
 			inputShape += [len(self.DataSetX[0][0])]
@@ -32,24 +37,38 @@ class NeuralNetwork(object):
 				if hasattr(self.DataSetX[0][0][0][0], "__len__"):
 					inputShape += [len(self.DataSetX[0][0][0][0])]
 
-		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520)
-		return
+		structreArray = []
+		structreArray += [["ann", 1000, "Tanh"]]
+		structreArray += [["ann", 1000, "Tanh"]]
+		structreArray += [["ann", 1000, "Tanh"]]
+		structreArray += [["ann", 1000, "Tanh"]]
+		structreArray += [["ann", 1000, "Tanh"]]
+		structreArray += [["ann", 1000, "Tanh"]]
+		structreArray += [["ann", 9, "Tanh"]]
 
+		if self.MinOutputSize < -1 or self.MinOutputSize > 1:
+			structreArray += [["ann", len(self.DataSetY[0]), "Linear"]]
+		elif self.MinOutputSize < 0:
+			structreArray += [["ann", len(self.DataSetY[0]), "Tanh"]]
+		else:
+			structreArray += [["ann", len(self.DataSetY[0]), "Sigmoid"]]
+
+		return inputShape, structreArray
 	def ImportDataSet(self):
 		if not os.path.isfile(self.DataSetPath+"Dataset" + ".p"):
-			return
+			return False
 		
 		if not os.path.isfile(self.DataSetPath+"BoardHashLookup" + ".p"):
-			return
+			return False
 
 		if not os.path.isfile(self.DataSetPath+"MoveIdLookUp" + ".p"):
-			return
+			return False
 
 		if time.time() - self.LastImportTime < 60:
-			return
+			return False
 
 		if self.LastImportTime >= os.path.getmtime(self.DataSetPath+"Dataset"+".p"):
-			return
+			return False
 
 		file = open(self.DataSetPath+"Dataset" + ".p", "rb")
 		dataSet = pickle.load(file)
@@ -72,13 +91,7 @@ class NeuralNetwork(object):
 			else:
 				input("board hash missing")
 
-
-			temp = []
-			for loop2 in range(len(self.MoveIdLookUp)):#len of move to move ids list
-				if loop2 in value.Moves:
-					temp += [1]
-				else:
-					temp += [0]
+			temp = self.MoveIdLookUp[value.MoveIDOfBestAvgFitness]
 
 			self.DataSetY += [temp]
 			
@@ -89,20 +102,11 @@ class NeuralNetwork(object):
 			loop += 1
 		os.system("cls")
 		print("100% "+str(len(dataSet))+"/"+str(len(dataSet)))
-		return 
-
-	def SaveDataSet(self):
-		pickle.dump(self.DataSetX, open(self.DataSetPath+"X.p", "wb"))
-		pickle.dump(self.DataSetY, open(self.DataSetPath+"Y.p", "wb"))
-		return
-
-	def Train(self, epochs):
-		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=epochs)
-		#self.NetworkModel.fit( X , Y , n_epoch=epochs , validation_set=( testX , testY ) , show_metric=metrics_on , snapshot_epoch=checkpoints_on , run_id=run_ID )
-		return
+		return True
 
 	def MoveCal(self, inputs):
 		outputs = self.NetworkModel.predict([inputs])[0]
+		
 
 		temp =""
 		for loop in range(len(outputs)):
@@ -120,7 +124,11 @@ class NeuralNetwork(object):
 		return outputMove
 
 	def UpdateInvalidMove(self, board, move):
-		print("played invalid!!")
+		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=100, run_id=self.RunId)
+		return
+
+	def SaveData(self):
+
 		return
 
 def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam"):
@@ -136,12 +144,14 @@ def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam
 		network = tflearn.input_data(shape=[None, inputShape[0] , inputShape[1] , inputShape[2] , inputShape[3] ], name='input')
 
 	network = LayerMaker(network, structreArray)
-
+	
+	loss = loss='mean_square'
+	#loss = "categorical_crossentropy"
 	if optimizer == "adam":
-		network = tflearn.regression(network, optimizer="adam", learning_rate=lr, batch_size=batchSize, loss='mean_square', name='target')
+		network = tflearn.regression(network, optimizer="adam", learning_rate=lr, batch_size=batchSize, loss=loss, name='target')
 	else:
-		sgd = tflearn.SGD(learning_rate = lr, lr_decay = 0.01 , decay_step=50)
-		network = tflearn.regression(network, optimizer=sgd, learning_rate=lr, batch_size=batchSize, loss="mean_square", name="target")
+		sgd = tflearn.SGD(learning_rate = lr)
+		network = tflearn.regression(network, optimizer=sgd, learning_rate=lr, batch_size=batchSize, loss=loss, name="target")
 	
 	model = tflearn.DNN(network, tensorboard_dir="log")
 	return model
@@ -154,20 +164,20 @@ def LayerMaker(network, structreArray, layerNumber=0):
 		network = tflearn.conv_2d(network, layerInfo[1], 3, activation=layerInfo[2], regularizer="L2", name=layerName)
 
 	elif layerInfo[0] == "ann":
-		network = tflearn.fully_connected(network, layerInfo[1], activation=layerInfo[2], bias=False, name=layerName)
-		network = tflearn.dropout(network, 0.8)
+		network = tflearn.fully_connected(network, layerInfo[1], activation=layerInfo[2], bias=True, name=layerName)
+		#network = tflearn.dropout(network, 0.8)
 
 	elif layerInfo[0] == "maxpool":
 		network = tflearn.max_pool_2d(network, layerInfo[1], name=layerName)
 
 	elif layerInfo[0] == "rnn":
-		network = tflearn.simple_rnn(network, layerInfo[1] , activation=layerInfo[2],bias = True, name=layerName)
+		network = tflearn.simple_rnn(network, layerInfo[1], activation=layerInfo[2], bias=True, name=layerName)
 
 	elif  layerInfo[0] == "lstm":
 		if len(layerInfo) > 2 and layerInfo[3] == "True":
-			network = tflearn.lstm(network, layerInfo[1], activation=layerInfo[2] , dropout=0.8 , return_seq=True, name=layerName)
+			network = tflearn.lstm(network, layerInfo[1], activation=layerInfo[2], dropout=0.8, return_seq=True, name=layerName)
 		else:
-			network = tflearn.lstm(network, layerInfo[1], activation=layerInfo[2] , return_seq=False, name=layerName)
+			network = tflearn.lstm(network, layerInfo[1], activation=layerInfo[2], return_seq=False, name=layerName)
 
 
 

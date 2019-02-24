@@ -78,6 +78,15 @@ class DataSetManager(object):
 			moveID = moveID % (temp)**((self.NumOfOutputs - loop)-1)
 		return move
 
+	def BoardToKey(self, board):
+		key = str(board)
+		key = key.replace(" ", "")
+
+		if not key in self.BoardToHashLookUp:
+			self.BoardToHashLookUp[key] = board
+
+		return key
+
 class BruteForce(object):
 
 	def __init__(self, dataSetManager, winningModeON=False):
@@ -90,7 +99,7 @@ class BruteForce(object):
 		return
 
 	def MoveCal(self, board):
-		key = self.BoardToKey(board)
+		key = self.DataSetManager.BoardToKey(board)
 
 		if self.WinningModeON:
 			print("winnning mode!")
@@ -104,7 +113,7 @@ class BruteForce(object):
 		else:  # learning mode
 			if key in self.DataSetManager.DataSet:
 				
-				if not self.DataSetManager.DataSet[key].NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
+				if self.DataSetManager.DataSet[key].NumOfTriedMoves > self.DataSetManager.MaxMoveIDs:
 					if len(self.DataSetManager.DataSet[key].Moves) == 0:
 						input("error!!!")
 
@@ -139,7 +148,7 @@ class BruteForce(object):
 		return move
 
 	def UpdateInvalidMove(self, board, move):
-		key = self.BoardToKey(board)
+		key = self.DataSetManager.BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
 		if key in self.DataSetManager.DataSet:
@@ -150,7 +159,7 @@ class BruteForce(object):
 			del self.TempDataSet[str(key)+str(moveID)]
 		return
 	
-	def UpdateData(self, fitness):
+	def SaveData(self, fitness):
 		for tempKey in self.TempDataSet:
 			key = self.TempDataSet[tempKey]["BoardKey"]
 			moveID = self.TempDataSet[tempKey]["MoveID"]
@@ -171,15 +180,6 @@ class BruteForce(object):
 		self.TempDataSet = {}
 		self.DataSetManager.SaveDataSet(self.AiNumber)
 		return
-
-	def BoardToKey(self, board):
-		key = str(board)
-		key = key.replace(" ", "")
-
-		if not key in self.DataSetManager.BoardToHashLookUp:
-			self.DataSetManager.BoardToHashLookUp[key] = board
-
-		return key
 
 class BoardInfo():
 	NumOfTriedMoves = 1
