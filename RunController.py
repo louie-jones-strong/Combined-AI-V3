@@ -176,7 +176,7 @@ class RunController(object):
 		return
 
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
-		if (time.time() - self.LastOutputTime) >= 1:
+		if (time.time() - self.LastOutputTime) >= 0.5:
 			numGames = self.MetaData["NumberOfGames"]+1
 			avgMoveTime = 0
 			if numMoves != 0:

@@ -22,7 +22,6 @@ class NeuralNetwork(object):
 				time.sleep(1)
 
 		inputShape, structreArray = self.PredictNetworkStructre()
-		self.NumberOfLayers = len(structreArray)+1
 
 		self.RunId = "test2"
 		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520, lr=0.001)#, optimizer="sgd")
@@ -54,6 +53,7 @@ class NeuralNetwork(object):
 		else:
 			structreArray += [["ann", len(self.DataSetY[0]), "Sigmoid"]]
 
+		self.NumberOfLayers = len(structreArray)
 		return inputShape, structreArray
 	def ImportDataSet(self):
 		if not os.path.isfile(self.DataSetPath+"Dataset" + ".p"):
@@ -125,7 +125,9 @@ class NeuralNetwork(object):
 		return outputMove
 
 	def UpdateInvalidMove(self, board, move):
+		os.system("cls")
 		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=100, run_id=self.RunId)
+		self.SaveData(0)
 		return
 
 	def SaveData(self, fitness):
