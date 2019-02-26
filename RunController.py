@@ -127,11 +127,12 @@ class RunController(object):
 
 		if userInput == "n" or userInput == "N":
 			self.MetaData = {"SizeOfDataSet":0, "NumberOfCompleteBoards": 0, "NumberOfGames": 0, "TotalTime": 0}
+			return False
 		else:
-			self.AiDataManager.LoadDataSet()
 			self.AiDataManager.NumberOfCompleteBoards = self.MetaData["NumberOfCompleteBoards"]
+			return True
 
-		return
+		return False
 
 	def __init__(self):
 		simName = self.PickSimulation()
@@ -143,12 +144,11 @@ class RunController(object):
 		self.DatasetAddress = temp+"//"+simName
 
 		#setting
-		self.RenderQuality = int(input("Render level[0][1][2]: "))
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
 		self.LastOutputTime = time.time()
 		self.WinningMode = False
 
-		if self.RenderQuality != 0 and self.NumberOfBots >= 1:
+		if self.NumberOfBots >= 1:
 			userInput = input("Human Player[Y/N]:")
 			if userInput == "y" or userInput == "Y":
 				self.WinningMode = True
@@ -157,11 +157,13 @@ class RunController(object):
 		self.AiDataManager = BruteForce.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 
-		self.SetUpMetaData()
+		loadData = self.SetUpMetaData()
+
 		userInput = input("Brute b) network n):")
 		if userInput == "N" or userInput == "n":
 			Ais = [NeuralNetwork.NeuralNetwork(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 												self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)]
+			Ais[0].LoadData()
 
 			for loop in range(self.NumberOfBots-1):
 				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
@@ -170,34 +172,20 @@ class RunController(object):
 			for loop in range(self.NumberOfBots):
 				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 
-		if self.RenderQuality == 2:
-			import RenderEngine
-			self.RenderEngine = RenderEngine.RenderEngine()
-
 		self.RunSimMatch(Ais)
 		return
 
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
-		numGames = self.MetaData["NumberOfGames"]+1
-		avgMoveTime = 0
-		if numMoves != 0:
-			avgMoveTime = (time.time() - gameStartTime)/numMoves
-			avgMoveTime = round(avgMoveTime,6)
-		
-		if self.RenderQuality == 2:
-			text = "Dataset Size: "+str(len(self.AiDataManager.DataSet))+"\n"
-			text += "Game: "+str(numGames)+"\n"
-			text += "Move: "+str(numMoves)+"\n"
-			text += "AVG time: "+str(avgMoveTime)
-			self.RenderEngine.UpdateConsoleText(text)
-
-			if board != None and turn != None:
-				self.RenderEngine.UpdateBoard(board, turn)
-			self.RenderEngine.UpdateFrame()
-
 		if (time.time() - self.LastOutputTime) >= 1:
+			numGames = self.MetaData["NumberOfGames"]+1
+			avgMoveTime = 0
+			if numMoves != 0:
+				avgMoveTime = (time.time() - gameStartTime)/numMoves
+				avgMoveTime = round(avgMoveTime, 6)
+
+
 			os.system("cls")
-			if self.RenderQuality == 1 and self.NumberOfBots >= turn:
+			if self.NumberOfBots >= turn:
 				game.SimpleOutput(board)
 
 			print("Dataset size: " + str(SplitNumber(len(self.AiDataManager.DataSet))))
@@ -216,37 +204,28 @@ class RunController(object):
 		return
 	
 	def MakeHumanMove(self, game, board):
-		if self.RenderQuality == 1:
-
-			valid = False
-			while not valid:
-				os.system("cls")
-				game.SimpleOutput(board)
-				move = []
-
-				for loop in range(self.SimInfo["NumInputs"]):
-					validMove = False
-
-					while not validMove:
-						userInput = float(input("input["+ str(loop) +"]: "))
-						userInput = self.SimInfo["Resolution"] * round(float(userInput)/self.SimInfo["Resolution"])
-						print(userInput)
-
-						if userInput >= self.SimInfo["MinInputSize"] and userInput <= self.SimInfo["MaxInputSize"]:
-							validMove = True
-							move += [userInput]
-						else:
-							print("not in the range!")
-
-				valid, board, turn = game.MakeMove(move)
-				if not valid:
-					print("that move was not vaild")
-						
-			print("")
+		valid = False
+		while not valid:
+			os.system("cls")
 			game.SimpleOutput(board)
-		
-		elif self.RenderQuality == 2:
-			board, turn = self.RenderEngine.MakeHumanMove(game)
+			move = []
+			for loop in range(self.SimInfo["NumInputs"]):
+				validMove = False
+				while not validMove:
+					userInput = float(input("input["+ str(loop) +"]: "))
+					userInput = self.SimInfo["Resolution"] * round(float(userInput)/self.SimInfo["Resolution"])
+					print(userInput)
+					if userInput >= self.SimInfo["MinInputSize"] and userInput <= self.SimInfo["MaxInputSize"]:
+						validMove = True
+						move += [userInput]
+					else:
+						print("not in the range!")
+			valid, board, turn = game.MakeMove(move)
+			if not valid:
+				print("that move was not vaild")
+					
+		print("")
+		game.SimpleOutput(board)
 		return board, turn
 
 	def RunSimMatch(self, Ais):

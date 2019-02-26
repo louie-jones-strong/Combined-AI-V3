@@ -22,6 +22,7 @@ class NeuralNetwork(object):
 				time.sleep(1)
 
 		inputShape, structreArray = self.PredictNetworkStructre()
+		self.NumberOfLayers = len(structreArray)+1
 
 		self.RunId = "test2"
 		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520, lr=0.001)#, optimizer="sgd")
@@ -128,7 +129,17 @@ class NeuralNetwork(object):
 		return
 
 	def SaveData(self, fitness):
+		weights = GetWeights(self.NetworkModel, self.NumberOfLayers)
+		pickle.dump(weights, open(self.DataSetPath+"NetWorkWeights"+".p", "wb"))
+		return
 
+	def LoadData(self):
+		if os.path.isfile(self.DataSetPath+"NetWorkWeights"+".p"):
+			file = open(self.DataSetPath+"NetWorkWeights"+".p", "rb")
+			newWeights = pickle.load(file)
+			file.close()
+
+			self.NetworkModel = SetWeights(self.NetworkModel, self.NumberOfLayers, newWeights)
 		return
 
 def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam"):
