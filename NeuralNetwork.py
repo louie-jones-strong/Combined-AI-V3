@@ -86,6 +86,8 @@ class NeuralNetwork(object):
 		self.LastImportTime = time.time()
 
 		loop = 0
+		self.DataSetX = []
+		self.DataSetY = []
 		for key, value in dataSet.items():
 			if key in boardToHashLookUp:
 				self.DataSetX += [boardToHashLookUp[key]]
@@ -126,6 +128,7 @@ class NeuralNetwork(object):
 
 	def UpdateInvalidMove(self, board, move):
 		os.system("cls")
+		self.ImportDataSet()
 		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=100, run_id=self.RunId)
 		self.SaveData(0)
 		return
