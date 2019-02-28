@@ -158,6 +158,8 @@ class RunController(object):
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 
 		loadData = self.SetUpMetaData()
+		if loadData:
+			self.AiDataManager.LoadDataSet()
 
 		userInput = input("Brute b) network n):")
 		if userInput == "N" or userInput == "n":
@@ -172,7 +174,7 @@ class RunController(object):
 			for loop in range(self.NumberOfBots):
 				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 
-		self.RunSimMatch(Ais)
+		self.RunTournament(Ais)
 		return
 
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
@@ -227,6 +229,10 @@ class RunController(object):
 		print("")
 		game.SimpleOutput(board)
 		return board, turn
+
+	def RunTournament(self, Ais):
+		self.RunSimMatch(Ais)
+		return
 
 	def RunSimMatch(self, Ais):
 		game = self.Sim.Simulation()
