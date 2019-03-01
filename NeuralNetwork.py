@@ -129,7 +129,7 @@ class NeuralNetwork(object):
 	def UpdateInvalidMove(self, board, move):
 		os.system("cls")
 		self.ImportDataSet()
-		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=100, run_id=self.RunId)
+		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
 		self.SaveData(0)
 		return
 

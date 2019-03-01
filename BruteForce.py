@@ -59,13 +59,7 @@ class DataSetManager(object):
 		if os.path.isfile(self.DatasetAddress + ".p"):
 			file = open(self.DatasetAddress + ".p", "rb")
 			self.DataSet = pickle.load(file)
-			file.close()
-			
-			if os.path.isfile(self.BoardHashLookUpAddress + ".p"):
-				file = open(self.BoardHashLookUpAddress + ".p", "rb")
-				self.BoardToHashLookUp = pickle.load(file)
-				file.close()
-			
+			file.close()	
 			return True
 		else:
 			return False
