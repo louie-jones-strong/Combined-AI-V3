@@ -1,5 +1,4 @@
 import BruteForce
-import NeuralNetwork
 import importlib
 import time
 import os
@@ -163,6 +162,7 @@ class RunController(object):
 
 		userInput = input("Brute b) network n):")
 		if userInput == "N" or userInput == "n":
+			import NeuralNetwork
 			Ais = [NeuralNetwork.NeuralNetwork(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 												self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)]
 			Ais[0].LoadData()
