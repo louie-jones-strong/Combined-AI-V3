@@ -56,30 +56,30 @@ class NeuralNetwork(object):
 		self.NumberOfLayers = len(structreArray)
 		return inputShape, structreArray
 	def ImportDataSet(self):
-		if not os.path.isfile(self.DataSetPath+"Dataset" + ".p"):
+		if not os.path.isfile(self.DataSetPath+"BruteForceDataSet//"+"Dataset" + ".p"):
 			return False
 		
-		if not os.path.isfile(self.DataSetPath+"BoardHashLookup" + ".p"):
+		if not os.path.isfile(self.DataSetPath+"LookUp//"+"BoardHashLookup" + ".p"):
 			return False
 
-		if not os.path.isfile(self.DataSetPath+"MoveIdLookUp" + ".p"):
+		if not os.path.isfile(self.DataSetPath+"LookUp//"+"MoveIdLookUp" + ".p"):
 			return False
 
 		if time.time() - self.LastImportTime < 60:
 			return False
 
-		if self.LastImportTime >= os.path.getmtime(self.DataSetPath+"Dataset"+".p"):
+		if self.LastImportTime >= os.path.getmtime(self.DataSetPath+"BruteForceDataSet//"+"Dataset"+".p"):
 			return False
 
-		file = open(self.DataSetPath+"Dataset" + ".p", "rb")
+		file = open(self.DataSetPath+"BruteForceDataSet//"+"Dataset" + ".p", "rb")
 		dataSet = pickle.load(file)
 		file.close()
 		
-		file = open(self.DataSetPath+"BoardHashLookup" + ".p", "rb")
+		file = open(self.DataSetPath+"LookUp//"+"BoardHashLookup" + ".p", "rb")
 		boardToHashLookUp = pickle.load(file)
 		file.close()
 
-		file = open(self.DataSetPath+"MoveIdLookUp" + ".p", "rb")
+		file = open(self.DataSetPath+"LookUp//"+"MoveIdLookUp" + ".p", "rb")
 		self.MoveIdLookUp = pickle.load(file)
 		file.close()
 
