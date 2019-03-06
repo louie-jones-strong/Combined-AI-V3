@@ -140,7 +140,7 @@ class RunController(object):
 		temp = "DataSets//"+simName
 		if not os.path.exists(temp):
 			os.makedirs(temp)
-		self.DatasetAddress = temp+"//"+simName
+		self.DatasetAddress = temp+"//"
 
 		#setting
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
@@ -157,10 +157,12 @@ class RunController(object):
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 
 		loadData = self.SetUpMetaData()
-		if loadData:
-			self.AiDataManager.LoadDataSet()
-
 		userInput = input("Brute b) network n):")
+
+		if loadData:
+			if not self.AiDataManager.LoadDataSet():
+				input("Failed To Load Data")
+				
 		if userInput == "N" or userInput == "n":
 			import NeuralNetwork
 			Ais = [NeuralNetwork.NeuralNetwork(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 

@@ -18,9 +18,9 @@ class DataSetManager(object):
 		self.OutputResolution = outputResolution
 
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
-		self.DatasetAddress = datasetAddress+"Dataset"
-		self.BoardHashLookUpAddress = datasetAddress+"BoardHashLookup"
-		self.MoveIDLookUpAdress = datasetAddress+"MoveIdLookUp"
+		self.DatasetAddress = datasetAddress+"BruteForceDataSet//"+"Dataset"
+		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
+		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
 		self.RunningAIs = []
 		self.DataSet = {}
@@ -56,13 +56,20 @@ class DataSetManager(object):
 		return
 	
 	def LoadDataSet(self):
-		if os.path.isfile(self.DatasetAddress + ".p"):
-			file = open(self.DatasetAddress + ".p", "rb")
-			self.DataSet = pickle.load(file)
-			file.close()	
-			return True
-		else:
+		if not os.path.isfile(self.DatasetAddress + ".p"):
 			return False
+
+		if not os.path.isfile(self.BoardHashLookUpAddress + ".p"):
+			return False
+
+		file = open(self.DatasetAddress + ".p", "rb")
+		self.DataSet = pickle.load(file)
+		file.close()
+
+		file = open(self.BoardHashLookUpAddress + ".p", "rb")
+		self.BoardToHashLookUp = pickle.load(file)
+		file.close()
+		return True
 
 	def MoveIDToMove(self, moveID):
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
