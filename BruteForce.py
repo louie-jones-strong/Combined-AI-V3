@@ -3,6 +3,19 @@ import os
 import sys
 import random
 
+
+def SaveBruteForceDataSet(dataset, datasetAddress):
+	pickle.dump(dataset, open(datasetAddress, "wb"))
+	return
+
+
+def LoadBruteForceDataSet(datasetAddress):
+	file = open(datasetAddress, "rb")
+	output = pickle.load(file)
+	file.close()
+
+	return output
+
 class DataSetManager(object):
 	DataSet = {}
 	NumberOfCompleteBoards = 0
@@ -50,7 +63,9 @@ class DataSetManager(object):
 		if canSave:
 			pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
 			pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
-			pickle.dump(self.DataSet, open(self.DatasetAddress + ".p", "wb"))
+
+			SaveBruteForceDataSet(self.DataSet, self.DatasetAddress+".p")
+
 			for loop in range(len(self.RunningAIs)):
 				self.RunningAIs[loop] = False
 		return
@@ -62,9 +77,7 @@ class DataSetManager(object):
 		if not os.path.isfile(self.BoardHashLookUpAddress + ".p"):
 			return False
 
-		file = open(self.DatasetAddress + ".p", "rb")
-		self.DataSet = pickle.load(file)
-		file.close()
+		self.DataSet = LoadBruteForceDataSet(self.DatasetAddress+".p")
 
 		file = open(self.BoardHashLookUpAddress + ".p", "rb")
 		self.BoardToHashLookUp = pickle.load(file)
