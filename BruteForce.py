@@ -4,17 +4,53 @@ import sys
 import random
 
 
-def SaveBruteForceDataSet(dataset, datasetAddress):
-	pickle.dump(dataset, open(datasetAddress, "wb"))
-	return
+class DataSetLoadAndSaver(object):
+	def __init__(self, datasetAddress):
+		self.HashTableAddress = datasetAddress+"DataSetHashTable.p"
+		self.TableAddress = datasetAddress+"Table_"
+		self.batchSize = 30000
+		self.dataBaseHashTable = {}
+		self.DataSetTables = []
+		return
 
+	def SaveBruteForceDataSet(self, dataset):
+		fillingTable = 0
+		for loop in range(len(self.DataSetTables)):
+			if len(self.DataSetTables[loop]) >= self.batchSize:
+				fillingTable += 1
 
-def LoadBruteForceDataSet(datasetAddress):
-	file = open(datasetAddress, "rb")
-	output = pickle.load(file)
-	file.close()
+		tablesToSave = []
+		for key, value in dataset.items():
 
-	return output
+			if key in self.dataBaseHashTable:
+				index = self.dataBaseHashTable[key]
+
+			else:
+				self.dataBaseHashTable[key] = fillingTable
+				index = fillingTable
+				if len(self.DataSetTables) <= index:
+					self.DataSetTables += [{}]
+
+				if len(self.DataSetTables[index]) >= self.batchSize:
+					fillingTable += 1
+			
+			self.DataSetTables[index][key] = value
+			if index not in tablesToSave:
+				tablesToSave += [index]
+
+		for loop in range(len(tablesToSave)):
+			index = tablesToSave[loop]
+			pickle.dump(self.DataSetTables[index], open(self.TableAddress+str(index)+".p", "wb"))
+
+		pickle.dump(self.dataBaseHashTable, open(self.HashTableAddress, "wb"))
+		return
+
+	def LoadBruteForceDataSet(self, datasetAddress):
+		file = open(datasetAddress, "rb")
+		output = pickle.load(file)
+		file.close()
+
+		return output
 
 class DataSetManager(object):
 	DataSet = {}
@@ -31,13 +67,19 @@ class DataSetManager(object):
 		self.OutputResolution = outputResolution
 
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
-		self.DatasetAddress = datasetAddress+"BruteForceDataSet//"+"Dataset"
+		self.DatasetAddress = datasetAddress+"BruteForceDataSet//"
 		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
+
+		if not os.path.exists(datasetAddress+"BruteForceDataSet//"):
+			os.makedirs(datasetAddress+"BruteForceDataSet//")
+		if not os.path.exists(datasetAddress+"LookUp//"):
+			os.makedirs(datasetAddress+"LookUp//")
 
 		self.RunningAIs = []
 		self.DataSet = {}
 		self.MoveIDLookUp = self.BuildMoveIDLookUp()
+		self.LoadAndSaver = DataSetLoadAndSaver(self.DatasetAddress)
 		return
 
 	def BuildMoveIDLookUp(self):
@@ -64,20 +106,20 @@ class DataSetManager(object):
 			pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
 			pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
 
-			SaveBruteForceDataSet(self.DataSet, self.DatasetAddress+".p")
+			self.LoadAndSaver.SaveBruteForceDataSet(self.DataSet)
 
 			for loop in range(len(self.RunningAIs)):
 				self.RunningAIs[loop] = False
 		return
 	
 	def LoadDataSet(self):
-		if not os.path.isfile(self.DatasetAddress + ".p"):
+		if not os.path.isfile(self.DatasetAddress + "DataSet.p"):
 			return False
 
 		if not os.path.isfile(self.BoardHashLookUpAddress + ".p"):
 			return False
 
-		self.DataSet = LoadBruteForceDataSet(self.DatasetAddress+".p")
+		self.DataSet = self.LoadAndSaver.LoadBruteForceDataSet(self.DatasetAddress+"DataSet.p")
 
 		file = open(self.BoardHashLookUpAddress + ".p", "rb")
 		self.BoardToHashLookUp = pickle.load(file)
