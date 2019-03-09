@@ -162,7 +162,7 @@ class RunController(object):
 		if loadData:
 			if not self.AiDataManager.LoadDataSet():
 				input("Failed To Load Data")
-				
+
 		if userInput == "N" or userInput == "n":
 			import NeuralNetwork
 			Ais = [NeuralNetwork.NeuralNetwork(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
@@ -261,10 +261,10 @@ class RunController(object):
 				break
 
 			if finished:
+				for loop in range(len(Ais)):
+					Ais[loop].SaveData(fit[loop])
 				if time.time() - lastSaveTime > 10:
-					for loop in range(len(Ais)):
-						Ais[loop].SaveData(fit[loop])
-
+					self.AiDataManager.SaveDataSet()
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = len(self.AiDataManager.DataSet)
 					SaveMetaData(self.MetaData, self.DatasetAddress+"MetaData.txt")
