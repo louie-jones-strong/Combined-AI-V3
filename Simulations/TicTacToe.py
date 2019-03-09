@@ -60,7 +60,7 @@ class Simulation(object):
 	def FlipInput(self, move):
 		return move
 
-	def SimpleOutput(self, board):
+	def OutputBoard(self, board):
 		loop = 0
 		for y in range(3):
 			temp = ""

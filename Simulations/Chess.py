@@ -68,7 +68,7 @@ class Simulation(object):
 		temp = [7-move[0], 7-move[1], 7-move[2], 7-move[3]]
 		return temp
 
-	def SimpleOutput(self, board):
+	def OutputBoard(self, board):
 		print("   0  1  2  3  4  5  6  7   ")
 
 		for loop in range(8):
