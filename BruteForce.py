@@ -91,17 +91,13 @@ class DataSetManager(object):
 			os.makedirs(datasetAddress+"LookUp//")
 
 		self.DataSet = {}
-		self.MoveIDLookUp = self.BuildMoveIDLookUp()
+		self.MoveIDLookUp = []
+		for loop in range(self.MaxMoveIDs):
+			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
+			
 		self.LoadAndSaver = DataSetLoadAndSaver(self.DatasetAddress)
 		return
 
-	def BuildMoveIDLookUp(self):
-		moveIDLookUp = []
-		for loop in range(self.MaxMoveIDs):
-			moveIDLookUp += [self.MoveIDToMove(loop)]
-
-		return moveIDLookUp
-	
 	def SaveDataSet(self, forceSave=False):
 		if (not os.path.exists(self.MoveIDLookUpAdress + ".p")):
 			pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
@@ -271,3 +267,5 @@ class MoveInfo():
 
 
 # 1) point to the move that is least played
+# 2) make datasetmanager and datasetloadandsaver in to one to save ram 
+# 3) get a single boardinfo for the brute force to work with to cut down on lookups
