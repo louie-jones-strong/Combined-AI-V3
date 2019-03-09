@@ -57,7 +57,7 @@ class DataSetLoadAndSaver(object):
 
 		output = {}
 		self.DataSetTables = []
-		for loop in range(28):
+		for loop in range(numberOfTables):
 			file = open(self.TableAddress+"Table_"+str(loop)+".p", "rb")
 			self.DataSetTables += [pickle.load(file)]
 			file.close()
@@ -121,9 +121,6 @@ class DataSetManager(object):
 		return
 	
 	def LoadDataSet(self):
-		if not os.path.isfile(self.DatasetAddress + "DataSet.p"):
-			return False
-
 		if not os.path.isfile(self.BoardHashLookUpAddress + ".p"):
 			return False
 

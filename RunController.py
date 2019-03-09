@@ -134,10 +134,10 @@ class RunController(object):
 		return False
 
 	def __init__(self):
-		simName = self.PickSimulation()
+		self.SimName = self.PickSimulation()
 
 		#setup dataset address
-		temp = "DataSets//"+simName
+		temp = "DataSets//"+self.SimName
 		if not os.path.exists(temp):
 			os.makedirs(temp)
 		self.DatasetAddress = temp+"//"
@@ -204,6 +204,7 @@ class RunController(object):
 			print("time since start: " + str(SplitTime(totalTime, roundTo=2)))
 			print("press CTRl+Q to quit...")
 			
+			os.system("title "+"AI Playing: "+self.SimName+" Time Since Last Save: "+SplitTime(time.time()-self.LastSaveTime, roundTo=1))
 			self.LastOutputTime = time.time()
 		return
 	
@@ -243,7 +244,7 @@ class RunController(object):
 		numMoves = 0
 		totalStartTime = time.time()
 		gameStartTime = time.time()
-		lastSaveTime = time.time()
+		self.LastSaveTime = time.time()
 		while True:
 			if self.NumberOfBots >= turn:
 				board, turn = MakeAIMove(turn, board, Ais, game)
@@ -263,12 +264,12 @@ class RunController(object):
 			if finished:
 				for loop in range(len(Ais)):
 					Ais[loop].SaveData(fit[loop])
-				if time.time() - lastSaveTime > 10:
+				if time.time() - self.LastSaveTime > 60:
 					self.AiDataManager.SaveDataSet()
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = len(self.AiDataManager.DataSet)
 					SaveMetaData(self.MetaData, self.DatasetAddress+"MetaData.txt")
-					lastSaveTime = time.time()
+					self.LastSaveTime = time.time()
 
 				if keyboard.is_pressed("CTRl+Q"):
 					break
