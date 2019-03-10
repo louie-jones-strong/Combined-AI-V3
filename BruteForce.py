@@ -26,6 +26,7 @@ class DataSetManager(object):
 		self.DataBaseHashTable = {}
 		self.DataSetTables = []
 		self.BoardToHashLookUp = {}
+		self.FillingTable = 0
 
 		if not os.path.exists(self.TableAddress):
 			os.makedirs(self.TableAddress)
@@ -49,11 +50,6 @@ class DataSetManager(object):
 
 		self.BoardsToUpdate = {}
 
-		fillingTable = 0
-		for loop in range(len(self.DataSetTables)):
-			if len(self.DataSetTables[loop]) >= self.TableBatchSize:
-				fillingTable += 1
-
 		tablesToSave = []
 		for key, value in boardsToSave.items():
 
@@ -61,13 +57,13 @@ class DataSetManager(object):
 				index = self.DataBaseHashTable[key]
 
 			else:
-				self.DataBaseHashTable[key] = fillingTable
-				index = fillingTable
+				self.DataBaseHashTable[key] = self.FillingTable
+				index = self.FillingTable
 				if len(self.DataSetTables) <= index:
 					self.DataSetTables += [{}]
 
 				if len(self.DataSetTables[index]) >= self.TableBatchSize:
-					fillingTable += 1
+					self.FillingTable += 1
 			
 			self.DataSetTables[index][key] = value
 			if index not in tablesToSave:
@@ -101,6 +97,11 @@ class DataSetManager(object):
 				file.close()
 				
 				numberOfTables += 1
+
+		self.FillingTable = 0
+		for loop in range(len(self.DataSetTables)):
+			if len(self.DataSetTables[loop]) >= self.TableBatchSize:
+				self.FillingTable += 1
 		return True
 	
 	def GetBoardInfo(self, key):
@@ -115,7 +116,18 @@ class DataSetManager(object):
 		return found, boardInfo
 
 	def AddNewBoard(self , key):
+		index = self.FillingTable
+		self.DataBaseHashTable[key] = index
 
+		if len(self.DataSetTables) <= index:
+			self.DataSetTables += [{}]
+
+		if len(self.DataSetTables[index]) >= self.TableBatchSize:
+			self.FillingTable += 1
+
+		moves = MoveInfo(MoveID=0)
+		value = BoardInfo(Moves=moves)
+		self.DataSetTables[index][key] = value
 		return
 
 	def MoveIDToMove(self, moveID):
@@ -149,16 +161,14 @@ class BruteForce(object):
 
 		if self.WinningModeON:
 			print("winnning mode!")
-			if key in self.DataSetManager.DataSet and len(boardInfo.Moves) > 0:
+			if found and len(boardInfo.Moves) > 0:
 				moveID = boardInfo.MoveIDOfBestAvgFitness
 
 			else:#never played board before
 				moveID = random.randint(0,self.DataSetManager.MaxMoveIDs-1)
 				print("new Board!")
-
 		else:  # learning mode
 			if found:
-				
 				if boardInfo.NumOfTriedMoves > self.DataSetManager.MaxMoveIDs:
 					if len(boardInfo.Moves) == 0:
 						input("error!!!")
@@ -171,7 +181,7 @@ class BruteForce(object):
 					if boardInfo.NumOfTriedMoves >= self.DataSetManager.MaxMoveIDs:
 						self.DataSetManager.NumberOfCompleteBoards += 1
 
-				else:#played every board once already
+				else:#played every move once already
 					leastPlayed = sys.maxsize
 					moveID = 0
 					for movekey, moveValue in boardInfo.Moves.items():
@@ -185,7 +195,6 @@ class BruteForce(object):
 				moveID = 0
 				self.DataSetManager.AddNewBoard(key)
 
-			#cahnge tempdataset to dict so faster to del for bigger lists
 			self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID}
 
 
