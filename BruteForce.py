@@ -126,7 +126,7 @@ class DataSetManager(object):
 			self.FillingTable += 1
 
 		moves = MoveInfo(MoveID=0)
-		value = BoardInfo(Moves=moves)
+		value = {0, BoardInfo(Moves=moves)}
 		self.DataSetTables[index][key] = value
 		return
 
@@ -205,9 +205,11 @@ class BruteForce(object):
 		key = self.DataSetManager.BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
-		if key in self.DataSetManager.DataSet:
-			if moveID in self.DataSetManager.DataSet[key].Moves:
-				del self.DataSetManager.DataSet[key].Moves[moveID]
+		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+
+		if found:
+			if moveID in boardInfo.Moves:
+				del boardInfo.Moves[moveID]
 
 		if str(key)+str(moveID) in self.TempDataSet:
 			del self.TempDataSet[str(key)+str(moveID)]
@@ -223,16 +225,17 @@ class BruteForce(object):
 			else:
 				self.DataSetManager.BoardsToUpdate[key] = 1
 
-			if moveID in self.DataSetManager.DataSet[key].Moves:
-				newFitness = self.DataSetManager.DataSet[key].Moves[moveID].AvgFitness*self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed
+			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+			if moveID in boardInfo.Moves:
+				newFitness = boardInfo.Moves[moveID].AvgFitness*boardInfo.Moves[moveID].TimesPlayed
 				newFitness += fitness
-				self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed += 1
-				newFitness /= self.DataSetManager.DataSet[key].Moves[moveID].TimesPlayed
-				self.DataSetManager.DataSet[key].Moves[moveID].AvgFitness = newFitness
+				boardInfo.Moves[moveID].TimesPlayed += 1
+				newFitness /= boardInfo.Moves[moveID].TimesPlayed
+				boardInfo.Moves[moveID].AvgFitness = newFitness
 
-				if newFitness > self.DataSetManager.DataSet[key].BestAvgFitness:
-					self.DataSetManager.DataSet[key].MoveIDOfBestAvgFitness = moveID
-					self.DataSetManager.DataSet[key].bestAvgFitness = newFitness
+				if newFitness > boardInfo.BestAvgFitness:
+					boardInfo.MoveIDOfBestAvgFitness = moveID
+					boardInfo.bestAvgFitness = newFitness
 
 
 
