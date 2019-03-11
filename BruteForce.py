@@ -7,7 +7,6 @@ class DataSetManager(object):
 	NumberOfCompleteBoards = 0
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
-	BoardsToUpdate = {}
 	
 	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, datasetAddress):
 		self.NumOfOutputs = numOfOutputs
@@ -27,6 +26,7 @@ class DataSetManager(object):
 		self.DataSetTables = []
 		self.BoardToHashLookUp = {}
 		self.FillingTable = 0
+		self.TablesToSave = {}
 
 		if not os.path.exists(self.TableAddress):
 			os.makedirs(self.TableAddress)
@@ -44,34 +44,9 @@ class DataSetManager(object):
 			pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
 
 		pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
-		boardsToSave = {}
-		for key in self.BoardsToUpdate:
-			boardsToSave[key] = self.DataSet[key]
 
-		self.BoardsToUpdate = {}
-
-		tablesToSave = []
-		for key, value in boardsToSave.items():
-
-			if key in self.DataBaseHashTable:
-				index = self.DataBaseHashTable[key]
-
-			else:
-				self.DataBaseHashTable[key] = self.FillingTable
-				index = self.FillingTable
-				if len(self.DataSetTables) <= index:
-					self.DataSetTables += [{}]
-
-				if len(self.DataSetTables[index]) >= self.TableBatchSize:
-					self.FillingTable += 1
-			
-			self.DataSetTables[index][key] = value
-			if index not in tablesToSave:
-				tablesToSave += [index]
-
-		for loop in range(len(tablesToSave)):
-			index = tablesToSave[loop]
-			pickle.dump(self.DataSetTables[index], open(self.TableAddress+"Table_"+str(index)+".p", "wb"))
+		for key, value in self.TablesToSave.items():
+			pickle.dump(self.DataSetTables[key], open(self.TableAddress+"Table_"+str(key)+".p", "wb"))
 
 		pickle.dump(self.DataBaseHashTable, open(self.HashTableAddress, "wb"))
 
@@ -112,6 +87,10 @@ class DataSetManager(object):
 			index = self.DataBaseHashTable[key]
 			boardInfo = self.DataSetTables[index][key]
 			found = True
+			if (index in self.TablesToSave):
+				self.TablesToSave[index] += 1
+			else:
+				self.TablesToSave[index] = 1
 		
 		return found, boardInfo
 
@@ -125,8 +104,15 @@ class DataSetManager(object):
 		if len(self.DataSetTables[index]) >= self.TableBatchSize:
 			self.FillingTable += 1
 
-		moves = MoveInfo(MoveID=0)
-		value = {0, BoardInfo(Moves=moves)}
+		if (index in self.TablesToSave):
+			self.TablesToSave[index] += 1
+		else:
+			self.TablesToSave[index] = 1
+
+		temp = MoveInfo(MoveID=0)
+		moves  = {}
+		moves[0] = temp
+		value = BoardInfo(Moves=moves)
 		self.DataSetTables[index][key] = value
 		return
 
@@ -219,11 +205,6 @@ class BruteForce(object):
 		for tempKey in self.TempDataSet:
 			key = self.TempDataSet[tempKey]["BoardKey"]
 			moveID = self.TempDataSet[tempKey]["MoveID"]
-
-			if key in self.DataSetManager.BoardsToUpdate:
-				self.DataSetManager.BoardsToUpdate[key] += 1
-			else:
-				self.DataSetManager.BoardsToUpdate[key] = 1
 
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 			if moveID in boardInfo.Moves:
