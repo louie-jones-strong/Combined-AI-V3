@@ -86,19 +86,18 @@ class DataSetManager(object):
 		if len(self.DataSetTables) <= index:
 			self.DataSetTables += [{}]
 
-		if len(self.DataSetTables[index]) >= self.TableBatchSize:
-			self.FillingTable += 1
-
 		if (index in self.TablesToSave):
 			self.TablesToSave[index] += 1
 		else:
 			self.TablesToSave[index] = 1
 
-		temp = MoveInfo(MoveID=0)
 		moves = {}
-		moves[0] = temp
+		moves[0] = MoveInfo()
 		value = BoardInfo(Moves=moves)
 		self.DataSetTables[index][key] = value
+
+		if len(self.DataSetTables[index]) >= self.TableBatchSize:
+			self.FillingTable += 1
 		return
 	def GetBoardInfo(self, key):
 		boardInfo = None
@@ -166,7 +165,7 @@ class BruteForce(object):
 
 				if boardInfo.NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
 					moveID = boardInfo.NumOfTriedMoves
-					boardInfo.Moves[moveID] = MoveInfo(MoveID=moveID)
+					boardInfo.Moves[moveID] = MoveInfo()
 					boardInfo.NumOfTriedMoves += 1
 
 					if boardInfo.NumOfTriedMoves >= self.DataSetManager.MaxMoveIDs:
@@ -234,10 +233,9 @@ class BoardInfo():
 	BestAvgFitness = -sys.maxsize
 	Moves = {}
 
-	def __init__(self, NumOfTriedMoves=1, Moves={}, moveIDOfLeastPlayed=1, moveIDOfBestAvgFitness=0, bestAvgFitness=-sys.maxsize):
+	def __init__(self, NumOfTriedMoves=1, Moves={}, moveIDOfBestAvgFitness=0, bestAvgFitness=-sys.maxsize):
 		self.NumOfTriedMoves = NumOfTriedMoves
 		self.Moves = Moves
-		self.MoveIDOfLeastPlayed = moveIDOfLeastPlayed
 		self.MoveIDOfBestAvgFitness = moveIDOfBestAvgFitness
 		self.BestAvgFitness = bestAvgFitness
 		return
@@ -245,12 +243,10 @@ class BoardInfo():
 class MoveInfo():
 	AvgFitness = 0.0
 	TimesPlayed = 1
-	MoveID = 0
 
-	def __init__(self, AvgFitness=0.0, TimesPlayed=1, MoveID=0):
+	def __init__(self, AvgFitness=0.0, TimesPlayed=1):
 		self.AvgFitness = AvgFitness
 		self.TimesPlayed = TimesPlayed
-		self.MoveID = MoveID
 		return
 
 # 1) point to the move that is least played
