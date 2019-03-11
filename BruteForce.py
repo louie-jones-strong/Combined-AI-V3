@@ -79,22 +79,7 @@ class DataSetManager(object):
 				self.FillingTable += 1
 		return True
 	
-	def GetBoardInfo(self, key):
-		boardInfo = None
-		found = False
-
-		if key in self.DataBaseHashTable:
-			index = self.DataBaseHashTable[key]
-			boardInfo = self.DataSetTables[index][key]
-			found = True
-			if (index in self.TablesToSave):
-				self.TablesToSave[index] += 1
-			else:
-				self.TablesToSave[index] = 1
-		
-		return found, boardInfo
-
-	def AddNewBoard(self , key):
+	def AddNewBoard(self, key):
 		index = self.FillingTable
 		self.DataBaseHashTable[key] = index
 
@@ -110,11 +95,31 @@ class DataSetManager(object):
 			self.TablesToSave[index] = 1
 
 		temp = MoveInfo(MoveID=0)
-		moves  = {}
+		moves = {}
 		moves[0] = temp
 		value = BoardInfo(Moves=moves)
 		self.DataSetTables[index][key] = value
 		return
+	def GetBoardInfo(self, key):
+		boardInfo = None
+		found = False
+
+		if key in self.DataBaseHashTable:
+			index = self.DataBaseHashTable[key]
+			boardInfo = self.DataSetTables[index][key]
+			found = True
+			if (index in self.TablesToSave):
+				self.TablesToSave[index] += 1
+			else:
+				self.TablesToSave[index] = 1
+		
+		return found, boardInfo
+	def GetNumberOfBoards(self):
+		numberOfBoards = 0
+		for loop in range(len(self.DataSetTables)):
+			numberOfBoards += len(self.DataSetTables[loop])
+
+		return numberOfBoards
 
 	def MoveIDToMove(self, moveID):
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
@@ -249,5 +254,3 @@ class MoveInfo():
 		return
 
 # 1) point to the move that is least played
-# 2) make datasetmanager and datasetloadandsaver in to one to save ram 
-# 3) get a single boardinfo for the brute force to work with to cut down on lookups

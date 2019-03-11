@@ -192,7 +192,7 @@ class RunController(object):
 			if self.NumberOfBots >= turn:
 				game.OutputBoard(board)
 
-			print("Dataset size: " + str(SplitNumber(len(self.AiDataManager.DataSet))))
+			print("Dataset size: " + str(SplitNumber(self.AiDataManager.GetNumberOfBoards())))
 			print("Number Of Complete Boards: " + str(SplitNumber(self.AiDataManager.NumberOfCompleteBoards)))
 			if finished:
 				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)) + " finished game")
@@ -267,7 +267,7 @@ class RunController(object):
 				if time.time() - self.LastSaveTime > 60:
 					self.AiDataManager.SaveDataSet()
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
-					self.MetaData["SizeOfDataSet"] = len(self.AiDataManager.DataSet)
+					self.MetaData["SizeOfDataSet"] = self.AiDataManager.GetNumberOfBoards()
 					SaveMetaData(self.MetaData, self.DatasetAddress+"MetaData.txt")
 					self.LastSaveTime = time.time()
 
