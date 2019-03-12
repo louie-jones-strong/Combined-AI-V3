@@ -10,7 +10,6 @@ class DataSetManager(object):
 	
 	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, datasetAddress):
 		self.NumOfOutputs = numOfOutputs
-
 		self.MinOutputSize = minOutputSize
 		self.MaxOutputSize = maxOutputSize
 		self.OutputResolution = outputResolution
@@ -33,7 +32,6 @@ class DataSetManager(object):
 		if not os.path.exists(datasetAddress+"LookUp//"):
 			os.makedirs(datasetAddress+"LookUp//")
 
-		self.DataSet = {}
 		self.MoveIDLookUp = []
 		for loop in range(self.MaxMoveIDs):
 			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
@@ -93,8 +91,7 @@ class DataSetManager(object):
 
 		moves = {}
 		moves[0] = MoveInfo()
-		value = BoardInfo(Moves=moves)
-		self.DataSetTables[index][key] = value
+		self.DataSetTables[index][key] = BoardInfo(Moves=moves)
 
 		if len(self.DataSetTables[index]) >= self.TableBatchSize:
 			self.FillingTable += 1
