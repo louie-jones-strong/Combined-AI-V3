@@ -1,4 +1,5 @@
 import BruteForce
+import DataSetManager
 import importlib
 import time
 import os
@@ -153,7 +154,7 @@ class RunController(object):
 				self.WinningMode = True
 				self.NumberOfBots -= 1
 
-		self.AiDataManager = BruteForce.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
+		self.AiDataManager = DataSetManager.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 
 		loadData = self.SetUpMetaData()
@@ -264,6 +265,7 @@ class RunController(object):
 			if finished:
 				for loop in range(len(Ais)):
 					Ais[loop].SaveData(fit[loop])
+
 				if time.time() - self.LastSaveTime > 60:
 					self.AiDataManager.SaveDataSet()
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
