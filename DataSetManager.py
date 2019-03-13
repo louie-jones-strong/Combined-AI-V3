@@ -86,7 +86,7 @@ class DataSetManager(object):
 
 		self.FillingTable = 0
 		for loop in range(len(self.DataSetTables)):
-			if len(self.DataSetTables[loop]) >= self.TableBatchSize:
+			if len(self.DataSetTables[loop].Content) >= self.TableBatchSize:
 				self.FillingTable += 1
 		return True
 	
