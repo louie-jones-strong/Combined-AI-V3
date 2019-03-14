@@ -61,7 +61,7 @@ class DataSetManager(object):
 
 		
 		pickle.dump(self.DataBaseHashTable, open(self.HashTableAddress, "wb"))
-
+		self.TablesToSave = {}
 		return
 	def LoadDataSet(self):
 		if not os.path.isfile(self.BoardHashLookUpAddress + ".p"):
