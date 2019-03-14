@@ -106,6 +106,7 @@ class DataSetManager(object):
 		moves = {}
 		moves[0] = BoardInfo.MoveInfo()
 		self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo(Moves=moves)
+		self.DataSetTables[index].IsLoaded = True
 
 		if len(self.DataSetTables[index].Content) >= self.TableBatchSize:
 			self.FillingTable += 1
@@ -120,8 +121,8 @@ class DataSetManager(object):
 				file = open(self.DataSetTables[index].Address+".p", "rb")
 				self.DataSetTables[index].Content = pickle.load(file)
 				file.close()
-				self.DataSetTables[index].IsLoaded = True
-
+			
+			self.DataSetTables[index].IsLoaded = True
 			boardInfo = self.DataSetTables[index].Content[key]
 			found = True
 			if (index in self.TablesToSave):
@@ -132,6 +133,14 @@ class DataSetManager(object):
 		return found, boardInfo
 	def GetNumberOfBoards(self):
 		return len(self.DataBaseHashTable)
+	
+	def GetCachingInfoString(self):
+		loadedTables = 0
+		for loop in range(len(self.DataSetTables)):
+			if (self.DataSetTables[loop].IsLoaded):
+				loadedTables += 1
+
+		return str(loadedTables)+"/"+str(len(self.DataSetTables))
 
 	def MoveIDToMove(self, moveID):
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))

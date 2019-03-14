@@ -205,7 +205,10 @@ class RunController(object):
 			print("time since start: " + str(SplitTime(totalTime, roundTo=2)))
 			print("press CTRl+Q to quit...")
 			
-			os.system("title "+"AI Playing: "+self.SimName+" Time Since Last Save: "+SplitTime(time.time()-self.LastSaveTime, roundTo=1))
+			title = "AI Playing: "+self.SimName
+			title += " Time Since Last Save: " + SplitTime(time.time()-self.LastSaveTime, roundTo=1)
+			title += " CachingInfo: "+ self.AiDataManager.GetCachingInfoString()
+			os.system("title "+title)
 			self.LastOutputTime = time.time()
 		return
 	
