@@ -54,7 +54,7 @@ class DataSetManager(object):
 		for loop in range(len(self.DataSetTables)):
 			if self.DataSetTables[loop].IsLoaded:
 
-				pickle.dump(self.DataSetTables[loop], open(self.TableAddress+"Table_"+str(loop)+".p", "wb"))
+				pickle.dump(self.DataSetTables[loop].Content, open(self.DataSetTables[loop].Address, "wb"))
 				if loop not in self.TablesToSave:
 					self.DataSetTables[loop].IsLoaded = False
 					self.DataSetTables[loop].Content = {}
@@ -77,19 +77,18 @@ class DataSetManager(object):
 		self.DataSetTables = []
 		numberOfTables = 0
 		for file in os.listdir(self.TableAddress):
-			if file.startswith("Table_") and file.endswith(".p"):
+			if file.startswith("Table_"):
 
 				dataSetTable = DataSetTable(self.TableAddress+"Table_"+str(numberOfTables))
 				self.DataSetTables += [dataSetTable]
 				
 				numberOfTables += 1
-
-		self.FillingTable = 0
-		for loop in range(len(self.DataSetTables)):
-			if len(self.DataSetTables[loop].Content) >= self.TableBatchSize:
-				self.FillingTable += 1
+		self.FillingTable = numberOfTables-1
 		return True
-	
+	def BackUp(self, datasetAddress):
+
+		return
+
 	def AddNewBoard(self, key):
 		index = self.FillingTable
 		self.DataBaseHashTable[key] = index
@@ -135,12 +134,12 @@ class DataSetManager(object):
 		return len(self.DataBaseHashTable)
 	
 	def GetCachingInfoString(self):
-		loadedTables = 0
+		loadedTables = []
 		for loop in range(len(self.DataSetTables)):
 			if (self.DataSetTables[loop].IsLoaded):
-				loadedTables += 1
+				loadedTables += [loop]
 
-		return str(loadedTables)+"/"+str(len(self.DataSetTables))
+		return str(len(loadedTables))+"/"+str(len(self.DataSetTables))+" "+str(loadedTables)
 
 	def MoveIDToMove(self, moveID):
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))

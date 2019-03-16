@@ -146,6 +146,7 @@ class RunController(object):
 		#setting
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
 		self.LastOutputTime = time.time()
+		self.LastSaveTook = 0
 		self.WinningMode = False
 
 		if self.NumberOfBots >= 1:
@@ -207,7 +208,8 @@ class RunController(object):
 			
 			title = "AI Playing: "+self.SimName
 			title += " Time Since Last Save: " + SplitTime(time.time()-self.LastSaveTime, roundTo=1)
-			title += " CachingInfo: "+ self.AiDataManager.GetCachingInfoString()
+			title += " CachingInfo: " + self.AiDataManager.GetCachingInfoString()
+			title += " LastSaveTook: " + SplitTime(self.LastSaveTook, roundTo=2)
 			os.system("title "+title)
 			self.LastOutputTime = time.time()
 		return
@@ -270,11 +272,15 @@ class RunController(object):
 					Ais[loop].SaveData(fit[loop])
 
 				if time.time() - self.LastSaveTime > 60:
+					self.LastSaveTook = time.time()
+
 					self.AiDataManager.SaveDataSet()
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = self.AiDataManager.GetNumberOfBoards()
 					SaveMetaData(self.MetaData, self.DatasetAddress+"MetaData.txt")
 					self.LastSaveTime = time.time()
+
+					self.LastSaveTook = time.time() - self.LastSaveTook
 
 				if keyboard.is_pressed("CTRl+Q"):
 					break
