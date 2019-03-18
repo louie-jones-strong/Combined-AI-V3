@@ -27,7 +27,7 @@ class DataSetManager(object):
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
 		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
-		self.TableBatchSize = 20000
+		self.TableBatchSize = 10000
 
 		self.DataBaseHashTable = {}
 		self.DataSetTables = []
@@ -90,12 +90,19 @@ class DataSetManager(object):
 		return
 
 	def AddNewBoard(self, key):
+		if key in self.DataBaseHashTable:
+			return
+
 		index = self.FillingTable
 		self.DataBaseHashTable[key] = index
 
 		if len(self.DataSetTables) <= index:
 			dataSetTable = DataSetTable(self.TableAddress+"Table_"+str(index))
 			self.DataSetTables += [dataSetTable]
+		elif (os.path.exists(self.DataSetTables[index].Address+".p")):
+			file = open(self.DataSetTables[index].Address+".p", "rb")
+			self.DataSetTables[index].Content = pickle.load(file)
+			file.close()
 
 		if (index in self.TablesToSave):
 			self.TablesToSave[index] += 1
