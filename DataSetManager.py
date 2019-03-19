@@ -54,7 +54,7 @@ class DataSetManager(object):
 		for loop in range(len(self.DataSetTables)):
 			if self.DataSetTables[loop].IsLoaded:
 
-				pickle.dump(self.DataSetTables[loop].Content, open(self.DataSetTables[loop].Address, "wb"))
+				pickle.dump(self.DataSetTables[loop].Content, open(self.DataSetTables[loop].Address+".p", "wb"))
 				if loop not in self.TablesToSave:
 					self.DataSetTables[loop].IsLoaded = False
 					self.DataSetTables[loop].Content = {}
@@ -128,7 +128,8 @@ class DataSetManager(object):
 				self.DataSetTables[index].Content = pickle.load(file)
 				file.close()
 			
-			self.DataSetTables[index].IsLoaded = True
+				self.DataSetTables[index].IsLoaded = True
+
 			boardInfo = self.DataSetTables[index].Content[key]
 			found = True
 			if (index in self.TablesToSave):
@@ -157,7 +158,7 @@ class DataSetManager(object):
 		return move
 
 	def BoardToKey(self, board):
-		key = hash(str(board))
+		key = str(board)
 
 		if not key in self.BoardToHashLookUp:
 			self.BoardToHashLookUp[key] = board
