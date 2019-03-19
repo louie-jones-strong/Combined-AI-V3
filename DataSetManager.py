@@ -127,15 +127,15 @@ class DataSetManager(object):
 				file = open(self.DataSetTables[index].Address+".p", "rb")
 				self.DataSetTables[index].Content = pickle.load(file)
 				file.close()
-			
 				self.DataSetTables[index].IsLoaded = True
 
-			boardInfo = self.DataSetTables[index].Content[key]
-			found = True
-			if (index in self.TablesToSave):
-				self.TablesToSave[index] += 1
-			else:
-				self.TablesToSave[index] = 1
+			if (key in self.DataSetTables[index].Content):
+				boardInfo = self.DataSetTables[index].Content[key]
+				found = True
+				if (index in self.TablesToSave):
+					self.TablesToSave[index] += 1
+				else:
+					self.TablesToSave[index] = 1
 		
 		return found, boardInfo
 	def GetNumberOfBoards(self):
@@ -159,6 +159,7 @@ class DataSetManager(object):
 
 	def BoardToKey(self, board):
 		key = str(board)
+		key = hash(key)
 
 		if not key in self.BoardToHashLookUp:
 			self.BoardToHashLookUp[key] = board
