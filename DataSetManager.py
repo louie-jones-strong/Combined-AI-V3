@@ -123,7 +123,7 @@ class DataSetManager(object):
 
 		if key in self.DataBaseHashTable:
 			index = self.DataBaseHashTable[key]
-			if (key not in self.DataSetTables[index].Content):
+			if (not self.DataSetTables[index].IsLoaded):
 				file = open(self.DataSetTables[index].Address+".p", "rb")
 				self.DataSetTables[index].Content = pickle.load(file)
 				file.close()
@@ -159,7 +159,7 @@ class DataSetManager(object):
 
 	def BoardToKey(self, board):
 		key = str(board)
-		key = hash(key)
+		#key = hash(key)
 
 		if not key in self.BoardToHashLookUp:
 			self.BoardToHashLookUp[key] = board
