@@ -1,6 +1,39 @@
 import pickle
+import json
 import os
 import BoardInfo
+
+def SaveObject(address, objectInfo):
+	method = 1
+	if method == 0:
+		pickle.dump(objectInfo, open(address+".p", "wb"))
+	elif method == 1:
+		file = open(address+".json", "w")
+		file.write(json.dumps(objectInfo))
+		file.close()
+
+	return
+def LoadObject(address):
+	method = 1
+	if method == 0:
+		file = open(address+".p", "rb")
+		objectInfo = pickle.load(file)
+		file.close()
+	elif method == 1:
+		file = open(address+".json", "rb")
+		objectInfo = json.load(file)
+		file.close()
+
+	return objectInfo
+def FileExists(address):
+	method = 1
+	value = False
+
+	if method == 0:
+		value = os.path.exists(address+".p")
+	elif method == 1:
+		value = os.path.exists(address+".json")
+	return value
 
 class DataSetManager(object):
 	NumberOfCompleteBoards = 0
@@ -14,7 +47,7 @@ class DataSetManager(object):
 		self.OutputResolution = outputResolution
 
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
-		self.DataSetAddress = datasetAddress+"BruteForceDataSet//DataSet.p"
+		self.DataSetAddress = datasetAddress+"BruteForceDataSet//DataSet"
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
 		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
@@ -33,23 +66,22 @@ class DataSetManager(object):
 		return
 
 	def SaveDataSet(self):
-		if (not os.path.exists(self.MoveIDLookUpAdress + ".p")):
-			pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
+		if (not FileExists(self.MoveIDLookUpAdress)):
+			SaveObject(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+			#pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
 		
-		pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
+		SaveObject(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
+		#pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
 
-		pickle.dump(self.DataSet, open(self.DataSetAddress, "wb"))
+		SaveObject(self.DataSetAddress, self.DataSet)
+		#pickle.dump(self.DataSet, open(self.DataSetAddress, "wb"))
 		return
 	def LoadDataSet(self):
-		if not os.path.isfile(self.BoardHashLookUpAddress + ".p"):
+		if not FileExists(self.BoardHashLookUpAddress):
 			return False
-		file = open(self.BoardHashLookUpAddress + ".p", "rb")
-		self.BoardToHashLookUp = pickle.load(file)
-		file.close()
+		self.BoardToHashLookUp = LoadObject(self.BoardHashLookUpAddress)
 
-		file = open(self.DataSetAddress, "rb")
-		self.DataSet = pickle.load(file)
-		file.close()
+		self.DataSet = LoadObject(self.DataSetAddress)
 		return True
 	def BackUp(self, datasetAddress):
 
