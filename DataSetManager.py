@@ -1,15 +1,39 @@
 import pickle
+import json
 import os
 import BoardInfo
 
-class DataSetTable(object):
-	IsLoaded = False
-	Content = {}
-	Address = ""
+def SaveObject(address, objectInfo):
+	method = 0
+	if method == 0:
+		pickle.dump(objectInfo, open(address+".p", "wb"))
+	elif method == 1:
+		file = open(address+".json", "w")
+		file.write(json.dumps(objectInfo, indent=4))
+		file.close()
 
-	def __init__(self, address):
-		self.Address = address
-		return
+	return
+def LoadObject(address):
+	method = 0
+	if method == 0:
+		file = open(address+".p", "rb")
+		objectInfo = pickle.load(file)
+		file.close()
+	elif method == 1:
+		file = open(address+".json", "r")
+		objectInfo = json.load(file)
+		file.close()
+
+	return objectInfo
+def FileExists(address):
+	method = 0
+	value = False
+
+	if method == 0:
+		value = os.path.exists(address+".p")
+	elif method == 1:
+		value = os.path.exists(address+".json")
+	return value
 
 class DataSetManager(object):
 	NumberOfCompleteBoards = 0
@@ -23,131 +47,69 @@ class DataSetManager(object):
 		self.OutputResolution = outputResolution
 
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
-		self.HashTableAddress = datasetAddress+"BruteForceDataSet//DataSetHashTable.p"
+		self.DataSetAddress = datasetAddress+"BruteForceDataSet//DataSet"
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
 		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
-		self.TableBatchSize = 10000
 
-		self.DataBaseHashTable = {}
-		self.DataSetTables = []
-		self.BoardToHashLookUp = {}
-		self.FillingTable = 0
-		self.TablesToSave = {}
+		self.DataSet = {}
 
 		if not os.path.exists(self.TableAddress):
 			os.makedirs(self.TableAddress)
 		if not os.path.exists(datasetAddress+"LookUp//"):
 			os.makedirs(datasetAddress+"LookUp//")
 
+		self.BoardToHashLookUp = {}
 		self.MoveIDLookUp = []
 		for loop in range(self.MaxMoveIDs):
 			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
 		return
 
 	def SaveDataSet(self):
-		if (not os.path.exists(self.MoveIDLookUpAdress + ".p")):
-			pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
+		if (not FileExists(self.MoveIDLookUpAdress)):
+			SaveObject(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+			#pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
 		
-		pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
+		SaveObject(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
+		#pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
 
-		for loop in range(len(self.DataSetTables)):
-			if self.DataSetTables[loop].IsLoaded:
-
-				pickle.dump(self.DataSetTables[loop].Content, open(self.DataSetTables[loop].Address+".p", "wb"))
-				if loop not in self.TablesToSave:
-					self.DataSetTables[loop].IsLoaded = False
-					self.DataSetTables[loop].Content = {}
-
-		
-		pickle.dump(self.DataBaseHashTable, open(self.HashTableAddress, "wb"))
-		self.TablesToSave = {}
+		SaveObject(self.DataSetAddress, self.DataSet)
+		#pickle.dump(self.DataSet, open(self.DataSetAddress, "wb"))
 		return
 	def LoadDataSet(self):
-		if not os.path.isfile(self.BoardHashLookUpAddress + ".p"):
+		if not FileExists(self.BoardHashLookUpAddress):
 			return False
-		file = open(self.BoardHashLookUpAddress + ".p", "rb")
-		self.BoardToHashLookUp = pickle.load(file)
-		file.close()
+		self.BoardToHashLookUp = LoadObject(self.BoardHashLookUpAddress)
 
-		file = open(self.HashTableAddress, "rb")
-		self.DataBaseHashTable = pickle.load(file)
-		file.close()
-		
-		self.DataSetTables = []
-		numberOfTables = 0
-		for file in os.listdir(self.TableAddress):
-			if file.startswith("Table_"):
-
-				dataSetTable = DataSetTable(self.TableAddress+"Table_"+str(numberOfTables))
-				self.DataSetTables += [dataSetTable]
-				
-				numberOfTables += 1
-		self.FillingTable = numberOfTables-1
+		self.DataSet = LoadObject(self.DataSetAddress)
 		return True
 	def BackUp(self, datasetAddress):
 
 		return
 
 	def AddNewBoard(self, key):
-		if key in self.DataBaseHashTable:
+		if key in self.DataSet:
 			return
-
-		index = self.FillingTable
-		self.DataBaseHashTable[key] = index
-
-		if len(self.DataSetTables) <= index:
-			dataSetTable = DataSetTable(self.TableAddress+"Table_"+str(index))
-			self.DataSetTables += [dataSetTable]
-		elif (os.path.exists(self.DataSetTables[index].Address+".p")):
-			file = open(self.DataSetTables[index].Address+".p", "rb")
-			self.DataSetTables[index].Content = pickle.load(file)
-			file.close()
-
-		if (index in self.TablesToSave):
-			self.TablesToSave[index] += 1
-		else:
-			self.TablesToSave[index] = 1
 
 		moves = {}
 		moves[0] = BoardInfo.MoveInfo()
-		self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo(Moves=moves)
-		self.DataSetTables[index].IsLoaded = True
+		self.DataSet[key] = BoardInfo.BoardInfo(Moves=moves)
 
-		if len(self.DataSetTables[index].Content) >= self.TableBatchSize:
-			self.FillingTable += 1
 		return
 	def GetBoardInfo(self, key):
 		boardInfo = None
 		found = False
 
-		if key in self.DataBaseHashTable:
-			index = self.DataBaseHashTable[key]
-			if (not self.DataSetTables[index].IsLoaded):
-				file = open(self.DataSetTables[index].Address+".p", "rb")
-				self.DataSetTables[index].Content = pickle.load(file)
-				file.close()
-				self.DataSetTables[index].IsLoaded = True
-
-			if (key in self.DataSetTables[index].Content):
-				boardInfo = self.DataSetTables[index].Content[key]
-				found = True
-				if (index in self.TablesToSave):
-					self.TablesToSave[index] += 1
-				else:
-					self.TablesToSave[index] = 1
+		if key in self.DataSet:
+			boardInfo = self.DataSet[key]
+			found = True
 		
 		return found, boardInfo
 	def GetNumberOfBoards(self):
-		return len(self.DataBaseHashTable)
+		return len(self.DataSet)
 	
 	def GetCachingInfoString(self):
-		loadedTables = []
-		for loop in range(len(self.DataSetTables)):
-			if (self.DataSetTables[loop].IsLoaded):
-				loadedTables += [loop]
-
-		return str(len(loadedTables))+"/"+str(len(self.DataSetTables))+" "+str(loadedTables)
+		return str(1)+"/"+str(1)
 
 	def MoveIDToMove(self, moveID):
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
