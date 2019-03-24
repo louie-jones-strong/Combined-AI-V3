@@ -2,6 +2,7 @@ import pickle
 import json
 import os
 import BoardInfo
+import shutil
 
 def SaveObject(address, objectInfo):
 	method = 0
@@ -47,7 +48,8 @@ class DataSetManager(object):
 		self.OutputResolution = outputResolution
 
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
-		self.DataSetAddress = datasetAddress+"BruteForceDataSet//DataSet"
+		self.DatasetAddress = datasetAddress
+		self.DataSetHashTableAddress = datasetAddress+"BruteForceDataSet//DataSet"
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
 		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
@@ -73,18 +75,20 @@ class DataSetManager(object):
 		SaveObject(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
 		#pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
 
-		SaveObject(self.DataSetAddress, self.DataSet)
-		#pickle.dump(self.DataSet, open(self.DataSetAddress, "wb"))
+		SaveObject(self.DataSetHashTableAddress, self.DataSet)
+		#pickle.dump(self.DataSet, open(self.DataSetHashTableAddress, "wb"))
 		return
 	def LoadDataSet(self):
 		if not FileExists(self.BoardHashLookUpAddress):
 			return False
 		self.BoardToHashLookUp = LoadObject(self.BoardHashLookUpAddress)
 
-		self.DataSet = LoadObject(self.DataSetAddress)
+		self.DataSet = LoadObject(self.DataSetHashTableAddress)
 		return True
 	def BackUp(self, datasetAddress):
-
+		if (datasetAddress):
+			shutil.rmtree(datasetAddress)
+		shutil.copytree(self.DatasetAddress, datasetAddress)
 		return
 
 	def AddNewBoard(self, key):

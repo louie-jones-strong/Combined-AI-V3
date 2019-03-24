@@ -121,12 +121,18 @@ class RunController(object):
 			print("NumberOfCompleteBoards: "+str(self.MetaData["NumberOfCompleteBoards"]))
 			print("NumberOfGames: "+str(self.MetaData["NumberOfGames"]))
 			print("TotalTime: "+SplitTime(self.MetaData["TotalTime"], roundTo=2))
+			print("LastBackUpTotalTime: "+SplitTime(self.MetaData["LastBackUpTotalTime"], roundTo=2))
 			print("")
 
 			userInput = input("load Dataset[Y/N]:")
 
 		if userInput == "n" or userInput == "N":
-			self.MetaData = {"SizeOfDataSet":0, "NumberOfCompleteBoards": 0, "NumberOfGames": 0, "TotalTime": 0}
+			self.MetaData = {"SizeOfDataSet":0, 
+				"NumberOfCompleteBoards": 0, 
+				"NumberOfGames": 0, 
+				"TotalTime": 0,
+				"LastBackUpTotalTime": 0
+				}
 			return False
 		else:
 			self.AiDataManager.NumberOfCompleteBoards = self.MetaData["NumberOfCompleteBoards"]
@@ -141,6 +147,7 @@ class RunController(object):
 		temp = "DataSets//"+self.SimName
 		if not os.path.exists(temp):
 			os.makedirs(temp)
+		self.DatasetBackUpAddress = temp+"BackUp//"
 		self.DatasetAddress = temp+"//"
 
 		#setting
@@ -279,6 +286,11 @@ class RunController(object):
 					self.MetaData["SizeOfDataSet"] = self.AiDataManager.GetNumberOfBoards()
 					SaveMetaData(self.MetaData, self.DatasetAddress+"MetaData.txt")
 					self.LastSaveTime = time.time()
+
+					# save back up every hour
+					if self.MetaData["TotalTime"]-self.MetaData["LastBackUpTotalTime"] > 0:
+						self.AiDataManager.BackUp(self.DatasetBackUpAddress)
+						self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
 
 					self.LastSaveTook = time.time() - self.LastSaveTook
 
