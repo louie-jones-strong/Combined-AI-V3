@@ -1,0 +1,1 @@
+tensorboard --log=foo:%CD%\log
