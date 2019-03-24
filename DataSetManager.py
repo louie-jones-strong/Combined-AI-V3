@@ -4,29 +4,29 @@ import os
 import BoardInfo
 
 def SaveObject(address, objectInfo):
-	method = 1
+	method = 0
 	if method == 0:
 		pickle.dump(objectInfo, open(address+".p", "wb"))
 	elif method == 1:
 		file = open(address+".json", "w")
-		file.write(json.dumps(objectInfo))
+		file.write(json.dumps(objectInfo, indent=4))
 		file.close()
 
 	return
 def LoadObject(address):
-	method = 1
+	method = 0
 	if method == 0:
 		file = open(address+".p", "rb")
 		objectInfo = pickle.load(file)
 		file.close()
 	elif method == 1:
-		file = open(address+".json", "rb")
+		file = open(address+".json", "r")
 		objectInfo = json.load(file)
 		file.close()
 
 	return objectInfo
 def FileExists(address):
-	method = 1
+	method = 0
 	value = False
 
 	if method == 0:
