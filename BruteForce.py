@@ -86,7 +86,7 @@ class BruteForce(object):
 
 				if newFitness > boardInfo.BestAvgFitness:
 					boardInfo.MoveIDOfBestAvgFitness = moveID
-					boardInfo.bestAvgFitness = newFitness
+					boardInfo.BestAvgFitness = newFitness
 
 
 
