@@ -147,8 +147,14 @@ class RunController(object):
 		temp = "DataSets//"+self.SimName
 		if not os.path.exists(temp):
 			os.makedirs(temp)
+
+		temp += "//"
+		self.DatasetAddress = temp+"Current"
+		if not os.path.exists(self.DatasetAddress):
+			os.makedirs(self.DatasetAddress)
+
+		self.DatasetAddress += "//"
 		self.DatasetBackUpAddress = temp+"BackUp//"
-		self.DatasetAddress = temp+"//"
 
 		#setting
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
@@ -211,6 +217,9 @@ class RunController(object):
 			totalTime = self.MetaData["TotalTime"]
 			print("Games avg took: " + str(SplitTime(totalTime/numGames, roundTo=6)))
 			print("time since start: " + str(SplitTime(totalTime, roundTo=2)))
+
+			backUpTime = self.MetaData["LastBackUpTotalTime"]
+			print("time since last BackUp: " + str(SplitTime(totalTime-backUpTime, roundTo=2)))
 			print("press CTRl+Q to quit...")
 			
 			title = "AI Playing: "+self.SimName
@@ -270,9 +279,9 @@ class RunController(object):
 			self.Output(game, numMoves, gameStartTime, board, turn)
 
 			finished, fit = game.CheckFinished()
-			
-			if keyboard.is_pressed("CTRl+Q"):
-				break
+ 			
+			#if keyboard.is_pressed("CTRl+Q"):
+			#	break
 
 			if finished:
 				for loop in range(len(Ais)):
@@ -280,22 +289,20 @@ class RunController(object):
 
 				if time.time() - self.LastSaveTime > 60:
 					self.LastSaveTook = time.time()
+					# save back up every hour
+					if self.MetaData["TotalTime"]-self.MetaData["LastBackUpTotalTime"] > 60*60:
+						self.AiDataManager.BackUp(self.DatasetBackUpAddress)
+						self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
 
 					self.AiDataManager.SaveDataSet()
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = self.AiDataManager.GetNumberOfBoards()
 					SaveMetaData(self.MetaData, self.DatasetAddress+"MetaData.txt")
 					self.LastSaveTime = time.time()
-
-					# save back up every hour
-					if self.MetaData["TotalTime"]-self.MetaData["LastBackUpTotalTime"] > 0:
-						self.AiDataManager.BackUp(self.DatasetBackUpAddress)
-						self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
-
 					self.LastSaveTook = time.time() - self.LastSaveTook
 
-				if keyboard.is_pressed("CTRl+Q"):
-					break
+				#if keyboard.is_pressed("CTRl+Q"):
+				#	break
 
 				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 

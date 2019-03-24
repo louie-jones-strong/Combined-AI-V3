@@ -85,10 +85,10 @@ class DataSetManager(object):
 
 		self.DataSet = LoadObject(self.DataSetHashTableAddress)
 		return True
-	def BackUp(self, datasetAddress):
-		if (datasetAddress):
-			shutil.rmtree(datasetAddress)
-		shutil.copytree(self.DatasetAddress, datasetAddress)
+	def BackUp(self, backUpAddress):
+		if (os.path.exists(backUpAddress)):
+			shutil.rmtree(backUpAddress)
+		shutil.copytree(self.DatasetAddress, backUpAddress)
 		return
 
 	def AddNewBoard(self, key):
