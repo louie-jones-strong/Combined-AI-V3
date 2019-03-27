@@ -70,13 +70,10 @@ class DataSetManager(object):
 	def SaveDataSet(self):
 		if (not FileExists(self.MoveIDLookUpAdress)):
 			SaveObject(self.MoveIDLookUpAdress, self.MoveIDLookUp)
-			#pickle.dump(self.MoveIDLookUp, open(self.MoveIDLookUpAdress + ".p", "wb"))
 		
 		SaveObject(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
-		#pickle.dump(self.BoardToHashLookUp, open(self.BoardHashLookUpAddress + ".p", "wb"))
 
 		SaveObject(self.DataSetHashTableAddress, self.DataSet)
-		#pickle.dump(self.DataSet, open(self.DataSetHashTableAddress, "wb"))
 		return
 	def LoadDataSet(self):
 		if not FileExists(self.BoardHashLookUpAddress):
