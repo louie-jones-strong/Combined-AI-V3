@@ -5,12 +5,42 @@ import BoardInfo
 import shutil
 
 
-def DictSave():
+def DictAppend(address, dictionary): 
+	address += ".txt"
+	if (not os.path.exists(address)):
+		DictSave(address, dictionary)
+
+	else:
+		file = open(address, "a")
+		for key, value in dictionary.items():
+			file.write(str(key)+":"+str(value)+"\n")
+		file.close()
 
 	return
-def DictLoad():
-
+def DictSave(address, dictionary):
+	file = open(address, "w")
+	for key, value in dictionary.items():
+		file.write(str(key)+":"+str(value)+"\n")
+	file.close()
 	return
+def DictLoad(address):
+	dictionary = {}
+
+	file = open(address, "r")
+	lines = file.readlines()
+	file.close()
+	for loop in range(len(lines)):
+			line = lines[loop][:-1]
+			line = line.split(":")
+			key = line[0]
+			value = line[1]
+			if "." in value:
+				value = float(value)
+			else:
+				value = int(value)
+			dictionary[key] = value
+
+	return dictionary
 
 def ComplexSave(address, objectInfo):
 	method = 0
@@ -48,7 +78,6 @@ class DataSetTable(object):
 	Content = {}
 	FileAddress = ""
 	IsLoad = False
-
 	def __init__(self, address):
 		self.FileAddress = address
 		return
@@ -86,7 +115,7 @@ class DataSetManager(object):
 
 	def SaveDataSet(self):
 		if (not FileExists(self.MoveIDLookUpAdress)):
-			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+			DictSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 		
 		ComplexSave(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
 

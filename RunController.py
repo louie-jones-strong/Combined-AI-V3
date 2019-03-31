@@ -28,32 +28,6 @@ def MakeAIMove(turn, board, AIs, game):
 
 	return board, turn
 
-def SaveMetaData(metaData, address):
-	file = open(address, "w")
-	for key, value in metaData.items():
-		file.write(str(key)+":"+str(value)+"\n")
-	file.close() 
-	return
-def LoadMetaData(address):
-	metaData = {}
-
-	file = open(address, "r")
-	lines = file.readlines()
-	file.close() 
-	for loop in range(len(lines)):
-		line = lines[loop][:-1]
-		line = line.split(":")
-		key = line[0]
-		value = line[1]
-		if "." in value:
-			value = float(value)
-		else:
-			value = int(value)
-		metaData[key] = value
-	
-
-	return metaData
-
 def SplitNumber(number):
 	output = ""
 	number = str(number)
@@ -115,7 +89,7 @@ class RunController(object):
 		userInput = "N"
 
 		if os.path.isfile(self.DatasetAddress+"MetaData.txt"):
-			self.MetaData = LoadMetaData(self.DatasetAddress+"MetaData.txt")
+			self.MetaData = DataSetManager.DictLoad(self.DatasetAddress+"MetaData.txt")
 			print("")
 			print("SizeOfDataSet: "+str(self.MetaData["SizeOfDataSet"]))
 			print("NumberOfCompleteBoards: "+str(self.MetaData["NumberOfCompleteBoards"]))
@@ -297,7 +271,7 @@ class RunController(object):
 					self.AiDataManager.SaveDataSet()
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = self.AiDataManager.GetNumberOfBoards()
-					SaveMetaData(self.MetaData, self.DatasetAddress+"MetaData.txt")
+					DataSetManager.DictSave(self.MetaData, self.DatasetAddress+"MetaData.txt")
 					self.LastSaveTime = time.time()
 					self.LastSaveTook = time.time() - self.LastSaveTook
 
