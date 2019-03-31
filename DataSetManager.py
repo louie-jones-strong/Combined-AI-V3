@@ -8,8 +8,8 @@ import shutil
 def DictAppend(address, dictionary): 
 	if (dictionary == {}):
 		return
-		
-	if (not os.path.exists(address+".txt")):
+
+	if (not DictFileExists(address)):
 		DictSave(address, dictionary)
 
 	else:
@@ -46,6 +46,9 @@ def DictLoad(address):
 			dictionary[key] = value
 
 	return dictionary
+def DictFileExists(address):
+	return os.path.exists(address+".txt")
+
 
 def ComplexSave(address, objectInfo):
 	method = 0
@@ -69,7 +72,7 @@ def ComplexLoad(address):
 		file.close()
 
 	return objectInfo
-def FileExists(address):
+def ComplexFileExists(address):
 	method = 0
 	value = False
 
@@ -119,7 +122,7 @@ class DataSetManager(object):
 		return
 
 	def SaveDataSet(self):
-		if (not FileExists(self.MoveIDLookUpAdress)):
+		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
 			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 		
 		ComplexSave(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
@@ -127,7 +130,7 @@ class DataSetManager(object):
 		ComplexSave(self.DataSetHashTableAddress, self.DataSet)
 		return
 	def LoadDataSet(self):
-		if not FileExists(self.BoardHashLookUpAddress):
+		if not ComplexFileExists(self.BoardHashLookUpAddress):
 			return False
 		self.BoardToHashLookUp = ComplexLoad(self.BoardHashLookUpAddress)
 
