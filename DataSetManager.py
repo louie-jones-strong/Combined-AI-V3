@@ -84,10 +84,23 @@ def ComplexFileExists(address):
 
 class DataSetTable(object):
 	Content = {}
-	FileAddress = ""
-	IsLoad = False
-	def __init__(self, address):
+	IsLoaded = False
+
+	def __init__(self, address, isLoaded):
 		self.FileAddress = address
+		self.IsLoaded = isLoaded
+		return
+
+	def Load(self):
+		self.Content = ComplexLoad(self.FileAddress)
+		self.IsLoaded = True
+		return
+	def Save(self):
+		ComplexSave(self.FileAddress, self.Content)
+		return
+	def Unload(self):
+		self.Content ={}
+		self.IsLoaded = False
 		return
 
 class DataSetManager(object):
@@ -108,7 +121,10 @@ class DataSetManager(object):
 		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
-		self.DataSet = {}
+		self.DataSetHashTable = {}
+		self.NewDataSetHashTable = {}
+		self.DataSetTables = []
+		self.DataSetTablesToSave = {}
 
 		if not os.path.exists(self.TableAddress):
 			os.makedirs(self.TableAddress)
@@ -124,17 +140,31 @@ class DataSetManager(object):
 	def SaveDataSet(self):
 		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
 			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
-		
 		ComplexSave(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
 
-		ComplexSave(self.DataSetHashTableAddress, self.DataSet)
+		DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+		self.NewDataSetHashTable = {}
+
+		for loop in range(len(self.DataSetTables)):
+			if (self.DataSetTables[loop].IsLoaded):
+				if (loop in self.DataSetTablesToSave):
+					self.DataSetTables[loop].Save()
+				else:
+					self.DataSetTables[loop].Unload()
+
 		return
 	def LoadDataSet(self):
 		if not ComplexFileExists(self.BoardHashLookUpAddress):
 			return False
 		self.BoardToHashLookUp = ComplexLoad(self.BoardHashLookUpAddress)
 
-		self.DataSet = ComplexLoad(self.DataSetHashTableAddress)
+		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress)
+
+		self.DataSetTables = []
+		for loop in os.listdir(self.TableAddress):
+			if loop.startswith("Table_") and "." in loop:
+				loop = loop[0:loop.find(".")]
+				self.DataSetTables += [DataSetTable(self.TableAddress+loop, False)]
 		return True
 	def BackUp(self, backUpAddress):
 		if (os.path.exists(backUpAddress)):
@@ -143,28 +173,50 @@ class DataSetManager(object):
 		return
 
 	def AddNewBoard(self, key):
-		if key in self.DataSet:
+		if key in self.DataSetHashTable:
 			return
+
+		index = 0
+		if (len(self.DataSetTables) <= index):
+			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(index), True)]
+
+		self.DataSetHashTable[key] = index
+		self.NewDataSetHashTable[key] = index
+		if not self.DataSetTables[index].IsLoaded:
+			self.DataSetTables[index].Load()
 
 		moves = {}
 		moves[0] = BoardInfo.MoveInfo()
-		self.DataSet[key] = BoardInfo.BoardInfo(Moves=moves)
-
+		self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo(Moves=moves)
 		return
 	def GetBoardInfo(self, key):
 		boardInfo = None
 		found = False
 
-		if key in self.DataSet:
-			boardInfo = self.DataSet[key]
+		if key in self.DataSetHashTable:
+			index = self.DataSetHashTable[key]
+			if not self.DataSetTables[index].IsLoaded:
+				self.DataSetTables[index].Load()
+			
+			if (index in self.DataSetTablesToSave):
+				self.DataSetTablesToSave[index] += 1
+			else:
+				self.DataSetTablesToSave[index] = 1
+
+			boardInfo = self.DataSetTables[index].Content[key]
 			found = True
 		
 		return found, boardInfo
 	def GetNumberOfBoards(self):
-		return len(self.DataSet)
+		return len(self.DataSetHashTable)
 	
 	def GetCachingInfoString(self):
-		return str(1)+"/"+str(1)
+		loadedTables = 0
+		for loop in range(len(self.DataSetTables)):
+			if (self.DataSetTables[loop].IsLoaded):
+				loadedTables += 1
+
+		return str(loadedTables)+"/"+str(len(self.DataSetTables))
 
 	def MoveIDToMove(self, moveID):
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
