@@ -6,11 +6,14 @@ import shutil
 
 
 def DictAppend(address, dictionary): 
-	address += ".txt"
-	if (not os.path.exists(address)):
+	if (dictionary == {}):
+		return
+		
+	if (not os.path.exists(address+".txt")):
 		DictSave(address, dictionary)
 
 	else:
+		address += ".txt"
 		file = open(address, "a")
 		for key, value in dictionary.items():
 			file.write(str(key)+":"+str(value)+"\n")
@@ -18,6 +21,7 @@ def DictAppend(address, dictionary):
 
 	return
 def DictSave(address, dictionary):
+	address += ".txt"
 	file = open(address, "w")
 	for key, value in dictionary.items():
 		file.write(str(key)+":"+str(value)+"\n")
@@ -25,6 +29,7 @@ def DictSave(address, dictionary):
 	return
 def DictLoad(address):
 	dictionary = {}
+	address += ".txt"
 
 	file = open(address, "r")
 	lines = file.readlines()
@@ -115,7 +120,7 @@ class DataSetManager(object):
 
 	def SaveDataSet(self):
 		if (not FileExists(self.MoveIDLookUpAdress)):
-			DictSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 		
 		ComplexSave(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
 

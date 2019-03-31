@@ -89,7 +89,7 @@ class RunController(object):
 		userInput = "N"
 
 		if os.path.isfile(self.DatasetAddress+"MetaData.txt"):
-			self.MetaData = DataSetManager.DictLoad(self.DatasetAddress+"MetaData.txt")
+			self.MetaData = DataSetManager.DictLoad(self.DatasetAddress+"MetaData")
 			print("")
 			print("SizeOfDataSet: "+str(self.MetaData["SizeOfDataSet"]))
 			print("NumberOfCompleteBoards: "+str(self.MetaData["NumberOfCompleteBoards"]))
@@ -271,7 +271,7 @@ class RunController(object):
 					self.AiDataManager.SaveDataSet()
 					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
 					self.MetaData["SizeOfDataSet"] = self.AiDataManager.GetNumberOfBoards()
-					DataSetManager.DictSave(self.MetaData, self.DatasetAddress+"MetaData.txt")
+					DataSetManager.DictSave(self.DatasetAddress+"MetaData", self.MetaData)
 					self.LastSaveTime = time.time()
 					self.LastSaveTook = time.time() - self.LastSaveTook
 
