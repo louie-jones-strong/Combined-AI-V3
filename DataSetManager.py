@@ -4,7 +4,15 @@ import os
 import BoardInfo
 import shutil
 
-def SaveObject(address, objectInfo):
+
+def DictSave():
+
+	return
+def DictLoad():
+
+	return
+
+def ComplexSave(address, objectInfo):
 	method = 0
 	if method == 0:
 		pickle.dump(objectInfo, open(address+".p", "wb"))
@@ -14,7 +22,7 @@ def SaveObject(address, objectInfo):
 		file.close()
 
 	return
-def LoadObject(address):
+def ComplexLoad(address):
 	method = 0
 	if method == 0:
 		file = open(address+".p", "rb")
@@ -35,6 +43,15 @@ def FileExists(address):
 	elif method == 1:
 		value = os.path.exists(address+".json")
 	return value
+
+class DataSetTable(object):
+	Content = {}
+	FileAddress = ""
+	IsLoad = False
+
+	def __init__(self, address):
+		self.FileAddress = address
+		return
 
 class DataSetManager(object):
 	NumberOfCompleteBoards = 0
@@ -69,18 +86,18 @@ class DataSetManager(object):
 
 	def SaveDataSet(self):
 		if (not FileExists(self.MoveIDLookUpAdress)):
-			SaveObject(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 		
-		SaveObject(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
+		ComplexSave(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
 
-		SaveObject(self.DataSetHashTableAddress, self.DataSet)
+		ComplexSave(self.DataSetHashTableAddress, self.DataSet)
 		return
 	def LoadDataSet(self):
 		if not FileExists(self.BoardHashLookUpAddress):
 			return False
-		self.BoardToHashLookUp = LoadObject(self.BoardHashLookUpAddress)
+		self.BoardToHashLookUp = ComplexLoad(self.BoardHashLookUpAddress)
 
-		self.DataSet = LoadObject(self.DataSetHashTableAddress)
+		self.DataSet = ComplexLoad(self.DataSetHashTableAddress)
 		return True
 	def BackUp(self, backUpAddress):
 		if (os.path.exists(backUpAddress)):
