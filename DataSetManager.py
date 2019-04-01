@@ -231,7 +231,7 @@ class DataSetManager(object):
 			if (self.DataSetTables[loop].IsLoaded):
 				loadedTables += 1
 
-		return str(loadedTables)+"/"+str(len(self.DataSetTables))+str(self.DataSetTablesToSave)
+		return str(loadedTables)+"/"+str(len(self.DataSetTables))
 
 	def MoveIDToMove(self, moveID):
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
