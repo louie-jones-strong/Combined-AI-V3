@@ -126,8 +126,6 @@ class DataSetManager(object):
 		self.DataSetTables = []
 		self.DataSetTablesToSave = {}
 
-		if not os.path.exists(self.TableAddress):
-			os.makedirs(self.TableAddress)
 		if not os.path.exists(datasetAddress+"LookUp//"):
 			os.makedirs(datasetAddress+"LookUp//")
 
