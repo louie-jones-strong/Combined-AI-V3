@@ -122,7 +122,7 @@ class DataSetManager(object):
 		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
-		self.TableBatchSize = 1000
+		self.TableBatchSize = 10000
 		self.DataSetHashTable = {}
 		self.NewDataSetHashTable = {}
 		self.DataSetTables = []
