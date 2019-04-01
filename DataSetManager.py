@@ -89,6 +89,7 @@ class DataSetTable(object):
 	def __init__(self, address, isLoaded):
 		self.FileAddress = address
 		self.IsLoaded = isLoaded
+		self.Content = {}
 		return
 
 	def Load(self):
