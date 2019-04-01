@@ -122,9 +122,11 @@ class DataSetManager(object):
 		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
+		self.TableBatchSize = 1000
 		self.DataSetHashTable = {}
 		self.NewDataSetHashTable = {}
 		self.DataSetTables = []
+		self.FillingTable = 0
 		self.DataSetTablesToSave = {}
 
 		if not os.path.exists(self.TableAddress):
@@ -152,7 +154,7 @@ class DataSetManager(object):
 					self.DataSetTables[loop].Save()
 				else:
 					self.DataSetTables[loop].Unload()
-
+		self.DataSetTablesToSave = {}
 		return
 	def LoadDataSet(self):
 		if not ComplexFileExists(self.BoardHashLookUpAddress):
@@ -161,11 +163,20 @@ class DataSetManager(object):
 
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress)
 
+		self.FillingTable = -1
 		self.DataSetTables = []
+		index = 0
 		for loop in os.listdir(self.TableAddress):
 			if loop.startswith("Table_") and "." in loop:
 				loop = loop[0:loop.find(".")]
 				self.DataSetTables += [DataSetTable(self.TableAddress+loop, False)]
+				if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
+					self.FillingTable = index
+
+				index += 1
+
+		if self.FillingTable == -1:
+			self.FillingTable = index
 		return True
 	def BackUp(self, backUpAddress):
 		if (os.path.exists(backUpAddress)):
@@ -177,7 +188,7 @@ class DataSetManager(object):
 		if key in self.DataSetHashTable:
 			return
 
-		index = 0
+		index = self.FillingTable
 		if (len(self.DataSetTables) <= index):
 			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(index), True)]
 
@@ -189,6 +200,9 @@ class DataSetManager(object):
 		moves = {}
 		moves[0] = BoardInfo.MoveInfo()
 		self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo(Moves=moves)
+		if len(self.DataSetTables[index].Content) >= self.TableBatchSize:
+			self.FillingTable += 1
+
 		return
 	def GetBoardInfo(self, key):
 		boardInfo = None
@@ -217,7 +231,7 @@ class DataSetManager(object):
 			if (self.DataSetTables[loop].IsLoaded):
 				loadedTables += 1
 
-		return str(loadedTables)+"/"+str(len(self.DataSetTables))
+		return str(loadedTables)+"/"+str(len(self.DataSetTables))+str(self.DataSetTablesToSave)
 
 	def MoveIDToMove(self, moveID):
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
