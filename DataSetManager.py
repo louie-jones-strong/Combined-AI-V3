@@ -5,6 +5,24 @@ import BoardInfo
 import shutil
 
 
+def serializer(inputObject):
+
+	return str(inputObject)
+def deserializer(inputString):
+	if inputString.startswith("b'"):
+		outputObject = inputString
+
+	elif "(" in inputString:
+		inputString = inputString.replace('(', '').replace(')', '')
+		outputObject = tuple(map(deserializer, inputString.split(', ')))
+
+	elif "." in inputString:
+		outputObject = float(inputString)
+
+	else:
+		outputObject = int(inputString)
+	return outputObject
+
 def DictAppend(address, dictionary): 
 	if (dictionary == {}):
 		return
@@ -24,7 +42,7 @@ def DictSave(address, dictionary):
 	address += ".txt"
 	file = open(address, "w")
 	for key, value in dictionary.items():
-		file.write(str(key)+":"+str(value)+"\n")
+		file.write(str(key)+":"+serializer(value)+"\n")
 	file.close()
 	return
 def DictLoad(address):
@@ -35,15 +53,11 @@ def DictLoad(address):
 	lines = file.readlines()
 	file.close()
 	for loop in range(len(lines)):
-			line = lines[loop][:-1]
-			line = line.split(":")
-			key = line[0]
-			value = line[1]
-			if "." in value:
-				value = float(value)
-			else:
-				value = int(value)
-			dictionary[key] = value
+		line = lines[loop][:-1]
+		line = line.split(":")
+		key = line[0]
+		value = deserializer(line[1])
+		dictionary[key] = value
 
 	return dictionary
 def DictFileExists(address):
@@ -117,12 +131,12 @@ class DataSetManager(object):
 
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
 		self.DatasetAddress = datasetAddress
-		self.DataSetHashTableAddress = datasetAddress+"BruteForceDataSet//DataSet"
+		self.DataSetHashTableAddress = datasetAddress+"LookUp//DataSetHashTable"
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
-		self.BoardHashLookUpAddress = datasetAddress+"LookUp//"+"BoardHashLookup"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
 		self.TableBatchSize = 10000
+		self.CanAppendData = False
 		self.DataSetHashTable = {}
 		self.NewDataSetHashTable = {}
 		self.DataSetTables = []
@@ -143,9 +157,12 @@ class DataSetManager(object):
 	def SaveDataSet(self):
 		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
 			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
-		ComplexSave(self.BoardHashLookUpAddress, self.BoardToHashLookUp)
 
-		DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+		if self.CanAppendData:
+			DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+		else:
+			DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+
 		self.NewDataSetHashTable = {}
 
 		for loop in range(len(self.DataSetTables)):
@@ -155,12 +172,9 @@ class DataSetManager(object):
 				else:
 					self.DataSetTables[loop].Unload()
 		self.DataSetTablesToSave = {}
+		self.CanAppendData = True
 		return
 	def LoadDataSet(self):
-		if not ComplexFileExists(self.BoardHashLookUpAddress):
-			return False
-		self.BoardToHashLookUp = ComplexLoad(self.BoardHashLookUpAddress)
-
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress)
 
 		self.FillingTable = -1
@@ -177,6 +191,8 @@ class DataSetManager(object):
 
 		if self.FillingTable == -1:
 			self.FillingTable = index
+		
+		self.CanAppendData = True
 		return True
 	def BackUp(self, backUpAddress):
 		if (os.path.exists(backUpAddress)):
@@ -184,7 +200,7 @@ class DataSetManager(object):
 		shutil.copytree(self.DatasetAddress, backUpAddress)
 		return
 
-	def AddNewBoard(self, key):
+	def AddNewBoard(self, key, board):
 		if key in self.DataSetHashTable:
 			return
 
@@ -192,8 +208,10 @@ class DataSetManager(object):
 		if (len(self.DataSetTables) <= index):
 			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(index), True)]
 
-		self.DataSetHashTable[key] = index
-		self.NewDataSetHashTable[key] = index
+		pickledBoard = pickle.dumps(board)
+		self.DataSetHashTable[key] = (index, pickledBoard)
+		self.NewDataSetHashTable[key] = (index, pickledBoard)
+
 		if not self.DataSetTables[index].IsLoaded:
 			self.DataSetTables[index].Load()
 
@@ -209,7 +227,7 @@ class DataSetManager(object):
 		found = False
 
 		if key in self.DataSetHashTable:
-			index = self.DataSetHashTable[key]
+			index = self.DataSetHashTable[key][0]
 			if not self.DataSetTables[index].IsLoaded:
 				self.DataSetTables[index].Load()
 			

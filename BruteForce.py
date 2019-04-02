@@ -49,7 +49,7 @@ class BruteForce(object):
 
 			else:#never played board before
 				moveID = 0
-				self.DataSetManager.AddNewBoard(key)
+				self.DataSetManager.AddNewBoard(key, board)
 
 			self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID}
 
