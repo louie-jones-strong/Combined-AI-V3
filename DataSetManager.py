@@ -135,7 +135,7 @@ class DataSetManager(object):
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
-		self.TableBatchSize = 10000
+		self.TableBatchSize = 1000
 		self.CanAppendData = False
 		self.DataSetHashTable = {}
 		self.NewDataSetHashTable = {}
