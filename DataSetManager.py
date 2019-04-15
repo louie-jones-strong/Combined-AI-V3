@@ -148,7 +148,6 @@ class DataSetManager(object):
 		if not os.path.exists(datasetAddress+"LookUp//"):
 			os.makedirs(datasetAddress+"LookUp//")
 
-		self.BoardToHashLookUp = {}
 		self.MoveIDLookUp = []
 		for loop in range(self.MaxMoveIDs):
 			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
@@ -259,9 +258,5 @@ class DataSetManager(object):
 
 	def BoardToKey(self, board):
 		key = str(board)
-		#key = hash(key)
-
-		if not key in self.BoardToHashLookUp:
-			self.BoardToHashLookUp[key] = board
 
 		return key
