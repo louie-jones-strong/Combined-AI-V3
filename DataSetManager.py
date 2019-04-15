@@ -180,12 +180,10 @@ class DataSetManager(object):
 		self.FillingTable = -1
 		self.DataSetTables = []
 		index = 0
-		for loop in os.listdir(self.TableAddress):
-			if loop.startswith("Table_") and "." in loop:
-				loop = loop[0:loop.find(".")]
-				self.DataSetTables += [DataSetTable(self.TableAddress+loop, False)]
-				if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
-					self.FillingTable = index
+		for loop in range(len(os.listdir(self.TableAddress))):
+			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
+			if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
+				self.FillingTable = index
 
 				index += 1
 
