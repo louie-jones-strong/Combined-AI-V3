@@ -1,4 +1,4 @@
-from pygame import display,draw,Color
+from pygame import display,draw,Color,gfxdraw
 import pygame
 import Shape
 import time
@@ -25,15 +25,15 @@ def InsidePolygon(pos2D, points):
 		p1x, p1y = p2x, p2y
 	return inside
 
-class RenderEngine(object):
+class RenderEngine:
 	ConsoleText = ""
 	PieceList = []
+	Resolution = (700, 700)
 
 	def SettingSetup(self):
 		#window
-		self.resolution = (700, 700)
 		self.Font = pygame.font.SysFont("monospace", 15)
-		self.Window = display.set_mode(self.resolution)
+		self.Window = display.set_mode(self.Resolution)
 
 		#================
 		temp = mouse.get_position()
@@ -64,10 +64,6 @@ class RenderEngine(object):
 		self.PieceList = []
 
 		return
-
-	def DrawBackGround(self):
-
-		return
 	def DrawPieces(self):
 		for loop in range(len(self.PieceList)):
 			piece = self.PieceList[loop]
@@ -83,14 +79,16 @@ class RenderEngine(object):
 				borderColor = [0, 0, 0]
 
 
-			pygame.draw.polygon(self.Window, fillColor, piece.Points, 0)
-			pygame.draw.polygon(self.Window, borderColor, piece.Points, 5)
+			#pygame.draw.polygon(self.Window, fillColor, piece.Points, 0)
+			#pygame.draw.polygon(self.Window, borderColor, piece.Points, 2)
+
+			pygame.gfxdraw.filled_polygon(self.Window, piece.Points, fillColor)
+			pygame.gfxdraw.aapolygon(self.Window, piece.Points, borderColor)
 
 		return
 
 	def UpdateWindow(self):
-		draw.rect(self.Window, [0, 0, 0], [0, 0, self.resolution[0], self.resolution[1]], 0)
-		self.DrawBackGround()
+		draw.rect(self.Window, [50, 50, 50], [0, 0, self.Resolution[0], self.Resolution[1]], 0)
 		self.DrawPieces()
 
 
@@ -113,7 +111,7 @@ class RenderEngine(object):
 			for loop in range(len(temp)):
 				label = self.Font.render(temp[len(temp)-(loop+1)], 1, (255, 255, 255))
 				offSet = 22 + loop*12
-				self.Window.blit(label, [10, self.resolution[1]-offSet])
+				self.Window.blit(label, [10, self.Resolution[1]-offSet])
 
 		display.update()
 		for event in pygame.event.get():
@@ -132,12 +130,73 @@ class RenderEngine(object):
 		return None
 
 
+def getgrid():
+	pieceSize = 30
+	PieceList = []
+	boardColor = True
+	grid = [8,8]
+	for x in range(grid[0]):
+		for y in range(grid[1]):
+
+			if boardColor:
+				color = [255,255,255]
+				boardColor = False
+			else:
+				color = [0,0,0]
+				boardColor = True
+
+			PieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*pieceSize*2+350, ((y+0.5)-grid[1]/2)*pieceSize*2+350], [pieceSize, pieceSize], Shape.Square(), color)]
+		
+		if boardColor:
+			boardColor = False
+		else:
+			boardColor = True
+	return PieceList
+def getPiece():
+	pieceSize = 20
+	gridSize = 30
+	board = [[1, 0, 1, 0, 0, 0, 2, 0], 
+			[0, 1, 0, 0, 0, 2, 0, 2], 
+			[1, 0, 1, 0, 0, 0, 2, 0], 
+			[0, 1, 0, 0, 0, 2, 0, 2], 
+			[1, 0, 1, 0, 0, 0, 2, 0], 
+			[0, 1, 0, 0, 0, 2, 0, 2], 
+			[1, 0, 1, 0, 0, 0, 2, 0], 
+			[0, 1, 0, 0, 0, 2, 0, 2]]
+
+	PieceList = []
+	grid = [8,8]
+	for x in range(grid[0]):
+		for y in range(grid[1]):
+			if board[x][y] != 0:
+				if board[x][y] == 1:
+					PieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)*gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255,255,255])]
+				else:
+					PieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)*gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0,0,0])]
+	return PieceList
+
 if __name__ == "__main__":
+	grid = getgrid()
+
+	temp = True
 	engine = RenderEngine()
 	loop= 0
 	while True:
-		engine.PieceList = [Shape.Piece([350, 350], [loop/10, loop/10], Shape.Square())]
-		if (loop > 3500):
+		engine.PieceList = []
+		engine.PieceList += grid
+		engine.PieceList += getPiece()
+
+		if temp:
+			engine.PieceList += [Shape.Piece([350, 350], [loop/10, loop/10], Shape.Square(), [255,0,0])]
+		else:
+			engine.PieceList += [Shape.Piece([350, 350], [loop/10, loop/10], Shape.Square(), [0,0,255])]
+
+		if loop == 250:
+			if temp:
+				temp = False
+			else:
+				temp = True
 			loop = 0
+
 		engine.UpdateWindow()
 		loop += 1
