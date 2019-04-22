@@ -1,7 +1,12 @@
+import RenderEngine.Shape as Shape
 class Simulation(object):
 	Info = {"MinPlayers":2,"MaxPlayers":2,
 	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":8,
 			"Resolution":1}
+
+	def __init__(self):
+		self.BackGroundpieceList = []
+		return
 
 	def Start(self):
 
@@ -80,6 +85,11 @@ class Simulation(object):
 			if y < 2:
 				print("-+-+-")
 		return
+
+	def ComplexBoardOutput(self, board):
+		pieceList = []
+		pieceList += self.BackGroundpieceList
+		return pieceList
 
 def CheckWin(board, player):
 	if    (board[0] == player and board[1] == player and board[2] == player) \

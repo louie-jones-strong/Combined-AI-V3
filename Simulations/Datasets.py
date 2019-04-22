@@ -1,7 +1,12 @@
+import RenderEngine.Shape as Shape
 class Simulation(object):
 	Info = {"MinPlayers":1,"MaxPlayers":1,
 	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":100,
 			"Resolution":1}
+
+	def __init__(self):
+		self.BackGroundpieceList = []
+		return
 
 	def __init__(self):
 		self.DataSetX = [[0],[1],[2],[3],[4],[5],[6]]
@@ -44,3 +49,8 @@ class Simulation(object):
 	def SimpleBoardOutput(self, board):
 		print(board)
 		return
+
+	def ComplexBoardOutput(self, board):
+		pieceList = []
+		pieceList += self.BackGroundpieceList
+		return pieceList

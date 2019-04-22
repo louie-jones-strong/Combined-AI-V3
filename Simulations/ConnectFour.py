@@ -1,8 +1,13 @@
+import RenderEngine.Shape as Shape
 class Simulation(object):
 	Info = {"Name":"ConnectFour",
 	        "MinPlayers":2,"MaxPlayers":2,
 	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":6,
 			"Resolution":1}
+
+	def __init__(self):
+		self.BackGroundpieceList = []
+		return
 
 	def Start(self):
 		self.Board = [[0,0,0,0,0,0],[0,0,0,0,0,0],
@@ -98,6 +103,10 @@ class Simulation(object):
 			print(temp)
 		print("|0|1|2|3|4|5|6|")
 		return
+	def ComplexBoardOutput(self, board):
+		pieceList = []
+		pieceList += self.BackGroundpieceList
+		return pieceList
 
 def WinCheck(board):
 	won = False
