@@ -21,6 +21,31 @@ def Square():
 	points += [[-1, 1]]
 	return points
 
+def Cross():
+	points = []
+	points += [[1, 1]]
+	points += [[-1, -1]]
+	points += [[0, 0]]
+	points += [[1, -1]]
+	points += [[-1, 1]]
+	points += [[0, 0]]
+	return points
+
+def HorizontalLine():
+	points = []
+	points += [[-1, 0.01]]
+	points += [[1, 0.01]]
+	points += [[-1, -0.01]]
+	points += [[1, -0.01]]
+	return points
+def VerticalLine():
+	points = []
+	points += [[0.01, -1]]
+	points += [[0.01, 1]]
+	points += [[-0.01, -1]]
+	points += [[-0.01, 1]]
+	return points
+
 class Piece():
 	Points = []
 	Color = [255, 255, 255]
