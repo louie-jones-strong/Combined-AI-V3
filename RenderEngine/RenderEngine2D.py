@@ -58,6 +58,7 @@ class RenderEngine:
 		display.init()
 		pygame.font.init()
 		self.SettingSetup()
+		self.Running = True
 
 		self.PieceList = []
 
@@ -86,9 +87,14 @@ class RenderEngine:
 		return
 
 	def UpdateWindow(self):
+		if not self.Running:
+			return False
+
+
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
+				self.Running = False
 				return False
 
 		if time.time()-self.TimeOfLastFrame >= 1/self.TargetFrameRate:

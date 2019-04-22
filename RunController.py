@@ -136,11 +136,11 @@ class RunController(object):
 		self.LastOutputTime = time.time()
 		self.LastSaveTook = 0
 		self.WinningMode = False
-		self.RenderQuality = 0
+		self.RenderQuality = 1
 
-		userInput = input("RenderQuality [0, 1]:")
-		if userInput == "1":
-			self.RenderQuality = 1
+		#userInput = input("RenderQuality [0, 1]:")
+		#if userInput == "0":
+		#	self.RenderQuality = 0
 
 		if self.NumberOfBots >= 1:
 			userInput = input("Human Player[Y/N]:")
@@ -182,7 +182,9 @@ class RunController(object):
 			game.SimpleBoardOutput(board)
 		else:
 			self.RenderEngine.PieceList = game.ComplexBoardOutput(board)
-			self.RenderEngine.UpdateWindow()
+			if not self.RenderEngine.UpdateWindow():
+				self.RenderQuality = 0
+
 
 		return
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
