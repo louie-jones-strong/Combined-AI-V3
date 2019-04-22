@@ -83,7 +83,7 @@ class Simulation(object):
 	def FlipInput(self, move):
 		return move
 
-	def OutputBoard(self, board):
+	def SimpleBoardOutput(self, board):
 		for Y in range(len(board[0])):
 			temp = "|"
 			for X in range(len(board)):

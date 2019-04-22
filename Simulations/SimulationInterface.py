@@ -34,6 +34,6 @@ class Simulation(object):
 	def FlipInput(self, move):
 		return move
 
-	def OutputBoard(self, board):
+	def SimpleBoardOutput(self, board):
 		
 		return

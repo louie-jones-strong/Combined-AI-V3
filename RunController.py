@@ -179,7 +179,7 @@ class RunController(object):
 
 			os.system("cls")
 			if self.NumberOfBots >= turn:
-				game.OutputBoard(board)
+				game.SimpleBoardOutput(board)
 
 			print("Dataset size: " + str(SplitNumber(self.AiDataManager.GetNumberOfBoards())))
 			print("Number Of Complete Boards: " + str(SplitNumber(self.AiDataManager.NumberOfCompleteBoards)))
@@ -208,7 +208,7 @@ class RunController(object):
 		valid = False
 		while not valid:
 			os.system("cls")
-			game.OutputBoard(board)
+			game.SimpleBoardOutput(board)
 			move = []
 			for loop in range(self.SimInfo["NumInputs"]):
 				validMove = False
@@ -226,7 +226,7 @@ class RunController(object):
 				print("that move was not vaild")
 					
 		print("")
-		game.OutputBoard(board)
+		game.SimpleBoardOutput(board)
 		return board, turn
 
 	def RunTournament(self, Ais):
