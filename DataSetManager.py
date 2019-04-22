@@ -6,6 +6,11 @@ import shutil
 
 
 def LoadingBar(progress, text=""):
+	if (progress > 1):
+		progress = 1
+	if progress < 0:
+		progress = 0
+		
 	Resolution = 100
 	progress = progress*Resolution
 	os.system("cls")
@@ -189,8 +194,7 @@ class DataSetManager(object):
 		self.CanAppendData = True
 		return
 	def LoadDataSet(self):
-		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress)
-
+		LoadingBar(0, "loading tables...")
 		self.FillingTable = -1
 		self.DataSetTables = []
 		numberOfTables = len(os.listdir(self.TableAddress))
@@ -201,12 +205,17 @@ class DataSetManager(object):
 			self.DataSetTables[index].Load()
 			if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
 				self.FillingTable = index
-			index += 1
 			self.DataSetTables[index].Unload()
+			LoadingBar(((loop/numberOfTables)/9)*10, "loading tables...")
+
+			index += 1
 			
 		if self.FillingTable == -1:
 			self.FillingTable = index
 
+		LoadingBar(((loop/numberOfTables)/9)*10, "loading hashtable...")
+		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress)
+		LoadingBar(1, "finished loading")
 		self.CanAppendData = True
 		return True
 	def BackUp(self, backUpAddress):
