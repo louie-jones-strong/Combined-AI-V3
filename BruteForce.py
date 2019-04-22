@@ -77,7 +77,7 @@ class BruteForce(object):
 			moveID = self.TempDataSet[tempKey]["MoveID"]
 
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
-			if moveID in boardInfo.Moves:
+			if found and moveID in boardInfo.Moves:
 				newFitness = boardInfo.Moves[moveID].AvgFitness*boardInfo.Moves[moveID].TimesPlayed
 				newFitness += fitness
 				boardInfo.Moves[moveID].TimesPlayed += 1

@@ -5,6 +5,16 @@ import BoardInfo
 import shutil
 
 
+def LoadingBar(progress, text=""):
+	Resolution = 100
+	progress = progress*Resolution
+	os.system("cls")
+	bar = "#"*int(progress)
+	fill = " "*(Resolution-int(progress))
+	print("|"+bar+fill+"|")
+	print(text)
+	return
+
 def serializer(inputObject):
 
 	return str(inputObject)
@@ -122,14 +132,23 @@ class DataSetManager(object):
 	NumberOfCompleteBoards = 0
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
+
+	NumOfOutputs = 0
+	MinOutputSize = 0
+	MaxOutputSize = 0
+	OutputResolution = 0
 	
 	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, datasetAddress):
 		self.NumOfOutputs = numOfOutputs
 		self.MinOutputSize = minOutputSize
 		self.MaxOutputSize = maxOutputSize
 		self.OutputResolution = outputResolution
-
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
+
+		self.MoveIDLookUp = []
+		for loop in range(self.MaxMoveIDs):
+			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
+		
 		self.DatasetAddress = datasetAddress
 		self.DataSetHashTableAddress = datasetAddress+"LookUp//DataSetHashTable"
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
@@ -147,10 +166,6 @@ class DataSetManager(object):
 			os.makedirs(self.TableAddress)
 		if not os.path.exists(datasetAddress+"LookUp//"):
 			os.makedirs(datasetAddress+"LookUp//")
-
-		self.MoveIDLookUp = []
-		for loop in range(self.MaxMoveIDs):
-			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
 		return
 
 	def SaveDataSet(self):
@@ -178,17 +193,20 @@ class DataSetManager(object):
 
 		self.FillingTable = -1
 		self.DataSetTables = []
+		numberOfTables = len(os.listdir(self.TableAddress))
 		index = 0
-		for loop in range(len(os.listdir(self.TableAddress))):
+		for loop in range(numberOfTables):
 			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
+
+			self.DataSetTables[index].Load()
 			if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
 				self.FillingTable = index
-
-				index += 1
-
+			index += 1
+			self.DataSetTables[index].Unload()
+			
 		if self.FillingTable == -1:
 			self.FillingTable = index
-		
+
 		self.CanAppendData = True
 		return True
 	def BackUp(self, backUpAddress):
@@ -197,6 +215,7 @@ class DataSetManager(object):
 		shutil.copytree(self.DatasetAddress, backUpAddress)
 		return
 
+#for Brute Force
 	def AddNewBoard(self, key, board):
 		if key in self.DataSetHashTable:
 			return
@@ -240,6 +259,13 @@ class DataSetManager(object):
 	def GetNumberOfBoards(self):
 		return len(self.DataSetHashTable)
 	
+#for Neural Network
+	def GetDataSet(self):
+		dataSetX = []
+		dataSetY = []
+
+		return dataSetX, dataSetY
+
 	def GetCachingInfoString(self):
 		loadedTables = 0
 		for loop in range(len(self.DataSetTables)):

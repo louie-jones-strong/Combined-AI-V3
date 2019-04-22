@@ -160,9 +160,7 @@ class RunController(object):
 
 		if userInput == "N" or userInput == "n":
 			import NeuralNetwork
-			Ais = [NeuralNetwork.NeuralNetwork(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
-												self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)]
-			Ais[0].LoadData()
+			Ais = [NeuralNetwork.NeuralNetwork(self.AiDataManager, winningModeON=self.WinningMode)]
 
 			for loop in range(self.NumberOfBots-1):
 				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]

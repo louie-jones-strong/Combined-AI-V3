@@ -1,30 +1,20 @@
-import os
-import pickle
 import tflearn
-import time
 
 class NeuralNetwork(object):
-	DataSetX = []
-	DataSetY = []
 
-	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, dataSetPath):
-		self.MinOutputSize = minOutputSize
-		self.MaxOutputSize = maxOutputSize
-		self.OutputResolution = outputResolution
+	def __init__(self, dataSetManager, winningModeON=False):
+		self.DataSetManager = dataSetManager
 
-		self.DataSetPath = dataSetPath
-		self.LastImportTime = 0
+		self.DataSetX = []
+		self.DataSetY = []
 
 		print("Waiting for DataSet")
 		while len(self.DataSetY) == 0:
-			self.ImportDataSet()
-			if len(self.DataSetY) == 0:
-				time.sleep(1)
+			self.DataSetX, self.DataSetY = self.DataSetManager.GetDataSet()
 
 		inputShape, structreArray = self.PredictNetworkStructre()
-
-		self.RunId = "test2"
-		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520, lr=0.001)#, optimizer="sgd")
+		self.RunId = "test"
+		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=1000, lr=0.001)#, optimizer="sgd")
 		return
 	def PredictNetworkStructre(self):
 		inputShape = [len(self.DataSetX[0])]
@@ -46,66 +36,15 @@ class NeuralNetwork(object):
 		structreArray += [["ann", 1000, "Tanh"]]
 		structreArray += [["ann", 9, "Tanh"]]
 
-		if self.MinOutputSize < -1 or self.MinOutputSize > 1:
+		if self.DataSetManager.MinOutputSize < -1 or self.DataSetManager.MinOutputSize > 1:
 			structreArray += [["ann", len(self.DataSetY[0]), "Linear"]]
-		elif self.MinOutputSize < 0:
+		elif self.DataSetManager.MinOutputSize < 0:
 			structreArray += [["ann", len(self.DataSetY[0]), "Tanh"]]
 		else:
 			structreArray += [["ann", len(self.DataSetY[0]), "Sigmoid"]]
 
 		self.NumberOfLayers = len(structreArray)
 		return inputShape, structreArray
-	def ImportDataSet(self):
-		if not os.path.isfile(self.DataSetPath+"BruteForceDataSet//"+"Dataset" + ".p"):
-			return False
-		
-		if not os.path.isfile(self.DataSetPath+"LookUp//"+"BoardHashLookup" + ".p"):
-			return False
-
-		if not os.path.isfile(self.DataSetPath+"LookUp//"+"MoveIdLookUp" + ".p"):
-			return False
-
-		if time.time() - self.LastImportTime < 60:
-			return False
-
-		if self.LastImportTime >= os.path.getmtime(self.DataSetPath+"BruteForceDataSet//"+"Dataset"+".p"):
-			return False
-
-		file = open(self.DataSetPath+"BruteForceDataSet//"+"Dataset" + ".p", "rb")
-		dataSet = pickle.load(file)
-		file.close()
-		
-		file = open(self.DataSetPath+"LookUp//"+"BoardHashLookup" + ".p", "rb")
-		boardToHashLookUp = pickle.load(file)
-		file.close()
-
-		file = open(self.DataSetPath+"LookUp//"+"MoveIdLookUp" + ".p", "rb")
-		self.MoveIdLookUp = pickle.load(file)
-		file.close()
-
-		self.LastImportTime = time.time()
-
-		loop = 0
-		self.DataSetX = []
-		self.DataSetY = []
-		for key, value in dataSet.items():
-			if key in boardToHashLookUp:
-				self.DataSetX += [boardToHashLookUp[key]]
-			else:
-				input("board hash missing")
-
-			temp = self.MoveIdLookUp[value.MoveIDOfBestAvgFitness]
-
-			self.DataSetY += [temp]
-			
-			if loop % 500 == 0:
-				temp = int((loop/len(dataSet))*100)
-				os.system("cls")
-				print(str(temp)+"% "+str(loop)+"/"+str(len(dataSet)))
-			loop += 1
-		os.system("cls")
-		print("100% "+str(len(dataSet))+"/"+str(len(dataSet)))
-		return True
 
 	def MoveCal(self, inputs):
 		outputs = self.NetworkModel.predict([inputs])[0]
@@ -123,28 +62,15 @@ class NeuralNetwork(object):
 				moveId = loop
 				largest = outputs[loop]
 		
-		outputMove = self.MoveIdLookUp[moveId]
+		outputMove = self.DataSetManager.MoveIDLookUp[moveId]
 		return outputMove
 
 	def UpdateInvalidMove(self, board, move):
-		os.system("cls")
-		self.ImportDataSet()
 		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
-		self.SaveData(0)
 		return
 
 	def SaveData(self, fitness):
 		weights = GetWeights(self.NetworkModel, self.NumberOfLayers)
-		pickle.dump(weights, open(self.DataSetPath+"NetWorkWeights"+".p", "wb"))
-		return
-
-	def LoadData(self):
-		if os.path.isfile(self.DataSetPath+"NetWorkWeights"+".p"):
-			file = open(self.DataSetPath+"NetWorkWeights"+".p", "rb")
-			newWeights = pickle.load(file)
-			file.close()
-
-			self.NetworkModel = SetWeights(self.NetworkModel, self.NumberOfLayers, newWeights)
 		return
 
 def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam"):
