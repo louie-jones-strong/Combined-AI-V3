@@ -41,14 +41,13 @@ class RenderEngine:
 		mouse.move(temp[0], temp[1])
 		self.startPos = [0, 0]
 
-		#highlighting
-		self.HighlightFadeTime = 2
-		
-
 		#FPS
 		self.FPS = -1
 		self.Framecount = 0
 		self.LastSampleTime = time.time()
+		#vSync
+		self.TargetFrameRate = 60
+		self.TimeOfLastFrame = 0
 
 		#console text
 		self.ConsoleText = ""
@@ -87,36 +86,41 @@ class RenderEngine:
 		return
 
 	def UpdateWindow(self):
-		draw.rect(self.Window, [50, 50, 50], [0, 0, self.Resolution[0], self.Resolution[1]], 0)
-		self.DrawPieces()
-
-
-
-		#text on the screen
-		self.Framecount += 1
-		if (time.time() - self.LastSampleTime) >= 0.1:
-			self.FPS = self.Framecount*10
-			self.Framecount = 0
-			self.LastSampleTime = time.time()
-
-		if self.FPS != -1:
-			label = self.Font.render("FPS:"+str(self.FPS), 1, (255, 255, 255))
-			self.Window.blit(label, [10, 10])
-			label = self.Font.render("Objects:"+str(len(self.PieceList)), 1, (255, 255, 255))
-			self.Window.blit(label, [10, 34])
-
-		if self.ConsoleText != "":
-			temp = self.ConsoleText.split("\n")
-			for loop in range(len(temp)):
-				label = self.Font.render(temp[len(temp)-(loop+1)], 1, (255, 255, 255))
-				offSet = 22 + loop*12
-				self.Window.blit(label, [10, self.Resolution[1]-offSet])
-
-		display.update()
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				pygame.quit() 
+				pygame.quit()
 				return False
+
+		if time.time()-self.TimeOfLastFrame >= 1/self.TargetFrameRate:
+			draw.rect(self.Window, [50, 50, 50], [0, 0, self.Resolution[0], self.Resolution[1]], 0)
+			self.DrawPieces()
+
+
+
+			#text on the screen
+			self.Framecount += 1
+			if (time.time() - self.LastSampleTime) >= 0.1:
+				self.FPS = self.Framecount*10
+				self.Framecount = 0
+				self.LastSampleTime = time.time()
+
+			if self.FPS != -1:
+				label = self.Font.render("FPS:"+str(self.FPS), 1, (255, 255, 255))
+				self.Window.blit(label, [10, 10])
+				label = self.Font.render("Objects:"+str(len(self.PieceList)), 1, (255, 255, 255))
+				self.Window.blit(label, [10, 34])
+
+			if self.ConsoleText != "":
+				temp = self.ConsoleText.split("\n")
+				for loop in range(len(temp)):
+					label = self.Font.render(temp[len(temp)-(loop+1)], 1, (255, 255, 255))
+					offSet = 22 + loop*12
+					self.Window.blit(label, [10, self.Resolution[1]-offSet])
+
+			self.TimeOfLastFrame = time.time()
+
+
+		display.update()
 		return True
 
 	def GetObjectClicked(self):

@@ -23,12 +23,18 @@ def Square():
 
 def Cross():
 	points = []
-	points += [[1, 1]]
-	points += [[-1, -1]]
-	points += [[0, 0]]
-	points += [[1, -1]]
-	points += [[-1, 1]]
-	points += [[0, 0]]
+	points += [[-1, 0.9]]
+	points += [[-0.9, 1]]
+	points += [[0, 0.1]]
+	points += [[0.9, 1]]
+	points += [[1, 0.9]]
+	points += [[0.1, 0]]
+	points += [[1, -0.9]]
+	points += [[0.9, -1]]
+	points += [[0, -0.1]]
+	points += [[-0.9, -1]]
+	points += [[-1, -0.9]]
+	points += [[-0.1, 0]]
 	return points
 
 def HorizontalLine():

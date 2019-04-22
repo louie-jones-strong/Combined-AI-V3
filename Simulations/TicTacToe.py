@@ -91,7 +91,7 @@ class Simulation(object):
 				print("-+-+-")
 		return
 	def ComplexBoardOutput(self, board):
-		pieceSize = 20
+		pieceSize = 40
 		gridSize = 50
 
 		pieceList = []
@@ -103,7 +103,7 @@ class Simulation(object):
 
 				if board[loop] != 0:
 					if board[loop] == 1:#X
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)* gridSize*2+350], [pieceSize, pieceSize], Shape.Cross(), [255, 255, 255])]
+						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)* gridSize*2+350], [pieceSize, pieceSize], Shape.Cross(), [0, 0, 0])]
 					else:#O
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)* gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
 				loop += 1

@@ -177,6 +177,12 @@ class Simulation(object):
 					if board[x][y] == 1:
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
     	                                        * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 255, 255])]
+					elif board[x][y] == 3:
+						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+                                                    * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 255, 255])]
+					elif board[x][y] == 2:
+						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+                                                    * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
 					else:
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
     	                                        * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]

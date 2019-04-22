@@ -136,7 +136,11 @@ class RunController(object):
 		self.LastOutputTime = time.time()
 		self.LastSaveTook = 0
 		self.WinningMode = False
-		self.RenderQuality = 1
+		self.RenderQuality = 0
+
+		userInput = input("RenderQuality [0, 1]:")
+		if userInput == "1":
+			self.RenderQuality = 1
 
 		if self.NumberOfBots >= 1:
 			userInput = input("Human Player[Y/N]:")
@@ -172,7 +176,7 @@ class RunController(object):
 		self.RunTournament(Ais)
 		return
 
-	def RenderBoard(self, game, board):
+	def RenderBoard(self, game, board):	
 
 		if self.RenderQuality == 0:
 			game.SimpleBoardOutput(board)
