@@ -116,8 +116,9 @@ class RenderEngine:
 		display.update()
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
+				pygame.quit() 
 				return False
-		return
+		return True
 
 	def GetObjectClicked(self):
 		if mouse.is_pressed(button="left"):
@@ -198,5 +199,6 @@ if __name__ == "__main__":
 				temp = True
 			loop = 0
 
-		engine.UpdateWindow()
+		if not engine.UpdateWindow():
+			break
 		loop += 1
