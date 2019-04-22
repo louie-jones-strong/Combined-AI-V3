@@ -37,6 +37,17 @@ def Cross():
 	points += [[-0.1, 0]]
 	return points
 
+def Crown():
+	points = []
+	points += [[-1, -1]]
+	points += [[-0.5, -0.5]]
+	points += [[0, -1]]
+	points += [[0.5, -0.5]]
+	points += [[1, -1]]
+	points += [[1, 0.5]]
+	points += [[-1, 0.5]]
+	return points
+
 def HorizontalLine():
 	points = []
 	points += [[-1, 0.01]]

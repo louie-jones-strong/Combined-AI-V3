@@ -180,12 +180,18 @@ class Simulation(object):
 					elif board[x][y] == 3:
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 255, 255])]
+
+						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+                                                    * gridSize*2+350], [pieceSize*0.6, pieceSize*0.6], Shape.Crown(), [0, 0, 0])]
 					elif board[x][y] == 2:
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
 					else:
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
     	                                        * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
+						
+						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+                                                    * gridSize*2+350], [pieceSize*0.6, pieceSize*0.6], Shape.Crown(), [255, 255, 255])]
 		return pieceList
 
 def PossibleMoves(board, X, Y):
