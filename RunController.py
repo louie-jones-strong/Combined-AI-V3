@@ -1,3 +1,4 @@
+import RenderEngine.RenderEngine2D as RenderEngine
 import BruteForce
 import DataSetManager
 import importlib
@@ -135,6 +136,7 @@ class RunController(object):
 		self.LastOutputTime = time.time()
 		self.LastSaveTook = 0
 		self.WinningMode = False
+		self.RenderQuality = 1
 
 		if self.NumberOfBots >= 1:
 			userInput = input("Human Player[Y/N]:")
@@ -165,9 +167,20 @@ class RunController(object):
 			for loop in range(self.NumberOfBots):
 				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
 
+		if self.RenderQuality == 1:
+			self.RenderEngine = RenderEngine.RenderEngine()
 		self.RunTournament(Ais)
 		return
 
+	def RenderBoard(self, game, board):
+
+		if self.RenderQuality == 0:
+			game.SimpleBoardOutput(board)
+		else:
+			self.RenderEngine.PieceList = game.ComplexBoardOutput(board)
+			self.RenderEngine.UpdateWindow()
+
+		return
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
 		if (time.time() - self.LastOutputTime) >= 0.5:
 			numGames = self.MetaData["NumberOfGames"]+1
@@ -178,8 +191,8 @@ class RunController(object):
 
 
 			os.system("cls")
-			if self.NumberOfBots >= turn:
-				game.SimpleBoardOutput(board)
+			#if self.NumberOfBots >= turn:
+			self.RenderBoard(game, board)
 
 			print("Dataset size: " + str(SplitNumber(self.AiDataManager.GetNumberOfBoards())))
 			print("Number Of Complete Boards: " + str(SplitNumber(self.AiDataManager.NumberOfCompleteBoards)))
@@ -202,13 +215,18 @@ class RunController(object):
 			title += " LastSaveTook: " + SplitTime(self.LastSaveTook, roundTo=2)
 			os.system("title "+title)
 			self.LastOutputTime = time.time()
+
+		elif self.RenderQuality == 1:
+			self.RenderBoard(game, board)
+
+
 		return
 	
 	def MakeHumanMove(self, game, board):
 		valid = False
 		while not valid:
 			os.system("cls")
-			game.SimpleBoardOutput(board)
+			self.RenderBoard(game, board)
 			move = []
 			for loop in range(self.SimInfo["NumInputs"]):
 				validMove = False
@@ -226,7 +244,7 @@ class RunController(object):
 				print("that move was not vaild")
 					
 		print("")
-		game.SimpleBoardOutput(board)
+		self.RenderBoard(game, board)
 		return board, turn
 
 	def RunTournament(self, Ais):

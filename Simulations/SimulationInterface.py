@@ -1,8 +1,13 @@
+import RenderEngine.Shape as Shape
 class Simulation(object):
 	Info = {"MinPlayers":1,"MaxPlayers":2,
 	        "NumInputs":1,"MinInputSize":1,"MaxInputSize":3,
 			"Resolution":0.1}
 
+	def __init__(self):
+		self.BackGroundpieceList = []
+		return
+		
 	def Start(self, numPlayers):
 		if numPlayers > self.Info["MaxPlayers"] or numPlayers < self.Info["MinPlayers"]:
 			self.Finished = True
@@ -37,3 +42,7 @@ class Simulation(object):
 	def SimpleBoardOutput(self, board):
 		
 		return
+	def ComplexBoardOutput(self, board):
+		pieceList = []
+		pieceList += self.BackGroundpieceList
+		return pieceList

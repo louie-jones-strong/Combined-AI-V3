@@ -1,6 +1,5 @@
 from pygame import display,draw,Color,gfxdraw
 import pygame
-import Shape
 import time
 import mouse
 import math
@@ -129,76 +128,3 @@ class RenderEngine:
 				if InsidePolygon(pos, self.PieceList[loop].Points):
 					return self.PieceList[loop], loop
 		return None
-
-
-def getgrid():
-	pieceSize = 30
-	PieceList = []
-	boardColor = True
-	grid = [8,8]
-	for x in range(grid[0]):
-		for y in range(grid[1]):
-
-			if boardColor:
-				color = [255,255,255]
-				boardColor = False
-			else:
-				color = [0,0,0]
-				boardColor = True
-
-			PieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*pieceSize*2+350, ((y+0.5)-grid[1]/2)*pieceSize*2+350], [pieceSize, pieceSize], Shape.Square(), color)]
-		
-		if boardColor:
-			boardColor = False
-		else:
-			boardColor = True
-	return PieceList
-def getPiece():
-	pieceSize = 20
-	gridSize = 30
-	board = [[1, 0, 1, 0, 0, 0, 2, 0], 
-			[0, 1, 0, 0, 0, 2, 0, 2], 
-			[1, 0, 1, 0, 0, 0, 2, 0], 
-			[0, 1, 0, 0, 0, 2, 0, 2], 
-			[1, 0, 1, 0, 0, 0, 2, 0], 
-			[0, 1, 0, 0, 0, 2, 0, 2], 
-			[1, 0, 1, 0, 0, 0, 2, 0], 
-			[0, 1, 0, 0, 0, 2, 0, 2]]
-
-	PieceList = []
-	grid = [8,8]
-	for x in range(grid[0]):
-		for y in range(grid[1]):
-			if board[x][y] != 0:
-				if board[x][y] == 1:
-					PieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)*gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255,255,255])]
-				else:
-					PieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)*gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0,0,0])]
-	return PieceList
-
-if __name__ == "__main__":
-	grid = getgrid()
-
-	temp = True
-	engine = RenderEngine()
-	loop= 0
-	while True:
-		engine.PieceList = []
-		engine.PieceList += grid
-		engine.PieceList += getPiece()
-
-		if temp:
-			engine.PieceList += [Shape.Piece([350, 350], [loop/10, loop/10], Shape.Square(), [255,0,0])]
-		else:
-			engine.PieceList += [Shape.Piece([350, 350], [loop/10, loop/10], Shape.Square(), [0,0,255])]
-
-		if loop == 250:
-			if temp:
-				temp = False
-			else:
-				temp = True
-			loop = 0
-
-		if not engine.UpdateWindow():
-			break
-		loop += 1
