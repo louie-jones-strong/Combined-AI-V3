@@ -7,6 +7,14 @@ class Simulation(object):
 
 	def __init__(self):
 		self.BackGroundpieceList = []
+		gridSize = 40
+
+		grid = [7, 6]
+		self.BackGroundpieceList += [Shape.Piece([350, 350], [grid[0]*gridSize, grid[1]*gridSize], Shape.Square(), [0, 0, 255])]
+		for x in range(grid[0]):
+			for y in range(grid[1]):
+				self.BackGroundpieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+                                                    * gridSize*2+350], [35, 35], Shape.Circle(), [0, 0, 0])]
 		return
 
 	def Start(self):
@@ -104,8 +112,21 @@ class Simulation(object):
 		print("|0|1|2|3|4|5|6|")
 		return
 	def ComplexBoardOutput(self, board):
+		pieceSize = 30
+		gridSize = 40
+
 		pieceList = []
 		pieceList += self.BackGroundpieceList
+		grid = [7, 6]
+		for x in range(grid[0]):
+			for y in range(grid[1]):
+				if board[x][y] != 0:
+					if board[x][y] == 1:
+						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+                                                    * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 0, 0])]
+					else:
+						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+                                                    * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 255, 0])]
 		return pieceList
 
 def WinCheck(board):
