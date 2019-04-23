@@ -8,7 +8,6 @@ class NeuralNetwork(object):
 		self.DataSetX = []
 		self.DataSetY = []
 
-		print("Waiting for DataSet")
 		while len(self.DataSetY) == 0:
 			self.DataSetX, self.DataSetY = self.DataSetManager.GetDataSet()
 

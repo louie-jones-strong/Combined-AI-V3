@@ -25,7 +25,8 @@ def serializer(inputObject):
 	return str(inputObject)
 def deserializer(inputString):
 	if inputString.startswith("b'"):
-		outputObject = inputString
+		outputObject = bytes(inputString[2:-1], 'utf-8')
+		#outputObject = inputString
 
 	elif "(" in inputString:
 		inputString = inputString.replace('(', '').replace(')', '')
@@ -271,8 +272,30 @@ class DataSetManager(object):
 	
 #for Neural Network
 	def GetDataSet(self):
+		maxTablesLoaded = 1000
+
 		dataSetX = []
 		dataSetY = []
+
+		loop = 0
+		for key, value in self.DataSetHashTable.items():
+			index = value[0]
+			board = value[1]#pickle.loads(value[1])
+
+			if not self.DataSetTables[index].IsLoaded:
+				self.DataSetTables[index].Load()
+			
+			if key in self.DataSetTables[index].Content:
+				boardInfo = self.DataSetTables[index].Content[key]
+
+				if boardInfo.NumOfTriedMoves >= self.MaxMoveIDs:
+					dataSetX += [board]
+					dataSetY += [self.MoveIDLookUp[boardInfo.MoveIDOfBestAvgFitness]]
+
+
+			if loop % 10 == 0:
+				LoadingBar(loop/len(self.DataSetHashTable), "building Dataset")
+			loop += 1
 
 		return dataSetX, dataSetY
 
