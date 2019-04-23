@@ -78,7 +78,6 @@ def DictLoad(address):
 def DictFileExists(address):
 	return os.path.exists(address+".txt")
 
-
 def ComplexSave(address, objectInfo):
 	method = 0
 	if method == 0:
@@ -206,14 +205,16 @@ class DataSetManager(object):
 			if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
 				self.FillingTable = index
 			self.DataSetTables[index].Unload()
-			LoadingBar(((loop/numberOfTables)/9)*10, "loading table: "+str(loop)+"/"+str(numberOfTables))
+			if loop%10 == 0:
+				LoadingBar(loop/numberOfTables, "loading table: "+str(loop)+"/"+str(numberOfTables))
 
 			index += 1
-			
+
+		LoadingBar(1, "loading hashtable...")
 		if self.FillingTable == -1:
 			self.FillingTable = index
 
-		LoadingBar(((loop/numberOfTables)/9)*10, "loading hashtable...")
+		LoadingBar(0, "loading hashtable...")
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress)
 		LoadingBar(1, "finished loading")
 		self.CanAppendData = True

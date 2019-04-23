@@ -27,7 +27,7 @@ def InsidePolygon(pos2D, points):
 class RenderEngine:
 	ConsoleText = ""
 	PieceList = []
-	Resolution = (700, 700)
+	Resolution = (640, 640)
 
 	def SettingSetup(self):
 		#window
@@ -45,6 +45,7 @@ class RenderEngine:
 		self.FPS = -1
 		self.Framecount = 0
 		self.LastSampleTime = time.time()
+		self.LastFrameTook = 0
 		#vSync
 		self.TargetFrameRate = 60
 		self.TimeOfLastFrame = 0
@@ -87,6 +88,8 @@ class RenderEngine:
 		return
 
 	def UpdateWindow(self):
+		timeMark = time.time()
+
 		if not self.Running:
 			return False
 
@@ -115,6 +118,8 @@ class RenderEngine:
 				self.Window.blit(label, [10, 10])
 				label = self.Font.render("Objects:"+str(len(self.PieceList)), 1, (255, 255, 255))
 				self.Window.blit(label, [10, 34])
+				label = self.Font.render("frame took:"+str(self.LastFrameTook), 1, (255, 255, 255))
+				self.Window.blit(label, [10, 58])
 
 			if self.ConsoleText != "":
 				temp = self.ConsoleText.split("\n")
@@ -127,6 +132,7 @@ class RenderEngine:
 
 
 		display.update()
+		self.LastFrameTook = round(time.time()-timeMark, 4)
 		return True
 
 	def GetObjectClicked(self):
