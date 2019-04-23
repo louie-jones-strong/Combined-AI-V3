@@ -206,7 +206,7 @@ class DataSetManager(object):
 			if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
 				self.FillingTable = index
 			self.DataSetTables[index].Unload()
-			LoadingBar(((loop/numberOfTables)/9)*10, "loading table: "+loop+"/"+numberOfTables)
+			LoadingBar(((loop/numberOfTables)/9)*10, "loading table: "+str(loop)+"/"+str(numberOfTables))
 
 			index += 1
 			
