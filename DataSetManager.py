@@ -3,6 +3,7 @@ import json
 import os
 import BoardInfo
 import shutil
+import time
 
 
 def LoadingBar(progress, text=""):
@@ -61,19 +62,35 @@ def DictSave(address, dictionary):
 		file.write(str(key)+":"+serializer(value)+"\n")
 	file.close()
 	return
-def DictLoad(address):
+def DictLoad(address, loadingBarOn=False):
 	dictionary = {}
 	address += ".txt"
+
+	if loadingBarOn:
+		LoadingBar(0, "Loading Dict")
 
 	file = open(address, "r")
 	lines = file.readlines()
 	file.close()
-	for loop in range(len(lines)):
+	
+	numberOfLines = len(lines)
+	lastOutputTime = time.time()
+	if loadingBarOn:
+		LoadingBar(0, "Loading dict line: "+str(0)+"/"+str(numberOfLines))
+
+	for loop in range(numberOfLines):
 		line = lines[loop][:-1]
 		line = line.split(":")
 		key = line[0]
 		value = deserializer(line[1])
 		dictionary[key] = value
+
+		if loadingBarOn and time.time()-lastOutputTime >= 0.5:
+			LoadingBar(loop/numberOfLines, "Loading dict line: "+str(loop)+"/"+str(numberOfLines))
+			lastOutputTime = time.time()
+
+	if loadingBarOn:
+		LoadingBar(1, "Loading dict line: "+str(numberOfLines)+"/"+str(numberOfLines))
 
 	return dictionary
 def DictFileExists(address):
@@ -211,13 +228,11 @@ class DataSetManager(object):
 
 			index += 1
 
-		LoadingBar(1, "loading hashtable...")
+		LoadingBar(1, "loading table: "+str(numberOfTables)+"/"+str(numberOfTables))
 		if self.FillingTable == -1:
 			self.FillingTable = index
 
-		LoadingBar(0, "loading hashtable...")
-		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress)
-		LoadingBar(1, "finished loading")
+		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
 		self.CanAppendData = True
 		return True
 	def BackUp(self, backUpAddress):
