@@ -63,18 +63,17 @@ class BruteForce(object):
 
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
-		if found:
-			if moveID in boardInfo.Moves:
-				del boardInfo.Moves[moveID]
+		if found and moveID in boardInfo.Moves:
+			del boardInfo.Moves[moveID]
 
 		if str(key)+str(moveID) in self.TempDataSet:
 			del self.TempDataSet[str(key)+str(moveID)]
 		return
 	
 	def SaveData(self, fitness):
-		for tempKey in self.TempDataSet:
-			key = self.TempDataSet[tempKey]["BoardKey"]
-			moveID = self.TempDataSet[tempKey]["MoveID"]
+		for tempValue in self.TempDataSet.values():
+			key = tempValue["BoardKey"]
+			moveID = tempValue["MoveID"]
 
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 			if found and moveID in boardInfo.Moves:
