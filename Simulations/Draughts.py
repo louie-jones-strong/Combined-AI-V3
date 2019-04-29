@@ -138,7 +138,7 @@ class Simulation(object):
 		return finished, [player1Fitness, player2Fitness]
 
 	def FlipBoard(self, board):
-		lookup = {0:0,1:2,2:1,3:4,4:3}
+		lookup = {0:0, 1:2, 2:1, 3:4, 4:3}
 		output = []
 		for loop in range(len(board)-1,-1,-1):
 			temp = []
@@ -258,27 +258,12 @@ def IsPieceEnemySide(piece1, piece2):
 	return False
 
 def NewBoard():
-	Board = []
-	pickColour = 1
-	for loop in range(8):
-		test2 = []
-		for loop2 in range(8):
-			if pickColour == 1 :
-				if loop2 < 3 :
-					test2 += [1]
-				elif loop2>4:
-					test2 += [2]
-				else:
-					test2 += [0]
-				pickColour = 2
-			else:
-				test2 += [0]
-				pickColour = 1
-
-		if pickColour == 1:
-			pickColour = 2
-		else:
-			pickColour = 1
-		Board += [test2]
-
+	Board = [[1, 0, 1, 0, 0, 0, 2, 0], 
+			 [0, 1, 0, 0, 0, 2, 0, 2], 
+			 [1, 0, 1, 0, 0, 0, 2, 0], 
+			 [0, 1, 0, 0, 0, 2, 0, 2], 
+			 [1, 0, 1, 0, 0, 0, 2, 0], 
+			 [0, 1, 0, 0, 0, 2, 0, 2], 
+			 [1, 0, 1, 0, 0, 0, 2, 0], 
+			 [0, 1, 0, 0, 0, 2, 0, 2]]
 	return Board
