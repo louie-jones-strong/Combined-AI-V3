@@ -29,6 +29,11 @@ class RenderEngine:
 	PieceList = []
 	Resolution = (640, 640)
 
+	def SetNewResolution(self, resolution):
+		self.Resolution = resolution
+		self.Window = display.set_mode(self.Resolution)
+		return
+
 	def SettingSetup(self):
 		#window
 		self.Font = pygame.font.SysFont("monospace", 15)
@@ -82,7 +87,9 @@ class RenderEngine:
 			#pygame.draw.polygon(self.Window, fillColor, piece.Points, 0)
 			#pygame.draw.polygon(self.Window, borderColor, piece.Points, 2)
 
-			pygame.gfxdraw.filled_polygon(self.Window, piece.Points, fillColor)
+			if piece.Fill:
+				pygame.gfxdraw.filled_polygon(self.Window, piece.Points, fillColor)
+				
 			pygame.gfxdraw.aapolygon(self.Window, piece.Points, borderColor)
 
 		return

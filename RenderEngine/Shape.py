@@ -68,8 +68,10 @@ class Piece():
 	Color = [255, 255, 255]
 	Selected = False
 	Movable = False
+	Fill = True
+	InfoObject = None
 
-	def __init__(self, pos, scale, points, color):
+	def __init__(self, pos, scale, points, color, fill=True, infoObject=None):
 		for loop in range(len(points)):
 			points[loop][0] *= scale[0]
 			points[loop][1] *= scale[1]
@@ -79,4 +81,6 @@ class Piece():
 
 		self.Color = color
 		self.Points = points
+		self.Fill = fill
+		self.InfoObject = infoObject
 		return
