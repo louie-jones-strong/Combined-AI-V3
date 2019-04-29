@@ -97,35 +97,17 @@ def DictFileExists(address):
 	return os.path.exists(address+".txt")
 
 def ComplexSave(address, objectInfo):
-	method = 0
-	if method == 0:
-		pickle.dump(objectInfo, open(address+".p", "wb"))
-	elif method == 1:
-		file = open(address+".json", "w")
-		file.write(json.dumps(objectInfo, indent=4))
-		file.close()
-
+	pickle.dump(objectInfo, open(address+".p", "wb"))
 	return
 def ComplexLoad(address):
-	method = 0
-	if method == 0:
-		file = open(address+".p", "rb")
-		objectInfo = pickle.load(file)
-		file.close()
-	elif method == 1:
-		file = open(address+".json", "r")
-		objectInfo = json.load(file)
-		file.close()
-
+	file = open(address+".p", "rb")
+	objectInfo = pickle.load(file)
+	file.close()
 	return objectInfo
 def ComplexFileExists(address):
 	method = 0
 	value = False
-
-	if method == 0:
-		value = os.path.exists(address+".p")
-	elif method == 1:
-		value = os.path.exists(address+".json")
+	value = os.path.exists(address+".p")
 	return value
 
 class DataSetTable(object):
@@ -287,7 +269,6 @@ class DataSetManager(object):
 	
 #for Neural Network
 	def GetDataSet(self):
-		maxTablesLoaded = 1000
 
 		dataSetX = []
 		dataSetY = []
