@@ -50,15 +50,15 @@ class Simulation(object):
 			return False, self.Board, self.Turn
 
 		#check if your pick one of your pieces
-		if not(((selectedPiece == 1 or selectedPiece == 3) and self.Turn == 1) \
-		or ((selectedPiece == 2 or selectedPiece == 4) and self.Turn == 2)):
+		if not(((selectedPiece > 0) and self.Turn == 1) \
+		or ((selectedPiece < 0) and self.Turn == 2)):
 			return False, self.Board, self.Turn
 
 		moves = PossibleMoves(self.Board, moveArray[0], moveArray[1])
 		if len(moves) == 0:
 			return False, self.Board, self.Turn
 
-		if not([moveArray[2],moveArray[3]] in moves):
+		if [moveArray[2],moveArray[3]] not in moves:
 			return False, self.Board, self.Turn
 
 		#move the piece
@@ -78,10 +78,10 @@ class Simulation(object):
 
 		#upgrade the piece
 		if selectedPiece == 1 and moveArray[3] == 7:
-			self.Board[moveArray[2]][moveArray[3]] = 3
+			self.Board[moveArray[2]][moveArray[3]] = 2
 
-		elif selectedPiece == 2 and moveArray[3] == 0 :
-			self.Board[moveArray[2]][moveArray[3]] = 4
+		elif selectedPiece == -1 and moveArray[3] == 0 :
+			self.Board[moveArray[2]][moveArray[3]] = -2
 
 
 		if not canMoveAgain:
@@ -112,7 +112,7 @@ class Simulation(object):
 					if PossibleMoves(self.Board, x, y):
 						type1Moves += 1
 
-				elif IsPieceSameSide(self.Board[x][y], 2):
+				elif IsPieceSameSide(self.Board[x][y], -1):
 					type2Count += 1
 					if PossibleMoves(self.Board, x, y):
 						type2Moves += 1
@@ -138,12 +138,11 @@ class Simulation(object):
 		return finished, [player1Fitness, player2Fitness]
 
 	def FlipBoard(self, board):
-		lookup = {0:0, 1:2, 2:1, 3:4, 4:3}
 		output = []
 		for loop in range(len(board)-1,-1,-1):
 			temp = []
 			for loop2 in range(len(board[loop])-1,-1,-1):
-				temp += [lookup[board[loop][loop2]]]
+				temp += [board[loop][loop2]*-1]
 			output += [temp]
 
 		return output
@@ -177,13 +176,13 @@ class Simulation(object):
 					if board[x][y] == 1:
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
     	                                        * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 255, 255])]
-					elif board[x][y] == 3:
+					elif board[x][y] == 2:
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 255, 255])]
 
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize*0.6, pieceSize*0.6], Shape.Crown(), [0, 0, 0])]
-					elif board[x][y] == 2:
+					elif board[x][y] == -1:
 						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
 					else:
@@ -197,7 +196,7 @@ class Simulation(object):
 def PossibleMoves(board, X, Y):
 	outputList = AttackMoves(board,X,Y)
 
-	if board[X][Y] != 2:
+	if board[X][Y] != -1:
 		if X >= 1 and Y <= 6:
 			if board[X-1][Y+1] == 0:
 				outputList += [[X-1,Y+1]]
@@ -221,49 +220,37 @@ def AttackMoves(board, X, Y):
 
 	if board[X][Y] != 2:
 		if X >= 2 and Y <= 5:
-			if IsPieceEnemySide(piece, board[X-1][Y+1]) and board[X-2][Y+2] == 0:
+			if board[X-2][Y+2] == 0 and IsPieceEnemySide(piece, board[X-1][Y+1]):
 				outputList += [[X-2,Y+2]]
 
 		if X <= 5 and Y <= 5:
-			if IsPieceEnemySide(piece, board[X+1][Y+1]) and board[X+2][Y+2] == 0:
+			if board[X+2][Y+2] == 0 and IsPieceEnemySide(piece, board[X+1][Y+1]):
 				outputList += [[X+2,Y+2]]
 
 	if board[X][Y] != 1:
 		if X >= 2 and Y >= 2:
-			if IsPieceEnemySide(piece, board[X-1][Y-1]) and board[X-2][Y-2] == 0:
+			if board[X-2][Y-2] == 0 and IsPieceEnemySide(piece, board[X-1][Y-1]):
 				outputList += [[X-2,Y-2]]
 
 		if X <= 5 and Y >= 2:
-			if IsPieceEnemySide(piece, board[X+1][Y-1]) and board[X+2][Y-2] == 0:
+			if board[X+2][Y-2] == 0 and IsPieceEnemySide(piece, board[X+1][Y-1]):
 				outputList += [[X+2,Y-2]]
 
 	return outputList
 
 def IsPieceSameSide(piece1, piece2):
-	if (piece1 == 1 or piece1 == 3) and (piece2 == 1 or piece2 == 3):
-		return True
+	return (piece1 < 0 and piece2 < 0) or (piece1 > 0 and piece2 > 0)
 
-	elif (piece1 == 2 or piece1 == 4) and (piece2 == 2 or piece2 == 4):
-		return True
-		
-	return False
-
-def IsPieceEnemySide(piece1, piece2):
-	if (piece1 == 1 or piece1 == 3) and (piece2 == 2 or piece2 == 4):
-		return True
-
-	elif (piece1 == 2 or piece1 == 4) and (piece2 == 1 or piece2 == 3):
-		return True
-		
-	return False
+def IsPieceEnemySide(piece1, piece2):	
+	return (piece1 < 0 and piece2 > 0) or (piece1 > 0 and piece2 < 0)
 
 def NewBoard():
-	Board = [[1, 0, 1, 0, 0, 0, 2, 0], 
-			 [0, 1, 0, 0, 0, 2, 0, 2], 
-			 [1, 0, 1, 0, 0, 0, 2, 0], 
-			 [0, 1, 0, 0, 0, 2, 0, 2], 
-			 [1, 0, 1, 0, 0, 0, 2, 0], 
-			 [0, 1, 0, 0, 0, 2, 0, 2], 
-			 [1, 0, 1, 0, 0, 0, 2, 0], 
-			 [0, 1, 0, 0, 0, 2, 0, 2]]
+	Board = [[1, 0, 1, 0, 0, 0, -1, 0], 
+			 [0, 1, 0, 0, 0, -1, 0, -1], 
+			 [1, 0, 1, 0, 0, 0, -1, 0], 
+			 [0, 1, 0, 0, 0, -1, 0, -1], 
+			 [1, 0, 1, 0, 0, 0, -1, 0], 
+			 [0, 1, 0, 0, 0, -1, 0, -1], 
+			 [1, 0, 1, 0, 0, 0, -1, 0], 
+			 [0, 1, 0, 0, 0, -1, 0, -1]]
 	return Board
