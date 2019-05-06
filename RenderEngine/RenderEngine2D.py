@@ -93,7 +93,7 @@ class RenderEngine:
 
 		return
 
-	def UpdateWindow(self):
+	def UpdateWindow(self, listBuildTimeTook=0):
 		timeMark = time.time()
 
 		if not self.Running:
@@ -124,7 +124,7 @@ class RenderEngine:
 				self.Window.blit(label, [10, 10])
 				label = self.Font.render("Objects:"+str(len(self.PieceList)), 1, (255, 255, 255))
 				self.Window.blit(label, [10, 34])
-				label = self.Font.render("frame took:"+str(self.LastFrameTook), 1, (255, 255, 255))
+				label = self.Font.render("Last Frame Took:"+str(self.LastFrameTook), 1, (255, 255, 255))
 				self.Window.blit(label, [10, 58])
 
 			if self.ConsoleText != "":
@@ -138,7 +138,8 @@ class RenderEngine:
 
 
 		display.update()
-		self.LastFrameTook = round(time.time()-timeMark, 4)
+		listBuildTimeTook += time.time()-timeMark
+		self.LastFrameTook = round(listBuildTimeTook, 4)
 		return True
 
 	def GetObjectClicked(self):

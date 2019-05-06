@@ -179,8 +179,10 @@ class RunController(object):
 		if self.RenderQuality == 0:
 			game.SimpleBoardOutput(board)
 		else:
+			timeMark = time.time()
 			self.RenderEngine.PieceList = game.ComplexBoardOutput(board)
-			if not self.RenderEngine.UpdateWindow():
+			timeMark = time.time()-timeMark
+			if not self.RenderEngine.UpdateWindow(timeMark):
 				self.RenderQuality = 0
 
 
