@@ -70,17 +70,37 @@ class Piece():
 	Movable = False
 	Fill = True
 	InfoObject = None
+	Rotate = 0
+	Pos = [1,1]
+	Scale = [1,1]
 
-	def __init__(self, pos, scale, points, color, fill=True, infoObject=None):
-		for loop in range(len(points)):
-			points[loop][0] *= scale[0]
-			points[loop][1] *= scale[1]
-			
-			points[loop][0] += pos[0]
-			points[loop][1] += pos[1]
-
-		self.Color = color
+	def __init__(self, pos, scale, points, color, fill=True, rotate=0, infoObject=None):
+		self.Pos = pos
+		self.Scale = scale
 		self.Points = points
+		self.Color = color
 		self.Fill = fill
+		self.Rotate = rotate
 		self.InfoObject = infoObject
 		return
+
+	def GetRotatedPoints(self):
+		rotatedPoints = []
+
+		for loop in range(len(self.Points)):
+			point = self.Points[loop]
+
+			rotate = (self.Rotate) * (math.pi/180)
+			rotatedX = math.cos(rotate) * point[0] - math.sin(rotate) * point[1]
+			rotatedY = math.sin(rotate) * point[0] + math.cos(rotate) * point[1]
+
+			rotatedX *= self.Scale[0]
+			rotatedY *= self.Scale[1]
+
+			rotatedX += self.Pos[0]
+			rotatedY += self.Pos[1]
+
+			rotatedPoints += [[rotatedX, rotatedY]]
+
+
+		return rotatedPoints

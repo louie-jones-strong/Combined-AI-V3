@@ -83,14 +83,13 @@ class RenderEngine:
 			else:
 				borderColor = [0, 0, 0]
 
-
-			#pygame.draw.polygon(self.Window, fillColor, piece.Points, 0)
-			#pygame.draw.polygon(self.Window, borderColor, piece.Points, 2)
+			#pygame.draw.polygon(self.Window, fillColor, piece.GetRotatedPoints(), 0)
+			#pygame.draw.polygon(self.Window, borderColor, piece.GetRotatedPoints(), 2)
 
 			if piece.Fill:
-				pygame.gfxdraw.filled_polygon(self.Window, piece.Points, fillColor)
+				pygame.gfxdraw.filled_polygon(self.Window, piece.GetRotatedPoints(), fillColor)
 				
-			pygame.gfxdraw.aapolygon(self.Window, piece.Points, borderColor)
+			pygame.gfxdraw.aapolygon(self.Window, piece.GetRotatedPoints(), borderColor)
 
 		return
 
@@ -148,6 +147,19 @@ class RenderEngine:
 			pos = [pos[0]-self.WindowPostion[0],pos[1]-self.WindowPostion[1]]
 
 			for loop in range(len(self.PieceList)):
-				if InsidePolygon(pos, self.PieceList[loop].Points):
+				if InsidePolygon(pos, self.PieceList[loop].GetRotatedPoints()):
 					return self.PieceList[loop], loop
 		return None
+
+
+if __name__ == "__main__":
+	import Shape
+	engine = RenderEngine()
+	loop = 0
+	while True:
+		engine.PieceList = [Shape.Piece([350, 350], [100, 100], Shape.Square(), [255,255,255], rotate=loop)]
+		loop += 0.1
+		if loop >= 360:
+			loop = 0
+
+		engine.UpdateWindow()
