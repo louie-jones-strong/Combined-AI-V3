@@ -1,14 +1,14 @@
 # 3Dmath_render
 
 ## To Do List:
-* add a shape builder tool to help making new shapes
-* add more simulations
-*  poker
-*  black jack
-*  an image based game
-*  cart pole v.2
+* add a shape builder tool to help make new shapes
+* add more simulations:
+```
+1) poker
+2) black jack
+3) an image based game
+4) cart pole v.2 (from openAI gym)
+```
 * get the ann working 
 * speed up loading files in datasetmanger
 * add evo
-
-
