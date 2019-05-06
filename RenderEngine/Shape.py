@@ -1,9 +1,37 @@
 import math
 
+def BuildCardShapes(pos, scale, suit, value, rotate=0, showFace=True):
+	shapes = []
+
+	if showFace:
+		shapes += [Piece(pos, scale, CardBackBase(), [255, 255, 255], rotate=rotate)]
+
+		if suit >= 0 and suit <= 3:
+			suitPos = RotatePoint([0, 0], rotate, pos)
+
+			if suit == 0:
+				shapes += [Piece(suitPos, scale, Circle(), [255, 255, 255], rotate=rotate)]
+			elif suit == 1:
+				shapes += [Piece(suitPos, scale, Circle(), [255, 255, 255], rotate=rotate)]
+			elif suit == 2:
+				shapes += [Piece(suitPos, scale, Circle(), [255, 255, 255], rotate=rotate)]
+			elif suit == 3:
+				shapes += [Piece(suitPos, scale, Circle(), [255, 255, 255], rotate=rotate)]
+
+	else:
+		shapes += [Piece(pos, scale, CardBackBase(), [255, 255, 255], rotate=rotate)]
+
+	return shapes
+
+def CardBackBase():
+	points = []
+	points += [[1, 1]]
+	points += [[1, -1]]
+	points += [[-1, -1]]
+	points += [[-1, 1]]
+	return points
+
 def Circle():
-	#n = 16
-	#r = 1
-	#return [[math.cos(2*math.pi/n*x)*r, math.sin(2*math.pi/n*x)*r] for x in range(n)]
 	return [[1.0, 0.0], [0.9238795325112867, 0.3826834323650898], 
 	[0.7071067811865476, 0.7071067811865476], [0.38268343236508984, 0.9238795325112867], 
 	[6.123233995736766e-17, 1.0], [-0.3826834323650897, 0.9238795325112867], 
@@ -63,6 +91,17 @@ def VerticalLine():
 	points += [[-0.01, 1]]
 	return points
 
+
+def RotatePoint(point, degrees, center=[0,0]):
+	rotate = degrees*(math.pi/180)  # Convert to radians
+
+	cosValue = math.cos(rotate)
+	sinValue = math.sin(rotate)
+
+	rotatedX = cosValue*(point[0]-center[0]) - sinValue*(point[1]-center[1])+center[0]
+	rotatedY = sinValue*(point[0]-center[0]) + cosValue*(point[1]-center[1])+center[1]
+	return [rotatedX, rotatedY]
+
 class Piece():
 	Points = []
 	Color = [255, 255, 255]
@@ -89,18 +128,15 @@ class Piece():
 
 		for loop in range(len(self.Points)):
 			point = self.Points[loop]
+			point = RotatePoint(point, self.Rotate)
 
-			rotate = (self.Rotate) * (math.pi/180)
-			rotatedX = math.cos(rotate) * point[0] - math.sin(rotate) * point[1]
-			rotatedY = math.sin(rotate) * point[0] + math.cos(rotate) * point[1]
+			point[0] *= self.Scale[0]
+			point[1] *= self.Scale[1]
 
-			rotatedX *= self.Scale[0]
-			rotatedY *= self.Scale[1]
+			point[0] += self.Pos[0]
+			point[1] += self.Pos[1]
 
-			rotatedX += self.Pos[0]
-			rotatedY += self.Pos[1]
-
-			rotatedPoints += [[rotatedX, rotatedY]]
+			rotatedPoints += [point]
 
 
 		return rotatedPoints
