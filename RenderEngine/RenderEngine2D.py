@@ -140,10 +140,12 @@ class RenderEngine:
 
 			self.TimeOfLastFrame = time.time()
 
+			display.update()
+			lastBuildTimeTook += time.time()-timeMark
+			self.LastFrameTook = round(lastBuildTimeTook, 4)
+		else:
+			display.update()
 
-		display.update()
-		lastBuildTimeTook += time.time()-timeMark
-		self.LastFrameTook = round(lastBuildTimeTook, 4)
 		return True
 
 	def GetMouseScreenPos(self):
@@ -168,16 +170,3 @@ class RenderEngine:
 					if InsidePolygon(pos, self.PieceList[loop].GetRotatedPoints()):
 						return self.PieceList[loop], loop
 		return None
-
-
-if __name__ == "__main__":
-	import Shape
-	engine = RenderEngine()
-	loop = 0
-	while True:
-		engine.PieceList = [Shape.Piece([350, 350], [100, 100], Shape.Square(), [255,255,255], rotate=loop)]
-		loop += 0.1
-		if loop >= 360:
-			loop = 0
-
-		engine.UpdateWindow()
