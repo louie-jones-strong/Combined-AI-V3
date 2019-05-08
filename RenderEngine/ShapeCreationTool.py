@@ -1,6 +1,7 @@
 import Shape
 import RenderEngine2D
 import mouse
+import time
 
 if __name__ == "__main__":
     engine = RenderEngine2D.RenderEngine()
@@ -10,7 +11,13 @@ if __name__ == "__main__":
     rightClickDown = False
     middleClickDown = False
     while True:
-        engine.PieceList = [Shape.Piece([0, 0], [1, 1], points, [255,255,255])]
+        timeMark = time.time()
+        inScreenSpace, pos = engine.GetMouseScreenPos()
+        if inScreenSpace:
+            engine.PieceList = [Shape.Piece([0, 0], [1, 1], points+[pos], [255,255,255])]
+        else:
+            engine.PieceList = [Shape.Piece([0, 0], [1, 1], points, [255,255,255])]
+
         engine.PieceList += [Shape.Piece([350, 350], [100, 100], objectPoints, [255,255,255])]
         if len(objectPoints) > 2:
             engine.PieceList += [Shape.Piece([350, 350], [100, 100], Shape.Square(), [255,0,0])]
@@ -60,6 +67,6 @@ if __name__ == "__main__":
         elif not mouse.is_pressed(button="middle"):
             middleClickDown = False
         
-
-        if not engine.UpdateWindow():
+        timeMark = time.time()-timeMark
+        if not engine.UpdateWindow(timeMark):
             break

@@ -97,7 +97,7 @@ class RenderEngine:
 				pygame.gfxdraw.line(self.Window, int(points[0][0]), int(points[0][1]), int(points[1][0]), int(points[1][1]), borderColor)
 		return
 
-	def UpdateWindow(self, listBuildTimeTook=0):
+	def UpdateWindow(self, lastBuildTimeTook=0):
 		timeMark = time.time()
 
 		if not self.Running:
@@ -142,8 +142,8 @@ class RenderEngine:
 
 
 		display.update()
-		listBuildTimeTook += time.time()-timeMark
-		self.LastFrameTook = round(listBuildTimeTook, 4)
+		lastBuildTimeTook += time.time()-timeMark
+		self.LastFrameTook = round(lastBuildTimeTook, 4)
 		return True
 
 	def GetMouseScreenPos(self):
