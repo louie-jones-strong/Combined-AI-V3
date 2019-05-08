@@ -1,7 +1,6 @@
 # 3Dmath_render
 
 ## To Do List:
-* add a shape builder tool to help make new shapes
 * add more simulations:
 ```
 1) poker

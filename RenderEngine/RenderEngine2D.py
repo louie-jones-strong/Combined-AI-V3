@@ -83,14 +83,18 @@ class RenderEngine:
 			else:
 				borderColor = [0, 0, 0]
 
-			#pygame.draw.polygon(self.Window, fillColor, piece.GetRotatedPoints(), 0)
-			#pygame.draw.polygon(self.Window, borderColor, piece.GetRotatedPoints(), 2)
+			points = piece.GetRotatedPoints()
 
-			if piece.Fill:
-				pygame.gfxdraw.filled_polygon(self.Window, piece.GetRotatedPoints(), fillColor)
+			#pygame.draw.polygon(self.Window, fillColor, points, 0)
+			#pygame.draw.polygon(self.Window, borderColor, points, 2)
+
+			if piece.Fill and len(points) >= 3:
+				pygame.gfxdraw.filled_polygon(self.Window, points, fillColor)
 				
-			pygame.gfxdraw.aapolygon(self.Window, piece.GetRotatedPoints(), borderColor)
-
+			if len(points) >= 3:
+				pygame.gfxdraw.aapolygon(self.Window, points, borderColor)
+			elif len(points) == 2:
+				pygame.gfxdraw.line(self.Window, int(points[0][0]), int(points[0][1]), int(points[1][0]), int(points[1][1]), borderColor)
 		return
 
 	def UpdateWindow(self, listBuildTimeTook=0):
@@ -142,14 +146,27 @@ class RenderEngine:
 		self.LastFrameTook = round(listBuildTimeTook, 4)
 		return True
 
+	def GetMouseScreenPos(self):
+		pos = mouse.get_position()
+		x = pos[0]-self.WindowPostion[0]
+		y = pos[1]-self.WindowPostion[1]
+
+		x = int(x)
+		y = int(y)
+
+		if x < 0 or x > self.Resolution[0] or y < 0 or y > self.Resolution[1]:
+			return False, [x, y]
+		else:
+			return True, [x, y]
+
 	def GetObjectClicked(self):
 		if mouse.is_pressed(button="left"):
-			pos = mouse.get_position()
-			pos = [pos[0]-self.WindowPostion[0],pos[1]-self.WindowPostion[1]]
+			inScreenSpace, pos = self.GetMouseScreenPos()
 
-			for loop in range(len(self.PieceList)):
-				if InsidePolygon(pos, self.PieceList[loop].GetRotatedPoints()):
-					return self.PieceList[loop], loop
+			if inScreenSpace:
+				for loop in range(len(self.PieceList)):
+					if InsidePolygon(pos, self.PieceList[loop].GetRotatedPoints()):
+						return self.PieceList[loop], loop
 		return None
 
 
