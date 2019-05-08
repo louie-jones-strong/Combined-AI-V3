@@ -51,10 +51,19 @@ if __name__ == "__main__":
                     maxY = max(maxY, points[loop][1])
                     minY = min(minY, points[loop][1])
 
-                maxWidth = max(maxX-minX, maxY-minY)
+                xWidth = maxX-minX
+                yWidth = maxY-minY
+                maxWidth = max(xWidth, yWidth)
                 for loop in range(len(points)):
                     x = points[loop][0] - minX
                     y = points[loop][1] - minY
+
+                    if xWidth != maxWidth:
+                        x += (maxWidth-xWidth)/2
+
+                    if yWidth != maxWidth:
+                        y += (maxWidth-yWidth)/2
+
                     x = ((x / maxWidth)*2)-1
                     y = ((y / maxWidth)*2)-1
                     x = round(x, ndigits=4)
