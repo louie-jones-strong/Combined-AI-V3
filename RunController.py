@@ -81,11 +81,12 @@ class RunController(object):
 			userInput = 1
 		simName = files[userInput-1]
 
-		os.system("title "+"AI Playing:"+simName)
 		self.Sim = importlib.import_module("Simulations." + simName)
 		self.SimInfo = self.Sim.Simulation().Info
 
-		return simName
+		os.system("title "+"AI Playing:"+self.SimInfo["SimName"])
+
+		return self.SimInfo["SimName"]
 	def SetUpMetaData(self):
 		userInput = "N"
 
