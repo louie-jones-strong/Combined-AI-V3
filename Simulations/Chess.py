@@ -1,7 +1,9 @@
 import RenderEngine.Shape as Shape
+
 class Simulation(object):
 	Info = {"MinPlayers":2,"MaxPlayers":2,
-	        "NumInputs":4,"MinInputSize":0,"MaxInputSize":7,
+			"SimName":"Chess","NumInputs":4,
+			"MinInputSize":0,"MaxInputSize":7,
 			"Resolution":1}
 
 	def __init__(self):

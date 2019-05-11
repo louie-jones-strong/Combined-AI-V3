@@ -1,7 +1,9 @@
 import gym
+
 class Simulation(object):
 	Info = {"MinPlayers":1,"MaxPlayers":1,
-	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":1,
+	        "SimName":"CartPole","NumInputs":1,
+			"MinInputSize":0, "MaxInputSize":1,
 			"Resolution":1}
 
 	def __init__(self):

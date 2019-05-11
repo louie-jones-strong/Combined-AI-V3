@@ -1,16 +1,15 @@
 import RenderEngine.Shape as Shape
+
 class Simulation(object):
 	Info = {"MinPlayers":1,"MaxPlayers":1,
-	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":100,
+	        "SimName":"DataSet","NumInputs":1,
+			"MinInputSize":0,"MaxInputSize":100,
 			"Resolution":1}
-
-	def __init__(self):
-		self.BackGroundpieceList = []
-		return
 
 	def __init__(self):
 		self.DataSetX = [[0],[1],[2],[3],[4],[5],[6]]
 		self.DataSetY = [[0],[2],[4],[6],[8],[10],[12]]
+		self.BackGroundpieceList = []
 		return
 
 	def Start(self):
