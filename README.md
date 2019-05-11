@@ -6,7 +6,6 @@
 1) poker
 2) black jack
 3) an image based game
-4) cart pole v.2 (from openAI gym)
 ```
 * get the ann working 
 * speed up loading files in datasetmanger
