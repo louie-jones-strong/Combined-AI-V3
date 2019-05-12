@@ -1,19 +1,16 @@
 import gym
 
 class Simulation(object):
-	Info = {"MinPlayers":1,"MaxPlayers":1,
-	        "SimName":"CartPole","NumInputs":1,
-			"MinInputSize":0, "MaxInputSize":1,
-			"Resolution":1,"RenderSetup":False}
+	Info = {}
 
 	def __init__(self, index=None):
 		self.BackGroundpieceList = []
 
 		simsToPickFrom = [
 		{"MinPlayers":1,"MaxPlayers":1,"SimName":"CartPole-v1",
-		"NumInputs":1,"MinInputSize":0, "MaxInputSize":1,"Resolution":1},
+		"NumInputs":1,"MinInputSize":0, "MaxInputSize":1,"Resolution":1,"RenderSetup":False},
 		{"MinPlayers":1,"MaxPlayers":1,"SimName":"MountainCar-v0",
-		"NumInputs":1,"MinInputSize":0, "MaxInputSize":1,"Resolution":1}]
+		"NumInputs":1,"MinInputSize":0, "MaxInputSize":1,"Resolution":1,"RenderSetup":False}]
 
 		if index == None:
 			for loop in range(len(simsToPickFrom)):
@@ -37,7 +34,7 @@ class Simulation(object):
 
 		self.Board = []
 		for loop in range(len(board)):
-			self.Board += board[loop]
+			self.Board += [float(board[loop])]
 
 		self.Turn = 1
 		return self.Board, self.Turn
@@ -57,7 +54,7 @@ class Simulation(object):
 			board, temp, self.Finished, _ = self.Environment.step(action)
 			self.Board = []
 			for loop in range(len(board)):
-				self.Board += board[loop]
+				self.Board += [float(board[loop])]
 			self.playerFitness += temp
 
 		return True, self.Board, self.Turn

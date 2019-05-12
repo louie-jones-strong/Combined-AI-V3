@@ -138,11 +138,11 @@ class RunController(object):
 		self.LastOutputTime = time.time()
 		self.LastSaveTook = 0
 		self.WinningMode = False
-		self.RenderQuality = 1
-
-		#userInput = input("RenderQuality [0, 1]:")
-		#if userInput == "0":
-		#	self.RenderQuality = 0
+		
+		if self.SimInfo["RenderSetup"]:
+			self.RenderQuality = 1
+		else:
+			self.RenderQuality = 0
 
 		if self.NumberOfBots >= 1:
 			userInput = input("Human Player[Y/N]:")
