@@ -82,11 +82,12 @@ class RunController(object):
 		simName = files[userInput-1]
 
 		self.Sim = importlib.import_module("Simulations." + simName)
-		self.SimInfo = self.Sim.Simulation().Info
+		self.Sim = self.Sim.Simulation()
+		self.SimInfo = self.Sim.Info
 
 		os.system("title "+"AI Playing:"+self.SimInfo["SimName"])
 
-		return self.SimInfo["SimName"]
+		return
 	def SetUpMetaData(self):
 		userInput = "N"
 
@@ -117,10 +118,10 @@ class RunController(object):
 		return False
 
 	def __init__(self):
-		self.SimName = self.PickSimulation()
+		self.PickSimulation()
 
 		#setup dataset address
-		temp = "DataSets//"+self.SimName
+		temp = "DataSets//"+self.SimInfo["SimName"]
 		if not os.path.exists(temp):
 			os.makedirs(temp)
 
@@ -216,7 +217,7 @@ class RunController(object):
 			print("time since last BackUp: " + str(SplitTime(totalTime-backUpTime, roundTo=2)))
 			print("press CTRl+Q to quit...")
 			
-			title = "AI Playing: "+self.SimName
+			title = "AI Playing: "+self.SimInfo["SimName"]
 			title += " Time Since Last Save: " + SplitTime(time.time()-self.LastSaveTime, roundTo=1)
 			title += " CachingInfo: " + self.AiDataManager.GetCachingInfoString()
 			title += " LastSaveTook: " + SplitTime(self.LastSaveTook, roundTo=2)
@@ -255,11 +256,12 @@ class RunController(object):
 		return board, turn
 
 	def RunTournament(self, Ais):
-		self.RunSimMatch(Ais)
+		
+		self.RunSimMatch(Ais, self.Sim)
+		self.Sim.CreateNew()
 		return
 
-	def RunSimMatch(self, Ais):
-		game = self.Sim.Simulation()
+	def RunSimMatch(self, Ais, game):
 		board, turn = game.Start()
 
 		numMoves = 0

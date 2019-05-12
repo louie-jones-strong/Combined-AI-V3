@@ -6,17 +6,38 @@ class Simulation(object):
 			"MinInputSize":0, "MaxInputSize":1,
 			"Resolution":1}
 
-	def __init__(self):
+	def __init__(self, index=None):
 		self.BackGroundpieceList = []
-		self.Environment = gym.make("CartPole-v1")
+
+		simsToPickFrom = [
+		{"MinPlayers":1,"MaxPlayers":1,"SimName":"CartPole-v1",
+		"NumInputs":1,"MinInputSize":0, "MaxInputSize":1,"Resolution":1},
+		{"MinPlayers":1,"MaxPlayers":1,"SimName":"MountainCar-v0",
+		"NumInputs":1,"MinInputSize":0, "MaxInputSize":1,"Resolution":1}]
+
+		if index == None:
+			for loop in range(len(simsToPickFrom)):
+				print(str(loop)+") "+str(simsToPickFrom[loop]["SimName"]))
+
+			index = int(input("pick Gym Simulation: "))
+		self.Index = index
+		self.Info = simsToPickFrom[index]
+
+		self.Environment = gym.make(self.Info["SimName"])
 		return
+
+	def CreateNew(self):
+		sim = Simulation(self.Index)
+		return sim
 		
 	def Start(self):
 		self.Finished = False
 		self.playerFitness = 0
 		board = self.Environment.reset()
 
-		self.Board = [board[0], board[1], board[2], board[3]]
+		self.Board = []
+		for loop in range(len(board)):
+			self.Board += board[loop]
 
 		self.Turn = 1
 		return self.Board, self.Turn
@@ -34,7 +55,9 @@ class Simulation(object):
 		
 		if not self.Finished:
 			board, temp, self.Finished, _ = self.Environment.step(action)
-			self.Board = [board[0], board[1], board[2], board[3]]
+			self.Board = []
+			for loop in range(len(board)):
+				self.Board += board[loop]
 			self.playerFitness += temp
 
 		return True, self.Board, self.Turn
@@ -56,4 +79,3 @@ class Simulation(object):
 		pieceList = []
 		pieceList += self.BackGroundpieceList
 		return pieceList
-
