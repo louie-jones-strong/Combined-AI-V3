@@ -4,7 +4,7 @@ class Simulation(object):
 	Info = {"MinPlayers":2,"MaxPlayers":2,
 	        "SimName":"ConnectFour","NumInputs":1,
 			"MinInputSize":0,"MaxInputSize":6,
-			"Resolution":1}
+			"Resolution":1,"RenderSetup":True}
 
 	def __init__(self):
 		self.BackGroundpieceList = []

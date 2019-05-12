@@ -4,7 +4,7 @@ class Simulation(object):
 	Info = {"MinPlayers":1,"MaxPlayers":1,
 	        "SimName":"CartPole","NumInputs":1,
 			"MinInputSize":0, "MaxInputSize":1,
-			"Resolution":1}
+			"Resolution":1,"RenderSetup":False}
 
 	def __init__(self, index=None):
 		self.BackGroundpieceList = []

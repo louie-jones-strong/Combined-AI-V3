@@ -4,7 +4,7 @@ class Simulation(object):
 	Info = {"MinPlayers":1,"MaxPlayers":1,
 	        "SimName":"DataSet","NumInputs":1,
 			"MinInputSize":0,"MaxInputSize":100,
-			"Resolution":1}
+			"Resolution":1,"RenderSetup":False}
 
 	def __init__(self):
 		self.DataSetX = [[0],[1],[2],[3],[4],[5],[6]]

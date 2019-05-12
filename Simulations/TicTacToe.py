@@ -1,8 +1,9 @@
 import RenderEngine.Shape as Shape
 class Simulation(object):
 	Info = {"MinPlayers":2,"MaxPlayers":2,
-	        "NumInputs":1,"MinInputSize":0,"MaxInputSize":8,
-			"Resolution":1}
+	        "SimName":"TicTacToe","NumInputs":1,
+			"MinInputSize":0,"MaxInputSize":8,
+			"Resolution":1,"RenderSetup":True}
 
 	def __init__(self):
 		self.BackGroundpieceList = []
