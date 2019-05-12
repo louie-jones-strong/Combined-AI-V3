@@ -258,7 +258,9 @@ class RunController(object):
 	def RunTournament(self, Ais):
 		
 		self.RunSimMatch(Ais, self.Sim)
-		self.Sim.CreateNew()
+		
+		game = self.Sim.CreateNew()
+		self.RunSimMatch(Ais, game)
 		return
 
 	def RunSimMatch(self, Ais, game):
