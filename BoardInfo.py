@@ -15,9 +15,12 @@ class BoardInfo():
 class MoveInfo():
 	AvgFitness = 0.0
 	TimesPlayed = 1
+	MoveOutComes = {}
+
 
 	def __init__(self, AvgFitness=0.0, TimesPlayed=1):
 		self.AvgFitness = AvgFitness
 		self.TimesPlayed = TimesPlayed
+		self.MoveOutComes = {"GameFinished":0}
 		return
 # 1) point to the move that is least played

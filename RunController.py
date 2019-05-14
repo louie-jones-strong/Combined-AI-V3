@@ -8,26 +8,35 @@ import sys
 from threading import Thread
 import keyboard
 
-def MakeAIMove(turn, board, AIs, game):
+def MakeAIMove(turn, startBoard, AIs, game):
+	startBoard = startBoard[:]  # copy to break references
+
 	AI = AIs[turn-1]
 	valid = False
 	if turn == 1:
+		startBoard = game.FlipBoard(startBoard)
 		while not valid:
-			flippedBoard = game.FlipBoard(board)
-			move = AI.MoveCal(flippedBoard)		
+			move = AI.MoveCal(startBoard)
 			flippedMove = game.FlipInput(move)
-			valid, board, turn = game.MakeMove(flippedMove)
+
+			valid, outComeBoard, turn = game.MakeMove(flippedMove)
 
 			if not valid:
-				AI.UpdateInvalidMove(flippedBoard, move)
+				AI.UpdateInvalidMove(startBoard, move)
 	else:
 		while not valid:
-			move = AI.MoveCal(board)
-			valid, board, turn = game.MakeMove(move)
-			if not valid:
-				AI.UpdateInvalidMove(board, move)
+			move = AI.MoveCal(startBoard)
 
-	return board, turn
+			valid, outComeBoard, turn = game.MakeMove(move)
+
+			if not valid:
+				AI.UpdateInvalidMove(startBoard, move)
+
+	finished, fit = game.CheckFinished()
+
+	AI.UpdateMoveOutCome(startBoard, move, outComeBoard, finished)
+
+	return outComeBoard, turn, finished, fit
 
 def SplitNumber(number):
 	output = ""
@@ -250,10 +259,12 @@ class RunController(object):
 			valid, board, turn = game.MakeMove(move)
 			if not valid:
 				print("that move was not vaild")
-					
+
+		finished, fit = game.CheckFinished()
+
 		print("")
 		self.RenderBoard(game, board)
-		return board, turn
+		return board, turn, finished, fit
 
 	def RunTournament(self, Ais):
 		
@@ -272,16 +283,14 @@ class RunController(object):
 		self.LastSaveTime = time.time()
 		while True:
 			if self.NumberOfBots >= turn:
-				board, turn = MakeAIMove(turn, board, Ais, game)
+				board, turn, finished, fit = MakeAIMove(turn, board, Ais, game)
 			else:
-				board, turn = self.MakeHumanMove(game, board)
+				board, turn, finished, fit = self.MakeHumanMove(game, board)
 
 			numMoves += 1
 			self.MetaData["TotalTime"] += time.time()-totalStartTime
 			totalStartTime = time.time()
 			self.Output(game, numMoves, gameStartTime, board, turn)
-
-			finished, fit = game.CheckFinished()
  			
 			#if keyboard.is_pressed("CTRl+Q"):
 			#	break

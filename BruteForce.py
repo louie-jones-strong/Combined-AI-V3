@@ -70,6 +70,25 @@ class BruteForce(object):
 			del self.TempDataSet[str(key)+str(moveID)]
 		return
 	
+	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):
+		key = self.DataSetManager.BoardToKey(board)
+		moveID = self.DataSetManager.MoveIDLookUp.index(move)
+		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+
+		if found and moveID in boardInfo.Moves:
+			if gameFinished:
+				outComeKey = "GameFinished"
+			else:
+				outComeKey = self.DataSetManager.BoardToKey(outComeBoard)
+
+			move = boardInfo.Moves[moveID]
+			if outComeKey in move.MoveOutComes:
+				move.MoveOutComes[outComeKey] += 1
+			else:
+				move.MoveOutComes[outComeKey] = 1
+				
+		return
+
 	def SaveData(self, fitness):
 		for tempValue in self.TempDataSet.values():
 			key = tempValue["BoardKey"]
