@@ -313,5 +313,5 @@ class DataSetManager(object):
 
 	def BoardToKey(self, board):
 		key = str(board)
-		key = hash(key)
+		#key = hash(key)
 		return key
