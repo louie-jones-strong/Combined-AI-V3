@@ -22,16 +22,36 @@ def LoadingBar(progress, text=""):
 	return
 
 def serializer(inputObject):
+	outputObject = ""
 
-	return str(inputObject)
+	if type(inputObject) is bytes:
+		outputObject = "b("
+		for loop in range(len(inputObject)):
+			outputObject += str(inputObject[loop])
+			if loop < len(inputObject)-1:
+				outputObject +=","
+
+		return outputObject + ")"
+
+	elif hasattr(inputObject, "__len__"):
+		outputObject = []
+		for loop in range(len(inputObject)):
+			outputObject += [serializer(inputObject[loop])]
+
+		outputObject = ", ".join(outputObject)
+		return "["+outputObject+"]"
+	else:
+		return str(inputObject)
+
 def deserializer(inputString):
-	if inputString.startswith("b'"):
-		outputObject = bytes(inputString[2:-1], 'utf-8')
-		#outputObject = inputString
+	if inputString.startswith("b("):
+		subInputString = inputString[2:-1]
+		byteArray = list(map(int, subInputString.split(",")))
+		outputObject = bytes(byteArray)
 
-	elif "(" in inputString:
-		inputString = inputString.replace('(', '').replace(')', '')
-		outputObject = tuple(map(deserializer, inputString.split(', ')))
+	elif "[" in inputString:
+		inputString = inputString.replace('[', '').replace(']', '')
+		outputObject = tuple(map(deserializer, inputString.split(", ")))
 
 	elif "." in inputString:
 		outputObject = float(inputString)
@@ -51,7 +71,7 @@ def DictAppend(address, dictionary):
 		address += ".txt"
 		file = open(address, "a")
 		for key, value in dictionary.items():
-			file.write(str(key)+":"+str(value)+"\n")
+			file.write(str(key)+":"+serializer(value)+"\n")
 		file.close()
 
 	return
@@ -276,7 +296,7 @@ class DataSetManager(object):
 		loop = 0
 		for key, value in self.DataSetHashTable.items():
 			index = value[0]
-			board = value[1]#pickle.loads(value[1])
+			board = pickle.loads(value[1])
 
 			if not self.DataSetTables[index].IsLoaded:
 				self.DataSetTables[index].Load()
