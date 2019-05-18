@@ -66,7 +66,7 @@ class Simulation(object):
 			else:
 				output += [0]
 
-		return board
+		return output
 
 	def FlipInput(self, move):
 		return move

@@ -1,3 +1,4 @@
+print("Importing Tflearn...")
 import tflearn
 
 class NeuralNetwork(object):
@@ -66,6 +67,9 @@ class NeuralNetwork(object):
 
 	def UpdateInvalidMove(self, board, move):
 		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
+		return
+
+	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):				
 		return
 
 	def SaveData(self, fitness):
