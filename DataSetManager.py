@@ -157,6 +157,9 @@ class DataSetManager(object):
 				"NumberOfCompleteBoards": 0, 
 				"NumberOfGames": 0, 
 				"TotalTime": 0,
+				"BruteForceTotalTime":0,
+				"AnnTotalTime":0,
+				"AnnDataMadeFromBruteForceTotalTime":0,
 				"LastBackUpTotalTime": 0}
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
@@ -180,7 +183,7 @@ class DataSetManager(object):
 		self.DatasetAddress = datasetAddress
 		self.DataSetHashTableAddress = datasetAddress+"LookUp//DataSetHashTable"
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
-		self.AnnDataSetAddress = datasetAddress+"NeuralNetworkDataSet//"
+		self.AnnDataSetAddress = datasetAddress+"NeuralNetworkData//"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
 		self.TableBatchSize = 1000
@@ -217,12 +220,16 @@ class DataSetManager(object):
 					self.DataSetTables[loop].Save()
 				else:
 					self.DataSetTables[loop].Unload()
-					
+
 		self.DataSetTablesToSave = {}
 		self.CanAppendData = True
 
 
 		self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
+		self.SaveMetaData()
+		return
+
+	def SaveMetaData(self):
 		DictSave(self.DatasetAddress+"MetaData", self.MetaData)
 		return
 
@@ -305,32 +312,42 @@ class DataSetManager(object):
 	
 #for Neural Network
 	def GetDataSet(self):
-
 		dataSetX = []
 		dataSetY = []
 
-		loop = 0
-		for key, value in self.DataSetHashTable.items():
-			index = value[0]
-			board = pickle.loads(value[1])
+		if (self.MetaData["BruteForceTotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
+			not ComplexFileExists(self.AnnDataSetAddress+"XDataSet") or 
+			not ComplexFileExists(self.AnnDataSetAddress+"YDataSet")):
 
-			if not self.DataSetTables[index].IsLoaded:
-				self.DataSetTables[index].Load()
+			loop = 0
+			for key, value in self.DataSetHashTable.items():
+				index = value[0]
+				board = pickle.loads(value[1])
+
+				if not self.DataSetTables[index].IsLoaded:
+					self.DataSetTables[index].Load()
 			
-			if key in self.DataSetTables[index].Content:
-				boardInfo = self.DataSetTables[index].Content[key]
+				if key in self.DataSetTables[index].Content:
+					boardInfo = self.DataSetTables[index].Content[key]
 
-				if boardInfo.NumOfTriedMoves >= self.MaxMoveIDs:
-					dataSetX += [board]
-					dataSetY += [self.MoveIDLookUp[boardInfo.MoveIDOfBestAvgFitness]]
+					if boardInfo.NumOfTriedMoves >= self.MaxMoveIDs:
+						dataSetX += [board]
+						dataSetY += [self.MoveIDLookUp[boardInfo.MoveIDOfBestAvgFitness]]
 
 
-			if loop % 10 == 0:
-				LoadingBar(loop/len(self.DataSetHashTable), "building Dataset")
-			loop += 1
+				if loop % 10 == 0:
+					LoadingBar(loop/len(self.DataSetHashTable), "building Dataset")
+				loop += 1
 
-		ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
-		ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
+			ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
+			ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
+			self.MetaData["AnnDataMadeFromBruteForceTotalTime"] = self.MetaData["BruteForceTotalTime"]
+			self.SaveMetaData()
+
+		elif ComplexFileExists(self.AnnDataSetAddress+"XDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YDataSet"):
+			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XDataSet")
+			dataSetY = ComplexLoad(self.AnnDataSetAddress+"YDataSet")
+
 		return dataSetX, dataSetY
 
 	def GetCachingInfoString(self):

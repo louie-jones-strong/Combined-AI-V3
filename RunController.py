@@ -115,6 +115,9 @@ class RunController(object):
 				"NumberOfCompleteBoards": 0, 
 				"NumberOfGames": 0, 
 				"TotalTime": 0,
+				"BruteForceTotalTime":0,
+				"AnnTotalTime":0,
+				"AnnDataMadeFromBruteForceTotalTime":0,
 				"LastBackUpTotalTime": 0
 				}
 			return False
@@ -167,6 +170,7 @@ class RunController(object):
 				input("Failed To Load Data")
 
 		if userInput == "N" or userInput == "n":
+			self.RenderQuality = 0
 			import NeuralNetwork
 			Ais = [NeuralNetwork.NeuralNetwork(self.AiDataManager, winningModeON=self.WinningMode)]
 

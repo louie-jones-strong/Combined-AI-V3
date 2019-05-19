@@ -14,7 +14,8 @@ class NeuralNetwork(object):
 
 		inputShape, structreArray = self.PredictNetworkStructre()
 		self.RunId = "test"
-		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=1000, lr=0.001)#, optimizer="sgd")
+		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520, lr=0.001)#, optimizer="sgd")
+		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
 		return
 	def PredictNetworkStructre(self):
 		inputShape = [len(self.DataSetX[0])]
@@ -34,9 +35,8 @@ class NeuralNetwork(object):
 		structreArray += [["ann", 1000, "Tanh"]]
 		structreArray += [["ann", 1000, "Tanh"]]
 		structreArray += [["ann", 1000, "Tanh"]]
-		structreArray += [["ann", 9, "Tanh"]]
 
-		if self.DataSetManager.MinOutputSize < -1 or self.DataSetManager.MinOutputSize > 1:
+		if self.DataSetManager.MinOutputSize < -1 or self.DataSetManager.MaxOutputSize > 1:
 			structreArray += [["ann", len(self.DataSetY[0]), "Linear"]]
 		elif self.DataSetManager.MinOutputSize < 0:
 			structreArray += [["ann", len(self.DataSetY[0]), "Tanh"]]
@@ -47,25 +47,32 @@ class NeuralNetwork(object):
 		return inputShape, structreArray
 
 	def MoveCal(self, inputs):
-		outputs = self.NetworkModel.predict([inputs])[0]
-		
+		print(inputs)
 
-		temp =""
-		for loop in range(len(outputs)):
-			temp += str(loop)+": "+str(round(outputs[loop],2))+" "
-		print(temp)
+		networkOutputs = self.NetworkModel.predict([inputs])[0]
+		networkOutputs = list(networkOutputs)
 
-		largest = 0
-		moveId = 0
-		for loop in range(len(outputs)):
-			if outputs[loop] > largest:
-				moveId = loop
-				largest = outputs[loop]
+		outputs = []
+		for loop in range(len(networkOutputs)):
+			temp = networkOutputs[loop]
+			temp = temp / self.DataSetManager.OutputResolution
+			temp = round(temp)
+			temp = temp * self.DataSetManager.OutputResolution
+
+			if temp < self.DataSetManager.MinOutputSize:
+				temp = self.DataSetManager.MinOutputSize
+
+			if temp > self.DataSetManager.MaxOutputSize:
+				temp = self.DataSetManager.MaxOutputSize
+
+			outputs += [temp]
+
+			print(str(loop)+": "+str(round(networkOutputs[loop],2))+" "+str(temp))
 		
-		outputMove = self.DataSetManager.MoveIDLookUp[moveId]
-		return outputMove
+		return outputs
 
 	def UpdateInvalidMove(self, board, move):
+		print("Move was Invalid!! RETRAINING")
 		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
 		return
 

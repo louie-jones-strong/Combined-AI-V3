@@ -22,9 +22,11 @@ class Simulation(object):
 		return self.Board, self.Turn
 
 	def MakeMove(self,inputs):
+		move = int(inputs[0]) 
+
 		valid = False
-		if self.Board[inputs[0]] == 0:
-			self.Board[inputs[0]] = self.Turn
+		if self.Board[move] == 0:
+			self.Board[move] = self.Turn
 			valid = True
 
 
