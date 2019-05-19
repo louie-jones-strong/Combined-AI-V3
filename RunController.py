@@ -5,8 +5,6 @@ import importlib
 import time
 import os
 import sys
-from threading import Thread
-import keyboard
 
 def MakeAIMove(turn, startBoard, AIs, game):
 	startBoard = startBoard[:]  # copy to break references
@@ -101,19 +99,19 @@ class RunController(object):
 		userInput = "N"
 
 		if os.path.isfile(self.DatasetAddress+"MetaData.txt"):
-			self.MetaData = DataSetManager.DictLoad(self.DatasetAddress+"MetaData")
+			self.AiDataManager.MetaData = DataSetManager.DictLoad(self.DatasetAddress+"MetaData")
 			print("")
-			print("SizeOfDataSet: "+str(self.MetaData["SizeOfDataSet"]))
-			print("NumberOfCompleteBoards: "+str(self.MetaData["NumberOfCompleteBoards"]))
-			print("NumberOfGames: "+str(self.MetaData["NumberOfGames"]))
-			print("TotalTime: "+SplitTime(self.MetaData["TotalTime"], roundTo=2))
-			print("LastBackUpTotalTime: "+SplitTime(self.MetaData["LastBackUpTotalTime"], roundTo=2))
+			print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
+			print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
+			print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
+			print("TotalTime: "+SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
+			print("LastBackUpTotalTime: "+SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
 			print("")
 
 			userInput = input("load Dataset[Y/N]:")
 
 		if userInput == "n" or userInput == "N":
-			self.MetaData = {"SizeOfDataSet":0, 
+			self.AiDataManager.MetaData = {"SizeOfDataSet":0, 
 				"NumberOfCompleteBoards": 0, 
 				"NumberOfGames": 0, 
 				"TotalTime": 0,
@@ -121,7 +119,6 @@ class RunController(object):
 				}
 			return False
 		else:
-			self.AiDataManager.NumberOfCompleteBoards = self.MetaData["NumberOfCompleteBoards"]
 			return True
 
 		return False
@@ -200,7 +197,7 @@ class RunController(object):
 		return
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
 		if (time.time() - self.LastOutputTime) >= 0.5:
-			numGames = self.MetaData["NumberOfGames"]+1
+			numGames = self.AiDataManager.MetaData["NumberOfGames"]+1
 			avgMoveTime = 0
 			if numMoves != 0:
 				avgMoveTime = (time.time() - gameStartTime)/numMoves
@@ -212,17 +209,17 @@ class RunController(object):
 			self.RenderBoard(game, board)
 
 			print("Dataset size: " + str(SplitNumber(self.AiDataManager.GetNumberOfBoards())))
-			print("Number Of Complete Boards: " + str(SplitNumber(self.AiDataManager.NumberOfCompleteBoards)))
+			print("Number Of Complete Boards: " + str(SplitNumber(self.AiDataManager.MetaData["NumberOfCompleteBoards"])))
 			if finished:
 				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)) + " finished game")
 			else:
 				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
-			totalTime = self.MetaData["TotalTime"]
+			totalTime = self.AiDataManager.MetaData["TotalTime"]
 			print("Games avg took: " + str(SplitTime(totalTime/numGames, roundTo=6)))
 			print("time since start: " + str(SplitTime(totalTime, roundTo=2)))
 
-			backUpTime = self.MetaData["LastBackUpTotalTime"]
+			backUpTime = self.AiDataManager.MetaData["LastBackUpTotalTime"]
 			print("time since last BackUp: " + str(SplitTime(totalTime-backUpTime, roundTo=2)))
 			print("press CTRl+Q to quit...")
 			
@@ -288,38 +285,29 @@ class RunController(object):
 				board, turn, finished, fit = self.MakeHumanMove(game, board)
 
 			numMoves += 1
-			self.MetaData["TotalTime"] += time.time()-totalStartTime
+			self.AiDataManager.MetaData["TotalTime"] += time.time()-totalStartTime
 			totalStartTime = time.time()
 			self.Output(game, numMoves, gameStartTime, board, turn)
- 			
-			#if keyboard.is_pressed("CTRl+Q"):
-			#	break
 
 			if finished:
+				self.AiDataManager.MetaData["NumberOfGames"] += 1
+
 				for loop in range(len(Ais)):
 					Ais[loop].SaveData(fit[loop])
 
 				if time.time() - self.LastSaveTime > 60:
 					self.LastSaveTook = time.time()
 					# save back up every hour
-					if self.MetaData["TotalTime"]-self.MetaData["LastBackUpTotalTime"] > 60*60:
+					if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
 						self.AiDataManager.BackUp(self.DatasetBackUpAddress)
-						self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
 
 					self.AiDataManager.SaveDataSet()
-					self.MetaData["NumberOfCompleteBoards"] = self.AiDataManager.NumberOfCompleteBoards
-					self.MetaData["SizeOfDataSet"] = self.AiDataManager.GetNumberOfBoards()
-					DataSetManager.DictSave(self.DatasetAddress+"MetaData", self.MetaData)
 					self.LastSaveTime = time.time()
 					self.LastSaveTook = time.time() - self.LastSaveTook
-
-				#if keyboard.is_pressed("CTRl+Q"):
-				#	break
 
 				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 
 				board, turn = game.Start()
-				self.MetaData["NumberOfGames"] += 1
 				numMoves = 0
 				gameStartTime = time.time()
 		return

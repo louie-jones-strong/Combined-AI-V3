@@ -153,7 +153,11 @@ class DataSetTable(object):
 		return
 
 class DataSetManager(object):
-	NumberOfCompleteBoards = 0
+	MetaData = {"SizeOfDataSet":0, 
+				"NumberOfCompleteBoards": 0, 
+				"NumberOfGames": 0, 
+				"TotalTime": 0,
+				"LastBackUpTotalTime": 0}
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
 
@@ -211,7 +215,13 @@ class DataSetManager(object):
 					self.DataSetTables[loop].Unload()
 		self.DataSetTablesToSave = {}
 		self.CanAppendData = True
+
+
+		self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
+		DictSave(self.DatasetAddress+"MetaData", self.MetaData)
 		return
+
+
 	def LoadDataSet(self):
 		LoadingBar(0, "loading tables...")
 		self.FillingTable = -1
@@ -241,6 +251,7 @@ class DataSetManager(object):
 		if (os.path.exists(backUpAddress)):
 			shutil.rmtree(backUpAddress)
 		shutil.copytree(self.DatasetAddress, backUpAddress)
+		self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
 		return
 
 #for Brute Force

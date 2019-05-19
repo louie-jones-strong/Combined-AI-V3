@@ -25,22 +25,19 @@ class BruteForce(object):
 				print("new Board!")
 		else:  # learning mode
 			if found:
-				if boardInfo.NumOfTriedMoves > self.DataSetManager.MaxMoveIDs:
-					if len(boardInfo.Moves) == 0:
-						input("error!!!")
-
 				if boardInfo.NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
 					moveID = boardInfo.NumOfTriedMoves
 					boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
 					boardInfo.NumOfTriedMoves += 1
 
 					if boardInfo.NumOfTriedMoves >= self.DataSetManager.MaxMoveIDs:
-						self.DataSetManager.NumberOfCompleteBoards += 1
+						self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
 
 				else:#played every move once already
 					leastPlayed = sys.maxsize
 					moveID = 0
 					for movekey, moveValue in boardInfo.Moves.items():
+						
 						if moveValue.TimesPlayed < leastPlayed:
 							leastPlayed = moveValue.TimesPlayed
 							moveID = movekey
