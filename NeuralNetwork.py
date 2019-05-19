@@ -73,7 +73,13 @@ class NeuralNetwork(object):
 
 	def UpdateInvalidMove(self, board, move):
 		print("Move was Invalid!! RETRAINING")
-		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
+		newMove = move[:]
+		
+		while move == newMove:
+			self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
+
+			newMove = self.MoveCal(board)
+
 		return
 
 	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):				
