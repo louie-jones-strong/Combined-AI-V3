@@ -2,6 +2,7 @@ print("Importing Tflearn...")
 import tflearn
 
 class NeuralNetwork(object):
+	TrainedEpochs = 0
 
 	def __init__(self, dataSetManager, winningModeON=False):
 		self.DataSetManager = dataSetManager
@@ -15,7 +16,6 @@ class NeuralNetwork(object):
 		inputShape, structreArray = self.PredictNetworkStructre()
 		self.RunId = "test"
 		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520, lr=0.001)#, optimizer="sgd")
-		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
 		return
 	def PredictNetworkStructre(self):
 		inputShape = [len(self.DataSetX[0])]
@@ -76,10 +76,17 @@ class NeuralNetwork(object):
 		newMove = move[:]
 		
 		while move == newMove:
-			self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=10, run_id=self.RunId)
-
+			self.TrainNetWork()
 			newMove = self.MoveCal(board)
 
+		return
+
+	def TrainNetWork(self):
+		epochs = 10
+		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=epochs, run_id=self.RunId, shuffle=True)
+		self.TrainedEpochs += epochs
+		if self.TrainedEpochs%100 == 0:
+			self.SaveData(0)
 		return
 
 	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):				
@@ -87,6 +94,8 @@ class NeuralNetwork(object):
 
 	def SaveData(self, fitness):
 		weights = GetWeights(self.NetworkModel, self.NumberOfLayers)
+		self.DataSetManager.SaveNetworkWeights(weights)
+
 		return
 
 def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam"):
@@ -122,7 +131,7 @@ def LayerMaker(network, structreArray, layerNumber=0):
 		network = tflearn.conv_2d(network, layerInfo[1], 3, activation=layerInfo[2], regularizer="L2", name=layerName)
 
 	elif layerInfo[0] == "ann":
-		network = tflearn.fully_connected(network, layerInfo[1], activation=layerInfo[2], bias=True, name=layerName)
+		network = tflearn.fully_connected(network, layerInfo[1], activation=layerInfo[2], name=layerName)
 		#network = tflearn.dropout(network, 0.8)
 
 	elif layerInfo[0] == "maxpool":

@@ -350,6 +350,14 @@ class DataSetManager(object):
 
 		return dataSetX, dataSetY
 
+	def SaveNetworkWeights(self, weights):
+		ComplexSave(self.AnnDataSetAddress+"weights", weights)
+		return
+
+	def LoadNetworkWeights(self):
+
+		return 
+
 	def GetCachingInfoString(self):
 		loadedTables = 0
 		for loop in range(len(self.DataSetTables)):
