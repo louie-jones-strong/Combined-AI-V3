@@ -180,6 +180,7 @@ class DataSetManager(object):
 		self.DatasetAddress = datasetAddress
 		self.DataSetHashTableAddress = datasetAddress+"LookUp//DataSetHashTable"
 		self.TableAddress = datasetAddress+"BruteForceDataSet//"
+		self.AnnDataSetAddress = datasetAddress+"NeuralNetworkDataSet//"
 		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
 		self.TableBatchSize = 1000
@@ -194,18 +195,21 @@ class DataSetManager(object):
 			os.makedirs(self.TableAddress)
 		if not os.path.exists(datasetAddress+"LookUp//"):
 			os.makedirs(datasetAddress+"LookUp//")
+		if not os.path.exists(self.AnnDataSetAddress):
+			os.makedirs(self.AnnDataSetAddress)
+
+		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
+			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 		return
 
 	def SaveDataSet(self):
-		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
-			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+		if len(self.NewDataSetHashTable) > 0:
+			if self.CanAppendData:
+				DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+			else:
+				DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
 
-		if self.CanAppendData:
-			DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
-		else:
-			DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
-
-		self.NewDataSetHashTable = {}
+			self.NewDataSetHashTable = {}
 
 		for loop in range(len(self.DataSetTables)):
 			if (self.DataSetTables[loop].IsLoaded):
@@ -213,6 +217,7 @@ class DataSetManager(object):
 					self.DataSetTables[loop].Save()
 				else:
 					self.DataSetTables[loop].Unload()
+					
 		self.DataSetTablesToSave = {}
 		self.CanAppendData = True
 
@@ -324,6 +329,8 @@ class DataSetManager(object):
 				LoadingBar(loop/len(self.DataSetHashTable), "building Dataset")
 			loop += 1
 
+		ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
+		ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
 		return dataSetX, dataSetY
 
 	def GetCachingInfoString(self):
