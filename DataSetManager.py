@@ -5,21 +5,37 @@ import BoardInfo
 import shutil
 import time
 
+class LoadingBar():
 
-def LoadingBar(progress, text=""):
-	if (progress > 1):
-		progress = 1
-	if progress < 0:
-		progress = 0
-		
-	Resolution = 100
-	progress = progress*Resolution
-	os.system("cls")
-	bar = "#"*int(progress)
-	fill = " "*(Resolution-int(progress))
-	print("|"+bar+fill+"|")
-	print(text)
-	return
+	def __init__(self, allowUpdate=True):
+		self.CurrentProgress = 0
+		self.CurrentText = ""
+		self.Resolution = 100
+		self.LastUpdateTime = 0
+		self.AllowUpdate = allowUpdate
+		return
+
+	def Update(self, progress, text=""):
+		if (progress > 1):
+			progress = 1
+		if progress < 0:
+			progress = 0
+
+		progress = int(progress*self.Resolution)
+
+		if time.time()-self.LastUpdateTime < 0.1 and not progress == self.Resolution:
+			return
+
+		if progress != self.CurrentProgress or text != self.CurrentText:
+			os.system("cls")
+			bar = "#"*progress
+			fill = " "*(self.Resolution-progress)
+			print("|"+bar+fill+"|")
+			print(text)
+			self.CurrentProgress = progress
+			self.CurrentText = text
+			self.LastUpdateTime = time.time()
+		return
 
 def serializer(inputObject):
 	outputObject = ""
@@ -86,17 +102,15 @@ def DictLoad(address, loadingBarOn=False):
 	dictionary = {}
 	address += ".txt"
 
-	if loadingBarOn:
-		LoadingBar(0, "Loading Dict")
+	loadingBar = LoadingBar(loadingBarOn)
+	loadingBar.Update(0, "Loading Dict")
 
 	file = open(address, "r")
 	lines = file.readlines()
 	file.close()
 	
 	numberOfLines = len(lines)
-	lastOutputTime = time.time()
-	if loadingBarOn:
-		LoadingBar(0, "Loading dict line: "+str(0)+"/"+str(numberOfLines))
+	loadingBar.Update(0, "Loading dict line: "+str(0)+"/"+str(numberOfLines))
 
 	for loop in range(numberOfLines):
 		line = lines[loop][:-1]
@@ -105,12 +119,9 @@ def DictLoad(address, loadingBarOn=False):
 		value = deserializer(line[1])
 		dictionary[key] = value
 
-		if loadingBarOn and time.time()-lastOutputTime >= 0.5:
-			LoadingBar(loop/numberOfLines, "Loading dict line: "+str(loop)+"/"+str(numberOfLines))
-			lastOutputTime = time.time()
+		loadingBar.Update(loop/numberOfLines, "Loading dict line: "+str(loop)+"/"+str(numberOfLines))
 
-	if loadingBarOn:
-		LoadingBar(1, "Loading dict line: "+str(numberOfLines)+"/"+str(numberOfLines))
+	loadingBar.Update(1, "Loading dict line: "+str(numberOfLines)+"/"+str(numberOfLines))
 
 	return dictionary
 def DictFileExists(address):
@@ -235,7 +246,8 @@ class DataSetManager(object):
 
 
 	def LoadDataSet(self):
-		LoadingBar(0, "loading tables...")
+		loadingBar = LoadingBar()
+		loadingBar.Update(0, "loading tables...")
 		self.FillingTable = -1
 		self.DataSetTables = []
 		numberOfTables = len(os.listdir(self.TableAddress))
@@ -247,12 +259,11 @@ class DataSetManager(object):
 			if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
 				self.FillingTable = index
 			self.DataSetTables[index].Unload()
-			if loop%10 == 0:
-				LoadingBar(loop/numberOfTables, "loading table: "+str(loop)+"/"+str(numberOfTables))
+			loadingBar.Update(loop/numberOfTables, "loading table: "+str(loop)+"/"+str(numberOfTables))
 
 			index += 1
 
-		LoadingBar(1, "loading table: "+str(numberOfTables)+"/"+str(numberOfTables))
+		loadingBar.Update(1, "loading table: "+str(numberOfTables)+"/"+str(numberOfTables))
 		if self.FillingTable == -1:
 			self.FillingTable = index
 
@@ -314,6 +325,7 @@ class DataSetManager(object):
 	def GetDataSet(self):
 		dataSetX = []
 		dataSetY = []
+		loadingBar = LoadingBar()
 
 		if (self.MetaData["BruteForceTotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
 			not ComplexFileExists(self.AnnDataSetAddress+"XDataSet") or 
@@ -335,8 +347,7 @@ class DataSetManager(object):
 						dataSetY += [self.MoveIDLookUp[boardInfo.MoveIDOfBestAvgFitness]]
 
 
-				if loop % 10 == 0:
-					LoadingBar(loop/len(self.DataSetHashTable), "building Dataset")
+				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset")
 				loop += 1
 
 			ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
