@@ -47,24 +47,13 @@ class NeuralNetwork(object):
 		networkOutputs = self.NetworkModel.predict([inputs])[0]
 		networkOutputs = list(networkOutputs)
 
-		outputs = []
+		output = 0
+		bestValue = 0
 		for loop in range(len(networkOutputs)):
-			temp = networkOutputs[loop]
-			temp = temp / self.DataSetManager.OutputResolution
-			temp = round(temp)
-			temp = temp * self.DataSetManager.OutputResolution
-
-			if temp < self.DataSetManager.MinOutputSize:
-				temp = self.DataSetManager.MinOutputSize
-
-			if temp > self.DataSetManager.MaxOutputSize:
-				temp = self.DataSetManager.MaxOutputSize
-
-			outputs += [temp]
-
-			print(str(loop)+": "+str(round(networkOutputs[loop],2))+" "+str(temp))
-		
-		return outputs
+			if networkOutputs[loop] >= bestValue:
+				bestValue = networkOutputs[loop]
+				output = loop
+		return [output]
 
 	def UpdateInvalidMove(self, board, move):
 		print("Move was Invalid!! RETRAINING")

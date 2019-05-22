@@ -344,7 +344,9 @@ class DataSetManager(object):
 
 					if boardInfo.NumOfTriedMoves >= self.MaxMoveIDs:
 						dataSetX += [board]
-						dataSetY += [self.MoveIDLookUp[boardInfo.MoveIDOfBestAvgFitness]]
+						temp = [0,0,0,0,0,0,0,0,0]
+						temp[boardInfo.MoveIDOfBestAvgFitness] = 1
+						dataSetY += [temp]
 
 
 				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset")
