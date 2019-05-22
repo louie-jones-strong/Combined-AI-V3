@@ -1,1 +1,1 @@
-tensorboard --log=foo:%CD%\log
+tensorboard --logdir log
