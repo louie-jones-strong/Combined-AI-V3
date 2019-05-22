@@ -29,12 +29,9 @@ class NeuralNetwork(object):
 					inputShape += [len(self.DataSetX[0][0][0][0])]
 
 		structreArray = []
-		structreArray += [["ann", 1000, "Tanh"]]
-		structreArray += [["ann", 1000, "Tanh"]]
-		structreArray += [["ann", 1000, "Tanh"]]
-		structreArray += [["ann", 1000, "Tanh"]]
-		structreArray += [["ann", 1000, "Tanh"]]
-		structreArray += [["ann", 1000, "Tanh"]]
+		structreArray += [["ann", 50, "Tanh"]]
+		structreArray += [["ann", 50, "Tanh"]]
+		structreArray += [["ann", 9, "Sigmoid"]]
 
 		if self.DataSetManager.MinOutputSize < -1 or self.DataSetManager.MaxOutputSize > 1:
 			structreArray += [["ann", len(self.DataSetY[0]), "Linear"]]
@@ -47,8 +44,6 @@ class NeuralNetwork(object):
 		return inputShape, structreArray
 
 	def MoveCal(self, inputs):
-		print(inputs)
-
 		networkOutputs = self.NetworkModel.predict([inputs])[0]
 		networkOutputs = list(networkOutputs)
 
@@ -82,7 +77,7 @@ class NeuralNetwork(object):
 		return
 
 	def TrainNetWork(self):
-		epochs = 10
+		epochs = 1000
 		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=epochs, run_id=self.RunId, shuffle=True)
 		self.TrainedEpochs += epochs
 		if self.TrainedEpochs%100 == 0:
@@ -114,11 +109,10 @@ def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam
 	
 	loss = loss='mean_square'
 	#loss = "categorical_crossentropy"
-	if optimizer == "adam":
-		network = tflearn.regression(network, optimizer="adam", learning_rate=lr, batch_size=batchSize, loss=loss, name='target')
-	else:
-		sgd = tflearn.SGD(learning_rate = lr)
-		network = tflearn.regression(network, optimizer=sgd, learning_rate=lr, batch_size=batchSize, loss=loss, name="target")
+	if optimizer != "adam":
+		optimizer = tflearn.SGD(learning_rate=lr)
+	
+	network = tflearn.regression(network, optimizer=optimizer, learning_rate=lr, batch_size=batchSize, loss=loss, name="target")
 	
 	model = tflearn.DNN(network, tensorboard_dir="log")
 	return model
