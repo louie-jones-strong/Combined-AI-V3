@@ -69,7 +69,7 @@ def SplitTime(seconds, roundTo=0):
 	return output
 
 class RunController(object):
-	def PickSimulation(self):
+	def PickSimulation(self, simNumber=None):
 		files = os.listdir("Simulations")
 		if "__pycache__" in files:
 			files.remove("__pycache__")
@@ -79,9 +79,14 @@ class RunController(object):
 			files[loop] = files[loop][:-3]
 			if len(files) > 1:
 				print(str(loop+1)+") " + files[loop])
+
 		userInput = 1
 		if len(files) > 1:
-			userInput = int(input("pick Simulation: "))
+			if simNumber == None:
+				userInput = int(input("pick Simulation: "))
+			else:
+				userInput = simNumber
+
 		if userInput > len(files):
 			userInput = len(files)
 		if userInput < 1:
@@ -95,7 +100,8 @@ class RunController(object):
 		os.system("title "+"AI Playing:"+self.SimInfo["SimName"])
 
 		return
-	def SetUpMetaData(self):
+
+	def SetUpMetaData(self, loadData=None):
 		userInput = "N"
 
 		if os.path.isfile(self.DatasetAddress+"MetaData.txt"):
@@ -108,7 +114,10 @@ class RunController(object):
 			print("LastBackUpTotalTime: "+SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
 			print("")
 
-			userInput = input("load Dataset[Y/N]:")
+			if loadData == None:
+				userInput = input("load Dataset[Y/N]:")
+			else:
+				userInput = loadData
 
 		if userInput == "n" or userInput == "N":
 			self.AiDataManager.MetaData = {"SizeOfDataSet":0, 
@@ -126,8 +135,8 @@ class RunController(object):
 
 		return False
 
-	def __init__(self):
-		self.PickSimulation()
+	def __init__(self, simNumber=None, loadData=None, aiType=None):
+		self.PickSimulation(simNumber)
 
 		#setup dataset address
 		temp = "DataSets//"+self.SimInfo["SimName"]
@@ -153,17 +162,20 @@ class RunController(object):
 		else:
 			self.RenderQuality = 0
 
-		if self.NumberOfBots >= 1:
-			userInput = input("Human Player[Y/N]:")
-			if userInput == "y" or userInput == "Y":
-				self.WinningMode = True
-				self.NumberOfBots -= 1
+		#if self.NumberOfBots >= 1:
+		#	userInput = input("Human Player[Y/N]:")
+		#	if userInput == "y" or userInput == "Y":
+		#		self.WinningMode = True
+		#		self.NumberOfBots -= 1
 
 		self.AiDataManager = DataSetManager.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
 														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
 
-		loadData = self.SetUpMetaData()
-		userInput = input("Brute b) network n):")
+		loadData = self.SetUpMetaData(loadData)
+		if aiType == None:
+			userInput = input("Brute b) network n):")
+		else:
+			userInput = aiType
 
 		if loadData:
 			if not self.AiDataManager.LoadDataSet():
@@ -317,4 +329,5 @@ class RunController(object):
 		return
 
 if __name__ == "__main__":
-	RunController()
+	RunController(6, "Y", "N")
+	#RunController()

@@ -31,7 +31,6 @@ class NeuralNetwork(object):
 		structreArray = []
 		structreArray += [["ann", 50, "Tanh"]]
 		structreArray += [["ann", 50, "Tanh"]]
-		structreArray += [["ann", 9, "Sigmoid"]]
 
 		if self.DataSetManager.MinOutputSize < -1 or self.DataSetManager.MaxOutputSize > 1:
 			structreArray += [["ann", len(self.DataSetY[0]), "Linear"]]
