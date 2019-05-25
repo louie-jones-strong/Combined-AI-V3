@@ -68,9 +68,23 @@ class NeuralNetwork(object):
 		epochs = 1000
 		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=epochs, run_id=self.RunId, shuffle=True)
 		self.TrainedEpochs += epochs
-		if self.TrainedEpochs%100 == 0:
+
+		if self.TrainedEpochs % (epochs*10) == 0:
 			self.SaveData(0)
+
+		correct, total = self.GetAccuracy()
+		print("Accuracy: "+str(correct/total)+" "+str(correct)+"/"+str(total))
 		return
+
+	def GetAccuracy(self):
+		correct = 0
+		for loop in range(len(self.DataSetX)):
+			output = self.MoveCal(self.DataSetX[loop])
+
+			if output == self.DataSetY[loop]:
+				correct += 1
+
+		return correct, len(self.DataSetX)
 
 	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):				
 		return
