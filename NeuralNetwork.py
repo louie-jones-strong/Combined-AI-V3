@@ -9,9 +9,10 @@ class NeuralNetwork(object):
 
 		self.DataSetX = []
 		self.DataSetY = []
+		self.IsOneHotEncoding = False
 
 		while len(self.DataSetY) == 0:
-			self.DataSetX, self.DataSetY = self.DataSetManager.GetDataSet()
+			self.DataSetX, self.DataSetY, self.IsOneHotEncoding = self.DataSetManager.GetDataSet()
 
 		inputShape, structreArray = self.PredictNetworkStructre()
 		self.RunId = "test"

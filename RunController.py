@@ -120,15 +120,15 @@ class RunController(object):
 				userInput = loadData
 
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager.MetaData = {"SizeOfDataSet":0, 
-				"NumberOfCompleteBoards": 0, 
-				"NumberOfGames": 0, 
-				"TotalTime": 0,
-				"BruteForceTotalTime":0,
-				"AnnTotalTime":0,
-				"AnnDataMadeFromBruteForceTotalTime":0,
-				"LastBackUpTotalTime": 0
-				}
+			self.AiDataManager.MetaData = {"SizeOfDataSet": 0,
+                                  "NumberOfCompleteBoards": 0,
+                                  "NumberOfGames": 0,
+                                  "NetworkUsingOneHotEncoding": False,
+                                  "TotalTime": 0,
+                                  "BruteForceTotalTime": 0,
+                                  "AnnTotalTime": 0,
+                                  "AnnDataMadeFromBruteForceTotalTime": 0,
+                                  "LastBackUpTotalTime": 0}
 			return False
 		else:
 			return True

@@ -69,6 +69,12 @@ def deserializer(inputString):
 		inputString = inputString.replace('[', '').replace(']', '')
 		outputObject = tuple(map(deserializer, inputString.split(", ")))
 
+	elif inputString == "True":
+		outputObject = True
+
+	elif inputString == "False":
+		outputObject = False
+
 	elif "." in inputString:
 		outputObject = float(inputString)
 
@@ -167,6 +173,7 @@ class DataSetManager(object):
 	MetaData = {"SizeOfDataSet":0, 
 				"NumberOfCompleteBoards": 0, 
 				"NumberOfGames": 0, 
+				"NetworkUsingOneHotEncoding": False,
 				"TotalTime": 0,
 				"BruteForceTotalTime":0,
 				"AnnTotalTime":0,
@@ -326,6 +333,7 @@ class DataSetManager(object):
 		dataSetX = []
 		dataSetY = []
 		loadingBar = LoadingBar()
+		isOneHotEncoding = True
 
 		if (self.MetaData["BruteForceTotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
 			not ComplexFileExists(self.AnnDataSetAddress+"XDataSet") or 
@@ -344,8 +352,13 @@ class DataSetManager(object):
 
 					if boardInfo.NumOfTriedMoves >= self.MaxMoveIDs:
 						dataSetX += [board]
-						temp = [0,0,0,0,0,0,0,0,0]
-						temp[boardInfo.MoveIDOfBestAvgFitness] = 1
+						
+						if isOneHotEncoding:
+							temp = [0,0,0,0,0,0,0,0,0]
+							temp[boardInfo.MoveIDOfBestAvgFitness] = 1
+						else:
+							temp = [0,0,0,0,0,0,0,0,0]
+
 						dataSetY += [temp]
 
 
@@ -355,13 +368,15 @@ class DataSetManager(object):
 			ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
 			ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
 			self.MetaData["AnnDataMadeFromBruteForceTotalTime"] = self.MetaData["BruteForceTotalTime"]
+			self.MetaData["NetworkUsingOneHotEncoding"] = isOneHotEncoding
 			self.SaveMetaData()
 
 		elif ComplexFileExists(self.AnnDataSetAddress+"XDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YDataSet"):
 			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XDataSet")
 			dataSetY = ComplexLoad(self.AnnDataSetAddress+"YDataSet")
+			isOneHotEncoding = self.MetaData["NetworkUsingOneHotEncoding"]
 
-		return dataSetX, dataSetY
+		return dataSetX, dataSetY, isOneHotEncoding
 
 	def SaveNetworkWeights(self, weights):
 		ComplexSave(self.AnnDataSetAddress+"weights", weights)
