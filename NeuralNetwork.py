@@ -43,17 +43,46 @@ class NeuralNetwork(object):
 		self.NumberOfLayers = len(structreArray)
 		return inputShape, structreArray
 
-	def MoveCal(self, inputs):
-		networkOutputs = self.NetworkModel.predict([inputs])[0]
-		networkOutputs = list(networkOutputs)
+	def MoveCal(self, inputs, batch=False):
+		if not batch:
+			inputs = [inputs]
 
-		output = 0
-		bestValue = 0
+		networkOutputs = self.NetworkModel.predict(inputs)
+
+		outputs = []
 		for loop in range(len(networkOutputs)):
-			if networkOutputs[loop] >= bestValue:
-				bestValue = networkOutputs[loop]
-				output = loop
-		return [output]
+			networkOutput = list(networkOutputs[loop])
+
+			if self.IsOneHotEncoding:
+				output = [0] 
+				bestValue = 0
+				for loop2 in range(len(networkOutput)):
+					if networkOutput[loop2] >= bestValue:
+						bestValue = networkOutput[loop2]
+						output = [loop2]
+
+			else:
+				output = []
+				for loop2 in range(len(networkOutput)):
+					temp = networkOutput[loop2]
+					temp = temp / self.DataSetManager.OutputResolution
+					temp = round(temp)
+					temp = temp * self.DataSetManager.OutputResolution
+
+					if temp < self.DataSetManager.MinOutputSize:
+						temp = self.DataSetManager.MinOutputSize
+
+					if temp > self.DataSetManager.MaxOutputSize:
+						temp = self.DataSetManager.MaxOutputSize
+
+					output += [temp]
+
+			outputs += [output]
+
+		if not batch:
+			outputs = outputs[0]
+
+		return outputs
 
 	def UpdateInvalidMove(self, board, move):
 		print("Move was Invalid!! RETRAINING")
@@ -78,11 +107,13 @@ class NeuralNetwork(object):
 		return
 
 	def GetAccuracy(self):
+		
+		outputs = self.MoveCal(self.DataSetX, batch=True)
+
 		correct = 0
 		for loop in range(len(self.DataSetX)):
-			output = self.MoveCal(self.DataSetX[loop])
 
-			if output == self.DataSetY[loop]:
+			if outputs[loop] == self.DataSetY[loop]:
 				correct += 1
 
 		return correct, len(self.DataSetX)

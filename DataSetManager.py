@@ -58,7 +58,6 @@ def serializer(inputObject):
 		return "["+outputObject+"]"
 	else:
 		return str(inputObject)
-
 def deserializer(inputString):
 	if inputString.startswith("b("):
 		subInputString = inputString[2:-1]
@@ -346,7 +345,7 @@ class DataSetManager(object):
 		dataSetX = []
 		dataSetY = []
 		loadingBar = LoadingBar()
-		isOneHotEncoding = True
+		isOneHotEncoding = False
 
 		if (self.MetaData["BruteForceTotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
 			not ComplexFileExists(self.AnnDataSetAddress+"XDataSet") or 
@@ -367,10 +366,13 @@ class DataSetManager(object):
 						dataSetX += [board]
 						
 						if isOneHotEncoding:
-							temp = [0,0,0,0,0,0,0,0,0]
+							temp = [0]
+							for loop2 in range(self.MaxMoveIDs):
+								temp += [0]
+
 							temp[boardInfo.MoveIDOfBestAvgFitness] = 1
 						else:
-							temp = [0,0,0,0,0,0,0,0,0]
+							temp = self.MoveIDToMove(boardInfo.MoveIDOfBestAvgFitness)
 
 						dataSetY += [temp]
 
@@ -414,7 +416,6 @@ class DataSetManager(object):
 			move += [int(moveID / (temp)**((self.NumOfOutputs - loop)-1))]
 			moveID = moveID % (temp)**((self.NumOfOutputs - loop)-1)
 		return move
-
 	def BoardToKey(self, board):
 		key = str(board)
 		#key = hash(key)
