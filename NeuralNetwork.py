@@ -87,13 +87,33 @@ class NeuralNetwork(object):
 
 		return correct, len(self.DataSetX)
 
-	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):				
+	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):
+		
 		return
 
 	def SaveData(self, fitness):
-		weights = GetWeights(self.NetworkModel, self.NumberOfLayers)
+		weights = self.GetWeights()
 		self.DataSetManager.SaveNetworkWeights(weights)
+		return
 
+	def GetWeights(self):
+		weightsValue = []
+
+		for loop in range(self.NumberOfLayers):
+			temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
+			with self.NetworkModel.session.as_default():
+				temp[0] = tflearn.variables.get_value(temp[0])
+				temp[1] = tflearn.variables.get_value(temp[1])
+				weightsValue += [temp]
+		return weightsValue
+
+	def SetWeights(self, newWeights):
+
+		for loop in range(self.NumberOfLayers):
+			temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
+			with self.NetworkModel.session.as_default():
+				tflearn.variables.set_value(temp[0],newWeights[loop][0])
+				tflearn.variables.set_value(temp[1],newWeights[loop][1])
 		return
 
 def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam"):
@@ -149,22 +169,3 @@ def LayerMaker(network, structreArray, layerNumber=0):
 		network = LayerMaker(network, structreArray, layerNumber=layerNumber+1)
 
 	return network
-
-def GetWeights(model, numberOfLayers):
-	weightsValue = []
-
-	for loop in range(numberOfLayers):
-		temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
-		with model.session.as_default():
-			temp[0] = tflearn.variables.get_value(temp[0])
-			temp[1] = tflearn.variables.get_value(temp[1])
-			weightsValue += [temp]
-	return weightsValue
-def SetWeights(model, numberOfLayers, newWeights):
-
-	for loop in range(numberOfLayers):
-		temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
-		with model.session.as_default():
-			tflearn.variables.set_value(temp[0],newWeights[loop][0])
-			tflearn.variables.set_value(temp[1],newWeights[loop][1])
-	return model

@@ -184,7 +184,7 @@ class RunController(object):
 		self.RunTournament(Ais)
 		return
 
-	def RenderBoard(self, game, board):	
+	def RenderBoard(self, game, board):
 
 		if self.RenderQuality == 0:
 			game.SimpleBoardOutput(board)
