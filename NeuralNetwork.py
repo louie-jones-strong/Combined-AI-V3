@@ -1,3 +1,4 @@
+import os
 print("Importing Tflearn...")
 import tflearn
 
@@ -15,8 +16,13 @@ class NeuralNetwork(object):
 			self.DataSetX, self.DataSetY, self.IsOneHotEncoding = self.DataSetManager.GetDataSet()
 
 		inputShape, structreArray = self.PredictNetworkStructre()
-		self.RunId = self.DataSetManager.SimName
-		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520, lr=0.001)#, optimizer="sgd")
+		self.TensorBoardAdress = "TensorBoardLogs//"+str(self.DataSetManager.SimName)
+
+		self.RunId = 0
+		if os.path.exists(self.TensorBoardAdress):
+			self.RunId = len(os.listdir(self.TensorBoardAdress))
+
+		self.NetworkModel = ModelMaker(inputShape, structreArray, self.TensorBoardAdress, batchSize=4520, lr=0.001)#, optimizer="sgd")
 		return
 	def PredictNetworkStructre(self):
 		inputShape = [len(self.DataSetX[0])]
@@ -59,7 +65,7 @@ class NeuralNetwork(object):
 				for loop2 in range(len(networkOutput)):
 					if networkOutput[loop2] >= bestValue:
 						bestValue = networkOutput[loop2]
-						output = [loop2]
+						output = self.DataSetManager.MoveIDToMove(loop2)
 
 			else:
 				output = []
@@ -96,7 +102,7 @@ class NeuralNetwork(object):
 
 	def TrainNetWork(self):
 		epochs = 1000
-		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=epochs, run_id=self.RunId, shuffle=True)
+		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=epochs, run_id=str(self.RunId), shuffle=True)
 		self.TrainedEpochs += epochs
 
 		if self.TrainedEpochs % (epochs*10) == 0:
@@ -147,7 +153,7 @@ class NeuralNetwork(object):
 				tflearn.variables.set_value(temp[1],newWeights[loop][1])
 		return
 
-def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam"):
+def ModelMaker(inputShape, structreArray, tensorBoardAdress, batchSize=20, lr=0.01, optimizer="adam"):
 	tflearn.config.init_graph(gpu_memory_fraction=0.95, soft_placement=True)
 
 	if len(inputShape) == 1:
@@ -168,7 +174,7 @@ def ModelMaker(inputShape, structreArray, batchSize=20, lr=0.01, optimizer="adam
 	
 	network = tflearn.regression(network, optimizer=optimizer, learning_rate=lr, batch_size=batchSize, loss=loss, name="target")
 	
-	model = tflearn.DNN(network, tensorboard_dir="log")
+	model = tflearn.DNN(network, tensorboard_dir=tensorBoardAdress)
 	return model
 def LayerMaker(network, structreArray, layerNumber=0):
 	layerName = "layer" + str(layerNumber)
