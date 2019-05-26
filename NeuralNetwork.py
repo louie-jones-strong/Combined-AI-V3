@@ -15,7 +15,7 @@ class NeuralNetwork(object):
 			self.DataSetX, self.DataSetY, self.IsOneHotEncoding = self.DataSetManager.GetDataSet()
 
 		inputShape, structreArray = self.PredictNetworkStructre()
-		self.RunId = "test"
+		self.RunId = self.DataSetManager.SimName
 		self.NetworkModel = ModelMaker(inputShape, structreArray, batchSize=4520, lr=0.001)#, optimizer="sgd")
 		return
 	def PredictNetworkStructre(self):

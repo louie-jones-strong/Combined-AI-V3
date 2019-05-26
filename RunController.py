@@ -104,8 +104,7 @@ class RunController(object):
 	def SetUpMetaData(self, loadData=None):
 		userInput = "N"
 
-		if os.path.isfile(self.DatasetAddress+"MetaData.txt"):
-			self.AiDataManager.MetaData = DataSetManager.DictLoad(self.DatasetAddress+"MetaData")
+		if self.AiDataManager.GetMetaData():
 			print("")
 			print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
 			print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
@@ -138,19 +137,6 @@ class RunController(object):
 	def __init__(self, simNumber=None, loadData=None, aiType=None):
 		self.PickSimulation(simNumber)
 
-		#setup dataset address
-		temp = "DataSets//"+self.SimInfo["SimName"]
-		if not os.path.exists(temp):
-			os.makedirs(temp)
-
-		temp += "//"
-		self.DatasetAddress = temp+"Current"
-		if not os.path.exists(self.DatasetAddress):
-			os.makedirs(self.DatasetAddress)
-
-		self.DatasetAddress += "//"
-		self.DatasetBackUpAddress = temp+"BackUp//"
-
 		#setting
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
 		self.LastOutputTime = time.time()
@@ -169,7 +155,7 @@ class RunController(object):
 		#		self.NumberOfBots -= 1
 
 		self.AiDataManager = DataSetManager.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
-														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.DatasetAddress)
+														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
 
 		loadData = self.SetUpMetaData(loadData)
 		if aiType == None:
@@ -315,7 +301,7 @@ class RunController(object):
 					self.LastSaveTook = time.time()
 					# save back up every hour
 					if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
-						self.AiDataManager.BackUp(self.DatasetBackUpAddress)
+						self.AiDataManager.BackUp()
 
 					self.AiDataManager.SaveDataSet()
 					self.LastSaveTime = time.time()

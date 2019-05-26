@@ -170,39 +170,46 @@ class DataSetTable(object):
 		return
 
 class DataSetManager(object):
-	MetaData = {"SizeOfDataSet":0, 
-				"NumberOfCompleteBoards": 0, 
-				"NumberOfGames": 0, 
-				"NetworkUsingOneHotEncoding": False,
-				"TotalTime": 0,
-				"BruteForceTotalTime":0,
-				"AnnTotalTime":0,
-				"AnnDataMadeFromBruteForceTotalTime":0,
-				"LastBackUpTotalTime": 0}
+	MetaData = {}
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
 
+	SimName = ""
 	NumOfOutputs = 0
 	MinOutputSize = 0
 	MaxOutputSize = 0
 	OutputResolution = 0
 	
-	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, datasetAddress):
+	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, simName):
 		self.NumOfOutputs = numOfOutputs
 		self.MinOutputSize = minOutputSize
 		self.MaxOutputSize = maxOutputSize
 		self.OutputResolution = outputResolution
+		self.SimName = simName
+
+		
+		temp = "DataSets//"+self.SimName
+		if not os.path.exists(temp):
+			os.makedirs(temp)
+		temp += "//"
+
+		self.DatasetAddress = temp+"Current"
+		if not os.path.exists(self.DatasetAddress):
+			os.makedirs(self.DatasetAddress)
+
+		self.DatasetAddress += "//"
+		self.DatasetBackUpAddress = temp+"BackUp//"
+		self.DataSetHashTableAddress = self.DatasetAddress+"LookUp//DataSetHashTable"
+		self.TableAddress = self.DatasetAddress+"BruteForceDataSet//"
+		self.AnnDataSetAddress = self.DatasetAddress+"NeuralNetworkData//"
+		self.MoveIDLookUpAdress = self.DatasetAddress+"LookUp//"+"MoveIdLookUp"
+
+
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
 
 		self.MoveIDLookUp = []
 		for loop in range(self.MaxMoveIDs):
 			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
-		
-		self.DatasetAddress = datasetAddress
-		self.DataSetHashTableAddress = datasetAddress+"LookUp//DataSetHashTable"
-		self.TableAddress = datasetAddress+"BruteForceDataSet//"
-		self.AnnDataSetAddress = datasetAddress+"NeuralNetworkData//"
-		self.MoveIDLookUpAdress = datasetAddress+"LookUp//"+"MoveIdLookUp"
 
 		self.TableBatchSize = 1000
 		self.CanAppendData = False
@@ -214,8 +221,8 @@ class DataSetManager(object):
 
 		if not os.path.exists(self.TableAddress):
 			os.makedirs(self.TableAddress)
-		if not os.path.exists(datasetAddress+"LookUp//"):
-			os.makedirs(datasetAddress+"LookUp//")
+		if not os.path.exists(self.DatasetAddress+"LookUp//"):
+			os.makedirs(self.DatasetAddress+"LookUp//")
 		if not os.path.exists(self.AnnDataSetAddress):
 			os.makedirs(self.AnnDataSetAddress)
 
@@ -246,11 +253,17 @@ class DataSetManager(object):
 		self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
 		self.SaveMetaData()
 		return
+	def GetMetaData(self):
+		found = False
 
+		if DictFileExists(self.DatasetAddress+"MetaData"):
+			self.MetaData = DictLoad(self.DatasetAddress+"MetaData")
+			found = True
+
+		return found
 	def SaveMetaData(self):
 		DictSave(self.DatasetAddress+"MetaData", self.MetaData)
 		return
-
 
 	def LoadDataSet(self):
 		loadingBar = LoadingBar()
@@ -277,10 +290,10 @@ class DataSetManager(object):
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
 		self.CanAppendData = True
 		return True
-	def BackUp(self, backUpAddress):
-		if (os.path.exists(backUpAddress)):
-			shutil.rmtree(backUpAddress)
-		shutil.copytree(self.DatasetAddress, backUpAddress)
+	def BackUp(self):
+		if (os.path.exists(self.DatasetBackUpAddress)):
+			shutil.rmtree(self.DatasetBackUpAddress)
+		shutil.copytree(self.DatasetAddress, self.DatasetBackUpAddress)
 		self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
 		return
 
