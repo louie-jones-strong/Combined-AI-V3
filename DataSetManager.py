@@ -345,7 +345,7 @@ class DataSetManager(object):
 		dataSetX = []
 		dataSetY = []
 		loadingBar = LoadingBar()
-		isOneHotEncoding = False
+		isOneHotEncoding = True
 
 		if (self.MetaData["BruteForceTotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
 			not ComplexFileExists(self.AnnDataSetAddress+"XDataSet") or 
@@ -366,7 +366,7 @@ class DataSetManager(object):
 						dataSetX += [board]
 						
 						if isOneHotEncoding:
-							temp = [0]
+							temp = []
 							for loop2 in range(self.MaxMoveIDs):
 								temp += [0]
 
@@ -410,11 +410,15 @@ class DataSetManager(object):
 		return str(loadedTables)+"/"+str(len(self.DataSetTables))
 
 	def MoveIDToMove(self, moveID):
+		if moveID < 0 or moveID > self.MaxMoveIDs-1:
+			input("Error!!!")
+
 		temp = int((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution))
 		move = []
 		for loop in range(self.NumOfOutputs):
 			move += [int(moveID / (temp)**((self.NumOfOutputs - loop)-1))]
 			moveID = moveID % (temp)**((self.NumOfOutputs - loop)-1)
+
 		return move
 	def BoardToKey(self, board):
 		key = str(board)
