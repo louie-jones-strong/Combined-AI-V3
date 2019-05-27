@@ -16,25 +16,21 @@ class LoadingBar():
 		return
 
 	def Update(self, progress, text=""):
-		if (progress > 1):
-			progress = 1
-		if progress < 0:
-			progress = 0
+		progress = max(progress, 0)
+		progress = min(progress, 1)
 
 		progress = int(progress*self.Resolution)
 
-		if time.time()-self.LastUpdateTime < 0.1 and not progress == self.Resolution:
-			return
-
-		if progress != self.CurrentProgress or text != self.CurrentText:
-			os.system("cls")
-			bar = "#"*progress
-			fill = " "*(self.Resolution-progress)
-			print("|"+bar+fill+"|")
-			print(text)
-			self.CurrentProgress = progress
-			self.CurrentText = text
-			self.LastUpdateTime = time.time()
+		if time.time()-self.LastUpdateTime >= 0.15 or progress == self.Resolution:
+			if progress != self.CurrentProgress or text != self.CurrentText:
+				os.system("cls")
+				bar = "#"*progress
+				fill = " "*(self.Resolution-progress)
+				print("|"+bar+fill+"|")
+				print(text)
+				self.CurrentProgress = progress
+				self.CurrentText = text
+				self.LastUpdateTime = time.time()
 		return
 
 def serializer(inputObject):
@@ -64,7 +60,7 @@ def deserializer(inputString):
 		byteArray = list(map(int, subInputString.split(",")))
 		outputObject = bytes(byteArray)
 
-	elif "[" in inputString:
+	elif inputString.startswith("["):
 		inputString = inputString.replace('[', '').replace(']', '')
 		outputObject = tuple(map(deserializer, inputString.split(", ")))
 
@@ -118,11 +114,9 @@ def DictLoad(address, loadingBarOn=False):
 	loadingBar.Update(0, "Loading dict line: "+str(0)+"/"+str(numberOfLines))
 
 	for loop in range(numberOfLines):
-		line = lines[loop][:-1]
-		line = line.split(":")
+		line = lines[loop][:-1].split(":")
 		key = line[0]
-		value = deserializer(line[1])
-		dictionary[key] = value
+		dictionary[key] = deserializer(line[1])
 
 		loadingBar.Update(loop/numberOfLines, "Loading dict line: "+str(loop)+"/"+str(numberOfLines))
 

@@ -22,7 +22,8 @@ class NeuralNetwork(object):
 		if os.path.exists(self.TensorBoardAdress):
 			self.RunId = len(os.listdir(self.TensorBoardAdress))
 
-		self.NetworkModel = ModelMaker(inputShape, structreArray, self.TensorBoardAdress, batchSize=4520, lr=0.001)#, optimizer="sgd")
+		self.NetworkModel = ModelMaker(inputShape, structreArray, self.TensorBoardAdress, lr=0.001)#, optimizer="sgd")
+		self.BatchSize = 1000
 		return
 	def PredictNetworkStructre(self):
 		inputShape = [len(self.DataSetX[0])]
@@ -80,6 +81,9 @@ class NeuralNetwork(object):
 
 					if temp > self.DataSetManager.MaxOutputSize:
 						temp = self.DataSetManager.MaxOutputSize
+
+					if self.DataSetManager.OutputResolution == int(self.DataSetManager.OutputResolution):
+						temp= int(temp)
 
 					output += [temp]
 
@@ -153,7 +157,7 @@ class NeuralNetwork(object):
 				tflearn.variables.set_value(temp[1],newWeights[loop][1])
 		return
 
-def ModelMaker(inputShape, structreArray, tensorBoardAdress, batchSize=20, lr=0.01, optimizer="adam"):
+def ModelMaker(inputShape, structreArray, tensorBoardAdress, lr=0.01, optimizer="adam"):
 	tflearn.config.init_graph(gpu_memory_fraction=0.95, soft_placement=True)
 
 	if len(inputShape) == 1:
@@ -172,7 +176,7 @@ def ModelMaker(inputShape, structreArray, tensorBoardAdress, batchSize=20, lr=0.
 	if optimizer != "adam":
 		optimizer = tflearn.SGD(learning_rate=lr)
 	
-	network = tflearn.regression(network, optimizer=optimizer, learning_rate=lr, batch_size=batchSize, loss=loss, name="target")
+	network = tflearn.regression(network, optimizer=optimizer, learning_rate=lr, loss=loss, name="target")
 	
 	model = tflearn.DNN(network, tensorboard_dir=tensorBoardAdress)
 	return model
