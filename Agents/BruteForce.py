@@ -2,7 +2,8 @@ import random
 import sys
 import DataManger.BoardInfo as BoardInfo
 
-class BruteForce(object): 
+
+class Agent(object):
 
 	def __init__(self, dataSetManager, winningModeON=False):
 		self.DataSetManager = dataSetManager

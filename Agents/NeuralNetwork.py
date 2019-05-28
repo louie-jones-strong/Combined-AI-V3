@@ -2,7 +2,8 @@ import os
 print("Importing Tflearn...")
 import tflearn
 
-class NeuralNetwork(object):
+
+class Agent(object):
 	TrainedEpochs = 0
 
 	def __init__(self, dataSetManager, winningModeON=False):

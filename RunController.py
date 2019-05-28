@@ -1,5 +1,6 @@
 import RenderEngine.RenderEngine2D as RenderEngine
-import AIs.BruteForce as BruteForce
+import Agents.BruteForce as BruteForce
+import Agents.HumanPlayer as HumanPlayer
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 import importlib
@@ -7,7 +8,7 @@ import time
 import os
 import sys
 
-def MakeAIMove(turn, startBoard, AIs, game):
+def MakeAgentMove(turn, startBoard, AIs, game):
 	startBoard = startBoard[:]  # copy to break references
 
 	AI = AIs[turn-1]
@@ -73,17 +74,17 @@ class RunController(object):
 
 		if userInput == "N" or userInput == "n":
 			self.RenderQuality = 0
-			import AIs.NeuralNetwork as NeuralNetwork
-			Ais = [NeuralNetwork.NeuralNetwork(
+			import Agents.NeuralNetwork as NeuralNetwork
+			Ais = [NeuralNetwork.Agent(
 			    self.AiDataManager, winningModeON=self.WinningMode)]
 
 			for loop in range(self.NumberOfBots-1):
-				Ais += [BruteForce.BruteForce(self.AiDataManager,
+				Ais += [BruteForce.Agent(self.AiDataManager,
 				                              winningModeON=self.WinningMode)]
 		else:
 			Ais = []
 			for loop in range(self.NumberOfBots):
-				Ais += [BruteForce.BruteForce(self.AiDataManager,
+				Ais += [BruteForce.Agent(self.AiDataManager,
 				                              winningModeON=self.WinningMode)]
 
 		if renderQuality != None:
@@ -212,33 +213,6 @@ class RunController(object):
 
 		return
 	
-	def MakeHumanMove(self, game, board):
-		valid = False
-		while not valid:
-			os.system("cls")
-			self.RenderBoard(game, board)
-			move = []
-			for loop in range(self.SimInfo["NumInputs"]):
-				validMove = False
-				while not validMove:
-					userInput = float(input("input["+ str(loop) +"]: "))
-					userInput = self.SimInfo["Resolution"] * round(float(userInput)/self.SimInfo["Resolution"])
-					print(userInput)
-					if userInput >= self.SimInfo["MinInputSize"] and userInput <= self.SimInfo["MaxInputSize"]:
-						validMove = True
-						move += [userInput]
-					else:
-						print("not in the range!")
-			valid, board, turn = game.MakeMove(move)
-			if not valid:
-				print("that move was not vaild")
-
-		finished, fit = game.CheckFinished()
-
-		print("")
-		self.RenderBoard(game, board)
-		return board, turn, finished, fit
-
 	def RunTournament(self, Ais):
 		
 		self.RunSimMatch(Ais, self.Sim)
@@ -255,10 +229,7 @@ class RunController(object):
 		gameStartTime = time.time()
 		self.LastSaveTime = time.time()
 		while True:
-			if self.NumberOfBots >= turn:
-				board, turn, finished, fit = MakeAIMove(turn, board, Ais, game)
-			else:
-				board, turn, finished, fit = self.MakeHumanMove(game, board)
+			board, turn, finished, fit = MakeAgentMove(turn, board, Ais, game)
 
 			numMoves += 1
 			self.AiDataManager.MetaData["TotalTime"] += time.time()-totalStartTime
