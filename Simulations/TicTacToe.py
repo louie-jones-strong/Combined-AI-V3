@@ -1,5 +1,8 @@
 import RenderEngine.Shape as Shape
-class Simulation(object):
+import Simulations.SimulationBase as SimBase
+
+
+class Simulation(SimBase.SimBase):
 	Info = {"MinPlayers":2,"MaxPlayers":2,
 	        "SimName":"TicTacToe","NumInputs":1,
 			"MinInputSize":0,"MaxInputSize":8,
@@ -18,7 +21,6 @@ class Simulation(object):
 
 		self.Board = [0,0,0,0,0,0,0,0,0]
 		self.Turn = 1
-		self.Finished = False
 		return self.Board, self.Turn
 
 	def MakeMove(self,inputs):
@@ -39,24 +41,25 @@ class Simulation(object):
 
 	def CheckFinished(self):
 		player1Fitness, player2Fitness = 0,0
+		finished = False
 		
 		if CheckWin(self.Board, 1) == True:#win
-			self.Finished = True
+			finished = True
 			player1Fitness = 5
 			player2Fitness = -5
 
 		elif CheckWin(self.Board, 2) == True:#loss
-			self.Finished = True
+			finished = True
 			player1Fitness = -5
 			player2Fitness = 5
 
 		elif not(0 in self.Board):#draw
-			self.Finished = True
+			finished = True
 			player1Fitness = 3
 			player2Fitness = 3
 			
 
-		return self.Finished, [player1Fitness, player2Fitness]
+		return finished, [player1Fitness, player2Fitness]
 
 	def FlipBoard(self, board):
 		output = []

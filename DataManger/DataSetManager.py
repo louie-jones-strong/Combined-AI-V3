@@ -113,7 +113,7 @@ def ComplexFileExists(address):
 	value = os.path.exists(address+".p")
 	return value
 
-class DataSetTable(object):
+class DataSetTable:
 	Content = {}
 	IsLoaded = False
 
@@ -135,7 +135,7 @@ class DataSetTable(object):
 		self.IsLoaded = False
 		return
 
-class DataSetManager(object):
+class DataSetManager:
 	MetaData = {}
 	MoveIDLookUp = []
 	MaxMoveIDs = 0

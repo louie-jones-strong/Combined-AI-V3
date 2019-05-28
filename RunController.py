@@ -38,7 +38,7 @@ def MakeAgentMove(turn, startBoard, AIs, game):
 
 	return outComeBoard, turn, finished, fit
 
-class RunController(object):
+class RunController:
 	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None):
 		self.PickSimulation(simNumber)
 
@@ -98,8 +98,8 @@ class RunController(object):
 		files = os.listdir("Simulations")
 		if "__pycache__" in files:
 			files.remove("__pycache__")
-		if "SimulationInterface.py" in files:
-			files.remove("SimulationInterface.py")
+		if "SimulationBase.py" in files:
+			files.remove("SimulationBase.py")
 		for loop in range(len(files)):
 			files[loop] = files[loop][:-3]
 			if len(files) > 1:

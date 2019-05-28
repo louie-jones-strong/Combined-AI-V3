@@ -5,7 +5,7 @@ import mouse
 import math
 import os
 
-class face(object):
+class face:
 	def __init__(self, points, colour=[255,255,255]):
 		self.colour = [colour[0],colour[1],colour[2]]
 		self.points = points
@@ -19,7 +19,7 @@ class face(object):
 		z /= len(points)
 		self.centre = (x,y,z)
 
-class object3D(object):
+class object3D:
 	def __init__(self, faces, name="object3D" ,postion3D=[0,0,0], rotation3D=[0,0,0], hidden=False, selected=False):
 		self.name = name
 		self.postion3D = postion3D
@@ -41,7 +41,7 @@ def shapes(shape="cube", colour=[255,255,255], stretch=[1,1,1]):
 		faces= [face([[0*s[0],1*s[1],1*s[2]],[1*s[0],1*s[1],1*s[2]],[1*s[0],1*s[1],0*s[2]],[0*s[0],1*s[1],0*s[2]]]		, colour=colour)]
 	return faces
 		
-class RenderEngine(object):
+class RenderEngine:
 	def rotateX(self, angle, point_3D):
 		rad = angle * math.pi / 180
 		cosa = math.cos(rad)

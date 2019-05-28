@@ -1,6 +1,8 @@
 import RenderEngine.Shape as Shape
+import Simulations.SimulationBase as SimBase
 
-class Simulation(object):
+
+class Simulation(SimBase.SimBase):
 	Info = {"MinPlayers":2,"MaxPlayers":2,
 			"SimName":"Chess","NumInputs":4,
 			"MinInputSize":0,"MaxInputSize":7,

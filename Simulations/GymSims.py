@@ -1,6 +1,8 @@
 import gym
+import Simulations.SimulationBase as SimBase
 
-class Simulation(object):
+
+class Simulation(SimBase.SimBase):
 	Info = {}
 
 	def __init__(self, index=None):
