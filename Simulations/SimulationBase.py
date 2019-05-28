@@ -3,6 +3,10 @@ import RenderEngine.Shape as Shape
 
 class SimBase:
 	
+	def __init__(self):
+		self.BackGroundpieceList = []
+		return
+
 	def Start(self, numPlayers):
 
 		self.Board = []
@@ -28,7 +32,7 @@ class SimBase:
 		return move
 
 	def SimpleBoardOutput(self, board):
-
+		print(board)
 		return
 
 	def ComplexBoardOutput(self, board):

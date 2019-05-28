@@ -8,10 +8,6 @@ class Simulation(SimBase.SimBase):
 			"MinInputSize":0,"MaxInputSize":7,
 			"Resolution":1,"RenderSetup":True}
 
-	def __init__(self):
-		self.BackGroundpieceList = []
-		return
-
 	def Start(self):
 		self.Board = NewBoard()
 		self.Turn = 1
@@ -93,10 +89,6 @@ class Simulation(SimBase.SimBase):
 
 		print("   0  1  2  3  4  5  6  7   ")
 		return
-	def ComplexBoardOutput(self, board):
-		pieceList = []
-		pieceList += self.BackGroundpieceList
-		return pieceList
 
 def NewBoard():
 	board = [[4,2,3,5,6,3,2,4],
