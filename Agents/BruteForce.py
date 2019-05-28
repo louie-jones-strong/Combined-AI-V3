@@ -1,13 +1,13 @@
 import random
 import sys
 import DataManger.BoardInfo as BoardInfo
+import Agents.AgentBase as AgentBase
 
 
-class Agent(object):
+class Agent(AgentBase.AgentBase):
 
 	def __init__(self, dataSetManager, winningModeON=False):
-		self.DataSetManager = dataSetManager
-		self.WinningModeON = winningModeON
+		super().__init__(dataSetManager, winningModeON)
 
 		self.TempDataSet = {}
 		return

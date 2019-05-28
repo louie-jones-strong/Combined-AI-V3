@@ -1,14 +1,10 @@
 import random
 import sys
 import DataManger.BoardInfo as BoardInfo
+import Agents.AgentBase as AgentBase
 
 
-class Agent(object):
-
-	def __init__(self, dataSetManager, winningModeON=False):
-		self.DataSetManager = dataSetManager
-		
-		return
+class Agent(AgentBase.AgentBase):
 
 	def MoveCal(self, board):
 		numOfOutputs = self.DataSetManager.NumOfOutputs
@@ -21,7 +17,7 @@ class Agent(object):
 			validMove = False
 			while not validMove:
 				userInput = float(input("input[" + str(loop) + "]: "))
-				userInput = resolution * round(float(userInput)/resolution)
+				userInput = resolution*round(float(userInput)/resolution)
 				print(userInput)
 				if userInput >= minOutputSize and userInput <= maxOutputSize:
 					validMove = True
@@ -29,13 +25,3 @@ class Agent(object):
 				else:
 					print("not in the range!")
 		return move
-
-	def UpdateInvalidMove(self, board, move):
-		return
-
-	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):
-		return
-
-	def SaveData(self, fitness):
-		return
-

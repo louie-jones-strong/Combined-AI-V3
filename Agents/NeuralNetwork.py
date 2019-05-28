@@ -1,13 +1,15 @@
+import Agents.AgentBase as AgentBase
 import os
+
 print("Importing Tflearn...")
 import tflearn
 
 
-class Agent(object):
+class Agent(AgentBase.AgentBase):
 	TrainedEpochs = 0
 
 	def __init__(self, dataSetManager, winningModeON=False):
-		self.DataSetManager = dataSetManager
+		super().__init__(dataSetManager, winningModeON)
 
 		self.DataSetX = []
 		self.DataSetY = []
