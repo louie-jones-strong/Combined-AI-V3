@@ -1,6 +1,6 @@
 import random
 import sys
-import BoardInfo
+import DataManger.BoardInfo as BoardInfo
 
 class BruteForce(object): 
 

@@ -1,37 +1,10 @@
 import pickle
 import json
 import os
-import BoardInfo
+import DataManger.BoardInfo as BoardInfo
+from Shared import LoadingBar as LoadingBar
 import shutil
 import time
-
-class LoadingBar():
-
-	def __init__(self, allowUpdate=True):
-		self.CurrentProgress = 0
-		self.CurrentText = ""
-		self.Resolution = 100
-		self.LastUpdateTime = 0
-		self.AllowUpdate = allowUpdate
-		return
-
-	def Update(self, progress, text=""):
-		progress = max(progress, 0)
-		progress = min(progress, 1)
-
-		progress = int(progress*self.Resolution)
-
-		if time.time()-self.LastUpdateTime >= 0.15 or progress == self.Resolution:
-			if progress != self.CurrentProgress or text != self.CurrentText:
-				os.system("cls")
-				bar = "#"*progress
-				fill = " "*(self.Resolution-progress)
-				print("|"+bar+fill+"|")
-				print(text)
-				self.CurrentProgress = progress
-				self.CurrentText = text
-				self.LastUpdateTime = time.time()
-		return
 
 def serializer(inputObject):
 	outputObject = ""
@@ -103,7 +76,7 @@ def DictLoad(address, loadingBarOn=False):
 	dictionary = {}
 	address += ".txt"
 
-	loadingBar = LoadingBar(loadingBarOn)
+	loadingBar = LoadingBar.LoadingBar(loadingBarOn)
 	loadingBar.Update(0, "Loading Dict")
 
 	file = open(address, "r")
@@ -259,7 +232,7 @@ class DataSetManager(object):
 		return
 
 	def LoadDataSet(self):
-		loadingBar = LoadingBar()
+		loadingBar = LoadingBar.LoadingBar()
 		loadingBar.Update(0, "loading tables...")
 		self.FillingTable = -1
 		self.DataSetTables = []
@@ -338,7 +311,7 @@ class DataSetManager(object):
 	def GetDataSet(self):
 		dataSetX = []
 		dataSetY = []
-		loadingBar = LoadingBar()
+		loadingBar = LoadingBar.LoadingBar()
 		isOneHotEncoding = True
 
 		if (self.MetaData["BruteForceTotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 

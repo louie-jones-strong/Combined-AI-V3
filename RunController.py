@@ -1,6 +1,7 @@
 import RenderEngine.RenderEngine2D as RenderEngine
-import BruteForce
-import DataSetManager
+import AIs.BruteForce as BruteForce
+import DataManger.DataSetManager as DataSetManager
+from Shared import OutputFormating as Format
 import importlib
 import time
 import os
@@ -36,39 +37,62 @@ def MakeAIMove(turn, startBoard, AIs, game):
 
 	return outComeBoard, turn, finished, fit
 
-def SplitNumber(number):
-	output = ""
-	number = str(number)
-	lenght = len(number)
-	if lenght < 4:
-		output += str(number)
-	else:
-		start = lenght % 3
-		if start > 0:
-			output += str(number[:start]) + ","
-		gap = 0
-		for loop in range(start, lenght):
-			output += str(number[loop])
-			gap += 1
-			if gap == 3 and loop < lenght-1:
-				output += ","
-				gap = 0
-	return output
-def SplitTime(seconds, roundTo=0):
-	#Convert seconds to string "[[[DD:]HH:]MM:]SS"
-	output = ""
-	for scale in 86400, 3600, 60:
-		result, seconds = divmod(seconds, scale)
-		if output != "" or result > 0:
-			if output != "":
-				output += ":"
-			output += str(int(result))
-	if output != "":
-		output += ":"
-	output += str(round(seconds, roundTo))
-	return output
-
 class RunController(object):
+	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None):
+		self.PickSimulation(simNumber)
+
+		#setting
+		self.NumberOfBots = self.SimInfo["MaxPlayers"]
+		self.LastOutputTime = time.time()
+		self.LastSaveTook = 0
+		self.WinningMode = False
+
+		if self.SimInfo["RenderSetup"]:
+			self.RenderQuality = 1
+		else:
+			self.RenderQuality = 0
+
+		#if self.NumberOfBots >= 1:
+		#	userInput = input("Human Player[Y/N]:")
+		#	if userInput == "y" or userInput == "Y":
+		#		self.WinningMode = True
+		#		self.NumberOfBots -= 1
+
+		self.AiDataManager = DataSetManager.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
+                                                     self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
+
+		loadData = self.SetUpMetaData(loadData)
+		if aiType == None:
+			userInput = input("Brute b) network n):")
+		else:
+			userInput = aiType
+
+		if loadData:
+			if not self.AiDataManager.LoadDataSet():
+				input("Failed To Load Data")
+
+		if userInput == "N" or userInput == "n":
+			self.RenderQuality = 0
+			import AIs.NeuralNetwork as NeuralNetwork
+			Ais = [NeuralNetwork.NeuralNetwork(
+			    self.AiDataManager, winningModeON=self.WinningMode)]
+
+			for loop in range(self.NumberOfBots-1):
+				Ais += [BruteForce.BruteForce(self.AiDataManager,
+				                              winningModeON=self.WinningMode)]
+		else:
+			Ais = []
+			for loop in range(self.NumberOfBots):
+				Ais += [BruteForce.BruteForce(self.AiDataManager,
+				                              winningModeON=self.WinningMode)]
+
+		if renderQuality != None:
+			self.RenderQuality = renderQuality
+
+		if self.RenderQuality == 1:
+			self.RenderEngine = RenderEngine.RenderEngine()
+		self.RunTournament(Ais)
+		return
 	def PickSimulation(self, simNumber=None):
 		files = os.listdir("Simulations")
 		if "__pycache__" in files:
@@ -100,17 +124,17 @@ class RunController(object):
 		os.system("title "+"AI Playing:"+self.SimInfo["SimName"])
 
 		return
-
 	def SetUpMetaData(self, loadData=None):
 		userInput = "N"
 
 		if self.AiDataManager.GetMetaData():
+			os.system("cls")
 			print("")
 			print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
 			print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
 			print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
-			print("TotalTime: "+SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
-			print("LastBackUpTotalTime: "+SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
+			print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
+			print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
 			print("")
 
 			if loadData == None:
@@ -134,56 +158,6 @@ class RunController(object):
 
 		return False
 
-	def __init__(self, simNumber=None, loadData=None, aiType=None):
-		self.PickSimulation(simNumber)
-
-		#setting
-		self.NumberOfBots = self.SimInfo["MaxPlayers"]
-		self.LastOutputTime = time.time()
-		self.LastSaveTook = 0
-		self.WinningMode = False
-		
-		if self.SimInfo["RenderSetup"]:
-			self.RenderQuality = 1
-		else:
-			self.RenderQuality = 0
-
-		#if self.NumberOfBots >= 1:
-		#	userInput = input("Human Player[Y/N]:")
-		#	if userInput == "y" or userInput == "Y":
-		#		self.WinningMode = True
-		#		self.NumberOfBots -= 1
-
-		self.AiDataManager = DataSetManager.DataSetManager( self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"], 
-														self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
-
-		loadData = self.SetUpMetaData(loadData)
-		if aiType == None:
-			userInput = input("Brute b) network n):")
-		else:
-			userInput = aiType
-
-		if loadData:
-			if not self.AiDataManager.LoadDataSet():
-				input("Failed To Load Data")
-
-		if userInput == "N" or userInput == "n":
-			self.RenderQuality = 0
-			import NeuralNetwork
-			Ais = [NeuralNetwork.NeuralNetwork(self.AiDataManager, winningModeON=self.WinningMode)]
-
-			for loop in range(self.NumberOfBots-1):
-				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
-		else:
-			Ais = []
-			for loop in range(self.NumberOfBots):
-				Ais += [BruteForce.BruteForce(self.AiDataManager, winningModeON=self.WinningMode)]
-
-		if self.RenderQuality == 1:
-			self.RenderEngine = RenderEngine.RenderEngine()
-		self.RunTournament(Ais)
-		return
-
 	def RenderBoard(self, game, board):
 
 		if self.RenderQuality == 0:
@@ -198,6 +172,7 @@ class RunController(object):
 
 		return
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
+
 		if (time.time() - self.LastOutputTime) >= 0.5:
 			numGames = self.AiDataManager.MetaData["NumberOfGames"]+1
 			avgMoveTime = 0
@@ -207,28 +182,27 @@ class RunController(object):
 
 
 			os.system("cls")
-			#if self.NumberOfBots >= turn:
 			self.RenderBoard(game, board)
-
-			print("Dataset size: " + str(SplitNumber(self.AiDataManager.GetNumberOfBoards())))
-			print("Number Of Complete Boards: " + str(SplitNumber(self.AiDataManager.MetaData["NumberOfCompleteBoards"])))
+			print("")
+			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
+			print("Number Of Complete Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaData["NumberOfCompleteBoards"])))
 			if finished:
-				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)) + " finished game")
+				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)) + " finished game")
 			else:
-				print("game: " + str(SplitNumber(numGames)) + " move: " + str(SplitNumber(numMoves)))
+				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
 			totalTime = self.AiDataManager.MetaData["TotalTime"]
-			print("Games avg took: " + str(SplitTime(totalTime/numGames, roundTo=6)))
-			print("time since start: " + str(SplitTime(totalTime, roundTo=2)))
+			print("Games avg took: " + str(Format.SplitTime(totalTime/numGames, roundTo=6)))
+			print("time since start: " + str(Format.SplitTime(totalTime, roundTo=2)))
 
 			backUpTime = self.AiDataManager.MetaData["LastBackUpTotalTime"]
-			print("time since last BackUp: " + str(SplitTime(totalTime-backUpTime, roundTo=2)))
+			print("time since last BackUp: " + str(Format.SplitTime(totalTime-backUpTime, roundTo=2)))
 			print("press CTRl+Q to quit...")
 			
 			title = "AI Playing: "+self.SimInfo["SimName"]
-			title += " Time Since Last Save: " + SplitTime(time.time()-self.LastSaveTime, roundTo=1)
+			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
 			title += " CachingInfo: " + self.AiDataManager.GetCachingInfoString()
-			title += " LastSaveTook: " + SplitTime(self.LastSaveTook, roundTo=2)
+			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook, roundTo=2)
 			os.system("title "+title)
 			self.LastOutputTime = time.time()
 
@@ -315,5 +289,5 @@ class RunController(object):
 		return
 
 if __name__ == "__main__":
-	RunController(6, "Y", "N")
-	#RunController()
+	RunController(simNumber=6, loadData="Y", aiType=None, renderQuality=0)
+	RunController()
