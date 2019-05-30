@@ -196,6 +196,25 @@ class DataSetManager:
 			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 		return
 
+	def BackUp(self):
+		if (os.path.exists(self.DatasetBackUpAddress)):
+			shutil.rmtree(self.DatasetBackUpAddress)
+		shutil.copytree(self.DatasetAddress, self.DatasetBackUpAddress)
+		self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
+		return
+
+	def GetMetaData(self):
+		found = False
+
+		if DictFileExists(self.DatasetAddress+"MetaData"):
+			self.MetaData = DictLoad(self.DatasetAddress+"MetaData")
+			found = True
+
+		return found
+	def SaveMetaData(self):
+		DictSave(self.DatasetAddress+"MetaData", self.MetaData)
+		return
+
 	def SaveDataSet(self):
 		if len(self.NewDataSetHashTable) > 0:
 			if self.CanAppendData:
@@ -219,18 +238,6 @@ class DataSetManager:
 		self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
 		self.SaveMetaData()
 		return
-	def GetMetaData(self):
-		found = False
-
-		if DictFileExists(self.DatasetAddress+"MetaData"):
-			self.MetaData = DictLoad(self.DatasetAddress+"MetaData")
-			found = True
-
-		return found
-	def SaveMetaData(self):
-		DictSave(self.DatasetAddress+"MetaData", self.MetaData)
-		return
-
 	def LoadDataSet(self):
 		loadingBar = LoadingBar.LoadingBar()
 		loadingBar.Update(0, "loading tables...")
@@ -256,12 +263,6 @@ class DataSetManager:
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
 		self.CanAppendData = True
 		return True
-	def BackUp(self):
-		if (os.path.exists(self.DatasetBackUpAddress)):
-			shutil.rmtree(self.DatasetBackUpAddress)
-		shutil.copytree(self.DatasetAddress, self.DatasetBackUpAddress)
-		self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
-		return
 
 #for Brute Force
 	def AddNewBoard(self, key, board):
@@ -308,7 +309,7 @@ class DataSetManager:
 		return len(self.DataSetHashTable)
 	
 #for Neural Network
-	def GetDataSet(self):
+	def GetMoveDataSet(self):
 		dataSetX = []
 		dataSetY = []
 		loadingBar = LoadingBar.LoadingBar()
@@ -359,6 +360,11 @@ class DataSetManager:
 			isOneHotEncoding = self.MetaData["NetworkUsingOneHotEncoding"]
 
 		return dataSetX, dataSetY, isOneHotEncoding
+	def GetSimPredictionDataSet(self):
+		dataSetX = []
+		dataSetY = []
+
+		return dataSetX, dataSetY
 
 	def SaveNetworkWeights(self, weights):
 		ComplexSave(self.AnnDataSetAddress+"weights", weights)
