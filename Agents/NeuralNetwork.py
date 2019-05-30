@@ -16,7 +16,7 @@ class Agent(AgentBase.AgentBase):
 		self.IsOneHotEncoding = False
 
 		while len(self.DataSetY) == 0:
-			self.DataSetX, self.DataSetY, self.IsOneHotEncoding = self.DataSetManager.GetBestMoveDataSet()
+			self.DataSetX, self.DataSetY, self.IsOneHotEncoding = self.DataSetManager.GetMoveDataSet()
 
 		inputShape, structreArray = self.PredictNetworkStructre()
 		self.TensorBoardAdress = "TensorBoardLogs//"+str(self.DataSetManager.SimName)
