@@ -202,7 +202,7 @@ class RunController:
 			
 			title = "AI Playing: "+self.SimInfo["SimName"]
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
-			title += " CachingInfo: " + self.AiDataManager.GetCachingInfoString()
+			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
 			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook, roundTo=2)
 			os.system("title "+title)
 			self.LastOutputTime = time.time()

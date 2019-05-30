@@ -374,7 +374,7 @@ class DataSetManager:
 
 		return 
 
-	def GetCachingInfoString(self):
+	def GetLoadedDataInfo(self):
 		loadedTables = 0
 		for loop in range(len(self.DataSetTables)):
 			if (self.DataSetTables[loop].IsLoaded):
