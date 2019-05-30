@@ -305,9 +305,7 @@ class DataSetManager:
 			found = True
 		
 		return found, boardInfo
-	def GetNumberOfBoards(self):
-		return len(self.DataSetHashTable)
-	
+
 #for Neural Network
 	def GetMoveDataSet(self):
 		dataSetX = []
@@ -381,6 +379,8 @@ class DataSetManager:
 				loadedTables += 1
 
 		return str(loadedTables)+"/"+str(len(self.DataSetTables))
+	def GetNumberOfBoards(self):
+		return len(self.DataSetHashTable)
 
 	def MoveIDToMove(self, moveID):
 		if moveID < 0 or moveID > self.MaxMoveIDs-1:
