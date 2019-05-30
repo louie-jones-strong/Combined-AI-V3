@@ -68,24 +68,17 @@ class RunController:
 		else:
 			userInput = aiType
 
-		if loadData:
-			if not self.AiDataManager.LoadDataSet():
-				input("Failed To Load Data")
-
 		if userInput == "N" or userInput == "n":
 			self.RenderQuality = 0
 			import Agents.NeuralNetwork as NeuralNetwork
-			Ais = [NeuralNetwork.Agent(
-			    self.AiDataManager, winningModeON=self.WinningMode)]
+			Ais = [NeuralNetwork.Agent(self.AiDataManager, winningModeON=self.WinningMode)]
 
 			for loop in range(self.NumberOfBots-1):
-				Ais += [BruteForce.Agent(self.AiDataManager,
-				                              winningModeON=self.WinningMode)]
+				Ais += [BruteForce.Agent(self.AiDataManager, winningModeON=self.WinningMode)]
 		else:
 			Ais = []
 			for loop in range(self.NumberOfBots):
-				Ais += [BruteForce.Agent(self.AiDataManager,
-				                              winningModeON=self.WinningMode)]
+				Ais += [BruteForce.Agent(self.AiDataManager, winningModeON=self.WinningMode)]
 
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
@@ -248,7 +241,7 @@ class RunController:
 					if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
 						self.AiDataManager.BackUp()
 
-					self.AiDataManager.SaveDataSet()
+					self.AiDataManager.Save()
 					self.LastSaveTime = time.time()
 					self.LastSaveTook = time.time() - self.LastSaveTook
 

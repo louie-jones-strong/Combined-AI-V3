@@ -8,7 +8,7 @@ class Agent(AgentBase.AgentBase):
 
 	def __init__(self, dataSetManager, winningModeON=False):
 		super().__init__(dataSetManager, winningModeON)
-
+		self.DataSetManager.LoadTableInfo()
 		self.TempDataSet = {}
 		return
 

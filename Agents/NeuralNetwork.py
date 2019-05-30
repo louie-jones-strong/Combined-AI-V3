@@ -15,6 +15,7 @@ class Agent(AgentBase.AgentBase):
 		self.DataSetY = []
 		self.IsOneHotEncoding = False
 
+		self.DataSetManager.LoadTableInfo()
 		while len(self.DataSetY) == 0:
 			self.DataSetX, self.DataSetY, self.IsOneHotEncoding = self.DataSetManager.GetMoveDataSet()
 

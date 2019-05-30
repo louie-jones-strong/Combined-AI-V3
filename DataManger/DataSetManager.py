@@ -3,8 +3,10 @@ import json
 import os
 import DataManger.BoardInfo as BoardInfo
 from Shared import LoadingBar as LoadingBar
+from Shared import OutputFormating as Format
 import shutil
 import time
+import sys
 
 def serializer(inputObject):
 	outputObject = ""
@@ -153,7 +155,25 @@ class DataSetManager:
 		self.OutputResolution = outputResolution
 		self.SimName = simName
 
-		
+		self.SetupFoldersAndPaths()
+
+		#cal the max move ids from sim info
+		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
+
+		#cal all the moves and given them move ids
+		self.MoveIDLookUp = []
+		for loop in range(self.MaxMoveIDs):
+			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
+		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
+			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+
+		self.CanAppendData = False
+		self.DataSetHashTable = {}
+		self.NewDataSetHashTable = {}
+		self.DataSetTables = []
+		self.DataSetTablesToSave = {}
+		return
+	def SetupFoldersAndPaths(self):
 		temp = "DataSets//"+self.SimName
 		if not os.path.exists(temp):
 			os.makedirs(temp)
@@ -170,30 +190,39 @@ class DataSetManager:
 		self.AnnDataSetAddress = self.DatasetAddress+"NeuralNetworkData//"
 		self.MoveIDLookUpAdress = self.DatasetAddress+"LookUp//"+"MoveIdLookUp"
 
-
-		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
-
-		self.MoveIDLookUp = []
-		for loop in range(self.MaxMoveIDs):
-			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
-
-		self.TableBatchSize = 1000
-		self.CanAppendData = False
-		self.DataSetHashTable = {}
-		self.NewDataSetHashTable = {}
-		self.DataSetTables = []
-		self.FillingTable = 0
-		self.DataSetTablesToSave = {}
-
 		if not os.path.exists(self.TableAddress):
 			os.makedirs(self.TableAddress)
 		if not os.path.exists(self.DatasetAddress+"LookUp//"):
 			os.makedirs(self.DatasetAddress+"LookUp//")
 		if not os.path.exists(self.AnnDataSetAddress):
 			os.makedirs(self.AnnDataSetAddress)
+		return
 
-		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
-			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+	def Save(self):
+		if len(self.NewDataSetHashTable) > 0:
+			if self.CanAppendData:
+				DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+			else:
+				DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+
+			self.NewDataSetHashTable = {}
+
+		for loop in range(len(self.DataSetTables)):
+			if (self.DataSetTables[loop].IsLoaded):
+				if (loop in self.DataSetTablesToSave):
+					self.DataSetTables[loop].Save()
+				else:
+					self.DataSetTables[loop].Unload()
+
+		self.DataSetTablesToSave = {}
+		self.CanAppendData = True
+
+		self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
+		self.SaveMetaData()
+		return
+	def Clear(self):
+		self.DataSetHashTable = {}
+		self.DataSetTables = []
 		return
 
 	def BackUp(self):
@@ -215,56 +244,28 @@ class DataSetManager:
 		DictSave(self.DatasetAddress+"MetaData", self.MetaData)
 		return
 
-	def SaveDataSet(self):
-		if len(self.NewDataSetHashTable) > 0:
-			if self.CanAppendData:
-				DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
-			else:
-				DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+	def LoadTableInfo(self):
+		if len(self.DataSetHashTable)>0:
+			return
 
-			self.NewDataSetHashTable = {}
-
-		for loop in range(len(self.DataSetTables)):
-			if (self.DataSetTables[loop].IsLoaded):
-				if (loop in self.DataSetTablesToSave):
-					self.DataSetTables[loop].Save()
-				else:
-					self.DataSetTables[loop].Unload()
-
-		self.DataSetTablesToSave = {}
-		self.CanAppendData = True
-
-
-		self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
-		self.SaveMetaData()
-		return
-	def LoadDataSet(self):
-		loadingBar = LoadingBar.LoadingBar()
-		loadingBar.Update(0, "loading tables...")
-		self.FillingTable = -1
-		self.DataSetTables = []
+		self.TableBatchSize = 1000
 		numberOfTables = len(os.listdir(self.TableAddress))
-		index = 0
+
+		self.DataSetTables = []
 		for loop in range(numberOfTables):
 			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
 
-			self.DataSetTables[index].Load()
-			if len(self.DataSetTables[index].Content) < self.TableBatchSize and self.FillingTable == -1:
-				self.FillingTable = index
-			self.DataSetTables[index].Unload()
-			loadingBar.Update(loop/numberOfTables, "loading table: "+str(loop)+"/"+str(numberOfTables))
-
-			index += 1
-
-		loadingBar.Update(1, "loading table: "+str(numberOfTables)+"/"+str(numberOfTables))
-		if self.FillingTable == -1:
-			self.FillingTable = index
+		self.DataSetTables[numberOfTables-1].Load()
+		if len(self.DataSetTables[numberOfTables-1].Content) < self.TableBatchSize:
+				self.FillingTable = numberOfTables-1
+		else:
+			self.FillingTable = numberOfTables
+		self.DataSetTables[numberOfTables-1].Unload()
 
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
 		self.CanAppendData = True
-		return True
+		return
 
-#for Brute Force
 	def AddNewBoard(self, key, board):
 		if key in self.DataSetHashTable:
 			return
@@ -306,7 +307,6 @@ class DataSetManager:
 		
 		return found, boardInfo
 
-#for Neural Network
 	def GetMoveDataSet(self):
 		dataSetX = []
 		dataSetY = []
@@ -378,7 +378,14 @@ class DataSetManager:
 			if (self.DataSetTables[loop].IsLoaded):
 				loadedTables += 1
 
-		return str(loadedTables)+"/"+str(len(self.DataSetTables))
+		ramUsed = 0
+		ramUsed += sys.getsizeof(self.DataSetHashTable)
+		ramUsed += sys.getsizeof(self.DataSetTables)
+		ramUsed += sys.getsizeof(self.MetaData)
+		ramUsed += sys.getsizeof(self.MoveIDLookUp)
+		ramUsed = Format.SplitNumber(ramUsed)
+
+		return Format.SplitNumber(loadedTables)+"/"+Format.SplitNumber(len(self.DataSetTables)) + " RamUsed: "+ramUsed + " bytes"
 	def GetNumberOfBoards(self):
 		return len(self.DataSetHashTable)
 
