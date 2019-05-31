@@ -1,6 +1,6 @@
 import RenderEngine.RenderEngine2D as RenderEngine
-import Agents.BruteForce as BruteForce
-import Agents.HumanPlayer as HumanPlayer
+import Agents.BruteForceAgent as BruteForceAgent
+import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 import importlib
@@ -71,14 +71,15 @@ class RunController:
 		if userInput == "N" or userInput == "n":
 			self.RenderQuality = 0
 			import Agents.NeuralNetwork as NeuralNetwork
+
 			Ais = [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 			for loop in range(self.NumberOfBots-1):
-				Ais += [BruteForce.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				Ais += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 		else:
 			Ais = []
 			for loop in range(self.NumberOfBots):
-				Ais += [BruteForce.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				Ais += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
