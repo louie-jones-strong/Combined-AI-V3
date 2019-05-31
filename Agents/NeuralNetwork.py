@@ -8,8 +8,8 @@ import tflearn
 class Agent(AgentBase.AgentBase):
 	TrainedEpochs = 0
 
-	def __init__(self, dataSetManager, winningModeON=False):
-		super().__init__(dataSetManager, winningModeON)
+	def __init__(self, dataSetManager, loadData, winningModeON=False):
+		super().__init__(dataSetManager, loadData, winningModeON)
 
 		self.DataSetX = []
 		self.DataSetY = []
@@ -29,6 +29,7 @@ class Agent(AgentBase.AgentBase):
 		self.NetworkModel = ModelMaker(inputShape, structreArray, self.TensorBoardAdress, lr=0.001)#, optimizer="sgd")
 		self.BatchSize = 1000
 		return
+		
 	def PredictNetworkStructre(self):
 		inputShape = [len(self.DataSetX[0])]
 		if hasattr(self.DataSetX[0][0], "__len__"):

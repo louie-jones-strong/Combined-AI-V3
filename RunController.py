@@ -71,14 +71,14 @@ class RunController:
 		if userInput == "N" or userInput == "n":
 			self.RenderQuality = 0
 			import Agents.NeuralNetwork as NeuralNetwork
-			Ais = [NeuralNetwork.Agent(self.AiDataManager, winningModeON=self.WinningMode)]
+			Ais = [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 			for loop in range(self.NumberOfBots-1):
-				Ais += [BruteForce.Agent(self.AiDataManager, winningModeON=self.WinningMode)]
+				Ais += [BruteForce.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 		else:
 			Ais = []
 			for loop in range(self.NumberOfBots):
-				Ais += [BruteForce.Agent(self.AiDataManager, winningModeON=self.WinningMode)]
+				Ais += [BruteForce.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
@@ -93,9 +93,11 @@ class RunController:
 			files.remove("__pycache__")
 		if "SimulationBase.py" in files:
 			files.remove("SimulationBase.py")
+
+
 		for loop in range(len(files)):
 			files[loop] = files[loop][:-3]
-			if len(files) > 1:
+			if len(files) > 1 and simNumber == None:
 				print(str(loop+1)+") " + files[loop])
 
 		userInput = 1
@@ -253,5 +255,5 @@ class RunController:
 		return
 
 if __name__ == "__main__":
-	RunController(simNumber=6, loadData="Y", aiType=None, renderQuality=0)
+	RunController(simNumber=6, loadData=None, aiType="b", renderQuality=0)
 	RunController()

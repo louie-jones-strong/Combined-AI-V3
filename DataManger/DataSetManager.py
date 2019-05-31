@@ -172,6 +172,8 @@ class DataSetManager:
 		self.NewDataSetHashTable = {}
 		self.DataSetTables = []
 		self.DataSetTablesToSave = {}
+		self.FillingTable = 0
+		self.TableBatchSize = 1000
 		return
 	def SetupFoldersAndPaths(self):
 		temp = "DataSets//"+self.SimName
@@ -248,19 +250,21 @@ class DataSetManager:
 		if len(self.DataSetHashTable)>0:
 			return
 
-		self.TableBatchSize = 1000
 		numberOfTables = len(os.listdir(self.TableAddress))
 
 		self.DataSetTables = []
 		for loop in range(numberOfTables):
 			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
 
-		self.DataSetTables[numberOfTables-1].Load()
-		if len(self.DataSetTables[numberOfTables-1].Content) < self.TableBatchSize:
-				self.FillingTable = numberOfTables-1
-		else:
-			self.FillingTable = numberOfTables
-		self.DataSetTables[numberOfTables-1].Unload()
+		self.FillingTable = 0
+		if numberOfTables >= 1:
+			self.DataSetTables[numberOfTables-1].Load()
+			if len(self.DataSetTables[numberOfTables-1].Content) < self.TableBatchSize:
+					self.FillingTable = numberOfTables-1
+			else:
+				self.FillingTable = numberOfTables
+
+			self.DataSetTables[numberOfTables-1].Unload()
 
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
 		self.CanAppendData = True
