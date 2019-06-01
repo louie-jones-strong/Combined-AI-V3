@@ -39,6 +39,10 @@ def MakeAgentMove(turn, startBoard, AIs, game):
 	return outComeBoard, turn, finished, fit
 
 class RunController:
+
+	Version = 0
+
+
 	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None):
 		self.PickSimulation(simNumber)
 
@@ -125,35 +129,39 @@ class RunController:
 		userInput = "N"
 
 		if self.AiDataManager.GetMetaData():
-			os.system("cls")
-			print("")
-			print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
-			print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
-			print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
-			print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
-			print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
-			print("")
+			if self.AiDataManager.MetaData["Version"] == self.Version:
+				os.system("cls")
+				print("")
+				print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
+				print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
+				print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
+				print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
+				print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
+				print("")
 
-			if loadData == None:
-				userInput = input("load Dataset[Y/N]:")
+				if loadData == None:
+					userInput = input("load Dataset[Y/N]:")
+				else:
+					userInput = loadData
 			else:
-				userInput = loadData
+				print("MetaData Version "+str(self.AiDataManager.MetaData["Version"])+" != AiVersion "+str(self.Version)+" !")
+				input()
 
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager.MetaData = {"SizeOfDataSet": 0,
-                                  "NumberOfCompleteBoards": 0,
-                                  "NumberOfGames": 0,
-                                  "NetworkUsingOneHotEncoding": False,
-                                  "TotalTime": 0,
-                                  "BruteForceTotalTime": 0,
-                                  "AnnTotalTime": 0,
-                                  "AnnDataMadeFromBruteForceTotalTime": 0,
-                                  "LastBackUpTotalTime": 0}
+			self.AiDataManager.MetaData = {}
+			self.AiDataManager.MetaData["Version"] = self.Version
+			self.AiDataManager.MetaData["SizeOfDataSet"] = 0
+			self.AiDataManager.MetaData["NumberOfCompleteBoards"] = 0
+			self.AiDataManager.MetaData["NumberOfGames"] = 0
+			self.AiDataManager.MetaData["NetworkUsingOneHotEncoding"] = False
+			self.AiDataManager.MetaData["TotalTime"] = 0
+			self.AiDataManager.MetaData["BruteForceTotalTime"] = 0
+			self.AiDataManager.MetaData["AnnTotalTime"] = 0
+			self.AiDataManager.MetaData["AnnDataMadeFromBruteForceTotalTime"] = 0
+			self.AiDataManager.MetaData["LastBackUpTotalTime"] = 0
 			return False
-		else:
-			return True
-
-		return False
+		
+		return True
 
 	def RenderBoard(self, game, board):
 
@@ -256,5 +264,5 @@ class RunController:
 		return
 
 if __name__ == "__main__":
-	RunController(simNumber=6, loadData=None, aiType="b", renderQuality=0)
+	RunController(simNumber=None, loadData=None, aiType="b", renderQuality=0)
 	RunController()
