@@ -24,4 +24,6 @@ class Agent(AgentBase.AgentBase):
 					move += [userInput]
 				else:
 					print("not in the range!")
+
+		self.RecordMove(board, move)
 		return move
