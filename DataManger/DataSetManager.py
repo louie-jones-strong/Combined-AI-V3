@@ -59,6 +59,7 @@ class DataSetManager:
 		self.DataSetHashTableAddress = self.DatasetAddress+"LookUp//DataSetHashTable"
 		self.TableAddress = self.DatasetAddress+"BruteForceDataSet//"
 		self.AnnDataSetAddress = self.DatasetAddress+"NeuralNetworkData//"
+		self.TesnorBoardLogAddress = self.DatasetAddress+"Logs//"
 		self.MoveIDLookUpAdress = self.DatasetAddress+"LookUp//"+"MoveIdLookUp"
 
 		if not os.path.exists(self.TableAddress):

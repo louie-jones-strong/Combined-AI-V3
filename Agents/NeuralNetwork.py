@@ -20,13 +20,12 @@ class Agent(AgentBase.AgentBase):
 			self.DataSetX, self.DataSetY, self.IsOneHotEncoding = self.DataSetManager.GetMoveDataSet()
 
 		inputShape, structreArray = self.PredictNetworkStructre()
-		self.TensorBoardAdress = "TensorBoardLogs//"+str(self.DataSetManager.SimName)
 
 		self.RunId = 0
-		if os.path.exists(self.TensorBoardAdress):
-			self.RunId = len(os.listdir(self.TensorBoardAdress))
+		if os.path.exists(self.DataSetManager.TesnorBoardLogAddress):
+			self.RunId = len(os.listdir(self.DataSetManager.TesnorBoardLogAddress))
 
-		self.NetworkModel = ModelMaker(inputShape, structreArray, self.TensorBoardAdress, lr=0.001)#, optimizer="sgd")
+		self.NetworkModel = ModelMaker(inputShape, structreArray, self.DataSetManager.TesnorBoardLogAddress, lr=0.001)#, optimizer="sgd")
 		self.BatchSize = 1000
 		return
 		
