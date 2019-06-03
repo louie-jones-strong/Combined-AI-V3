@@ -31,17 +31,22 @@ def SplitTime(seconds, roundTo=0):
 	output += str(round(seconds, roundTo))
 	return output
 
-def BytesOutputFormat(numberOfBytes):
+def BytesOutputFormat(numberOfBytes, roundTo=2):
+	value  = numberOfBytes
+	suffix = "Bytes"
+
 	if numberOfBytes / pow(1024,3) >= 1:
-		output = str(numberOfBytes / pow(1024,3))+" GB"
+		value  = numberOfBytes/pow(1024,3)
+		suffix = "GB"
 
 	elif numberOfBytes / pow(1024,2) >= 1:
-		output = str(numberOfBytes / pow(1024,2))+" MB"
+		value  = numberOfBytes/pow(1024,2)
+		suffix = "MB"
 
 	elif numberOfBytes / 1024 >= 1:
-		output = str(numberOfBytes / 1024)+" KB"
-
-	else:
-		output = str(numberOfBytes)+" Bytes"
+		value  = numberOfBytes/1024
+		suffix = "KB"
 		
-	return output
+
+	value = round(value, roundTo)
+	return str(value)+" "+suffix
