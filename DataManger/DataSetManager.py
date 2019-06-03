@@ -89,7 +89,10 @@ class DataSetManager:
 		self.DataSetTablesToSave = {}
 		self.CanAppendData = True
 
-		self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
+		self.MetaData["SizeOfDataSet"] =  self.GetNumberOfBoards()
+		self.MetaData["NumberOfTables"] = len(self.DataSetTables)
+		self.MetaData["FillingTable"] =   self.FillingTable
+
 		self.SaveMetaData()
 		return
 	def Clear(self):
@@ -120,21 +123,13 @@ class DataSetManager:
 		if len(self.DataSetHashTable)>0:
 			return
 
-		numberOfTables = len(os.listdir(self.TableAddress))
+		numberOfTables = self.MetaData["NumberOfTables"]
 
 		self.DataSetTables = []
 		for loop in range(numberOfTables):
 			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
 
-		self.FillingTable = 0
-		if numberOfTables >= 1:
-			self.DataSetTables[numberOfTables-1].Load()
-			if len(self.DataSetTables[numberOfTables-1].Content) < self.TableBatchSize:
-					self.FillingTable = numberOfTables-1
-			else:
-				self.FillingTable = numberOfTables
-
-			self.DataSetTables[numberOfTables-1].Unload()
+		self.FillingTable = self.MetaData["FillingTable"]
 
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
 		self.CanAppendData = True
@@ -257,9 +252,9 @@ class DataSetManager:
 		ramUsed += sys.getsizeof(self.DataSetTables)
 		ramUsed += sys.getsizeof(self.MetaData)
 		ramUsed += sys.getsizeof(self.MoveIDLookUp)
-		ramUsed = Format.SplitNumber(ramUsed)
+		ramUsed = Format.BytesOutputFormat(ramUsed)
 
-		return Format.SplitNumber(loadedTables)+"/"+Format.SplitNumber(len(self.DataSetTables)) + " RamUsed: "+ramUsed + " bytes"
+		return Format.SplitNumber(loadedTables)+"/"+Format.SplitNumber(len(self.DataSetTables)) + " RamUsed: "+ramUsed
 	def GetNumberOfBoards(self):
 		return len(self.DataSetHashTable)
 

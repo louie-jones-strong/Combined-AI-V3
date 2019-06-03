@@ -17,7 +17,6 @@ def SplitNumber(number):
 				gap = 0
 	return output
 
-
 def SplitTime(seconds, roundTo=0):
 	#Convert seconds to string "[[[DD:]HH:]MM:]SS"
 	output = ""
@@ -30,4 +29,19 @@ def SplitTime(seconds, roundTo=0):
 	if output != "":
 		output += ":"
 	output += str(round(seconds, roundTo))
+	return output
+
+def BytesOutputFormat(numberOfBytes):
+	if numberOfBytes / pow(1024,3) >= 1:
+		output = str(numberOfBytes / pow(1024,3))+" GB"
+
+	elif numberOfBytes / pow(1024,2) >= 1:
+		output = str(numberOfBytes / pow(1024,2))+" MB"
+
+	elif numberOfBytes / 1024 >= 1:
+		output = str(numberOfBytes / 1024)+" KB"
+
+	else:
+		output = str(numberOfBytes)+" Bytes"
+		
 	return output

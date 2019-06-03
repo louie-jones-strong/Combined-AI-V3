@@ -151,6 +151,8 @@ class RunController:
 			self.AiDataManager.MetaData = {}
 			self.AiDataManager.MetaData["Version"] = self.Version
 			self.AiDataManager.MetaData["SizeOfDataSet"] = 0
+			self.AiDataManager.MetaData["NumberOfTables"] = 0
+			self.AiDataManager.MetaData["FillingTable"] = 0
 			self.AiDataManager.MetaData["NumberOfCompleteBoards"] = 0
 			self.AiDataManager.MetaData["NumberOfGames"] = 0
 			self.AiDataManager.MetaData["NetworkUsingOneHotEncoding"] = False
