@@ -6,12 +6,16 @@ class AgentBase:
 		self.DataSetManager = dataSetManager
 		self.WinningModeON = winningModeON
 		self.TempDataSet = {}
+		self.RecordMoves = True
 
 		if loadData:
 			self.DataSetManager.LoadTableInfo()
 		return
 	
 	def RecordMove(self, board, move):
+		if not self.RecordMoves:
+			return
+
 		key = self.DataSetManager.BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
@@ -35,6 +39,9 @@ class AgentBase:
 		return
 
 	def UpdateInvalidMove(self, board, move):
+		if not self.RecordMoves:
+			return
+
 		key = self.DataSetManager.BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
@@ -48,6 +55,9 @@ class AgentBase:
 		return
 
 	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):
+		if not self.RecordMoves:
+			return
+
 		key = self.DataSetManager.BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
@@ -67,6 +77,9 @@ class AgentBase:
 		return
 
 	def SaveData(self, fitness):
+		if not self.RecordMoves:
+			return
+			
 		for tempValue in self.TempDataSet.values():
 			key = tempValue["BoardKey"]
 			moveID = tempValue["MoveID"]
