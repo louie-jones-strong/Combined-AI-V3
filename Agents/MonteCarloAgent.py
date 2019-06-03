@@ -16,5 +16,6 @@ class Agent(AgentBase.AgentBase):
 	def MoveCal(self, board):
 		move = self.MoveAgent.MoveCal(board)
 		
+		self.RecordMove(board, move)
 		return move
 
