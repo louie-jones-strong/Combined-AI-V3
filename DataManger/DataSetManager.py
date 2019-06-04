@@ -236,10 +236,9 @@ class DataSetManager:
 	def SaveNetworkWeights(self, weights):
 		ComplexSave(self.AnnDataSetAddress+"weights", weights)
 		return
-
 	def LoadNetworkWeights(self):
-
-		return 
+		weights = ComplexLoad(self.AnnDataSetAddress+"weights")
+		return weights
 
 	def GetLoadedDataInfo(self):
 		loadedTables = 0
