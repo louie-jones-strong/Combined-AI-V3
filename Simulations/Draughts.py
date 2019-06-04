@@ -157,16 +157,20 @@ class Simulation(SimBase.SimBase):
 		return temp
 
 	def SimpleBoardOutput(self, board):
-		print("  0 1 2 3 4 5 6 7  ")
+		print("   0 1 2 3 4 5 6 7  ")
 		for loop in range(8):
 			line = ""
 			for loop2 in range(8):
 				if (board[loop2][loop] == 0):
 					line += "  "
 				else:
-					line += str(board[loop2][loop])+" "
-			print(str(loop)+" "+str(line)+str(loop))
-		print("  0 1 2 3 4 5 6 7  ")
+					if board[loop2][loop] < 0:
+						line += str(board[loop2][loop])
+					else:
+						line += " "+str(board[loop2][loop])
+
+			print(str(loop)+" "+str(line)+" "+str(loop))
+		print("   0 1 2 3 4 5 6 7  ")
 		return
 	def ComplexBoardOutput(self, board):
 		pieceSize = 20

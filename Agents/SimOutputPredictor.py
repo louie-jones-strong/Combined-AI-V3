@@ -23,7 +23,8 @@ class SimOutputPredictor:
 			for outCome, times in moveOutComes.items():
 						
 				if highestTimes < times:
-					newBoard = outCome 
+					newBoard = outCome
+					highestTimes = times
 
 		else:
 			print("need to code ann for PredictOutput")
