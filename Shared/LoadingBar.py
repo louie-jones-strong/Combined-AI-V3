@@ -1,5 +1,6 @@
 import time
 import os
+import Shared.OutputFormating as Formating
 
 class LoadingBar():
 
@@ -11,7 +12,7 @@ class LoadingBar():
 		self.AllowUpdate = allowUpdate
 		return
 
-	def Update(self, progress, text=""):
+	def Update(self, progress, numDone=None, totalNum=None, text=""):
 		progress = max(progress, 0)
 		progress = min(progress, 1)
 
@@ -24,6 +25,15 @@ class LoadingBar():
 				fill = " "*(self.Resolution-progress)
 				print("|"+bar+fill+"|")
 				print(text)
+				
+				if numDone != None and totalNum != None:
+					output = Formating.SplitNumber(numDone)
+					output += "/"
+					output += Formating.SplitNumber(totalNum)
+					output += " "+round(progress, 2)+"%"
+
+					print(output)
+
 				self.CurrentProgress = progress
 				self.CurrentText = text
 				self.LastUpdateTime = time.time()

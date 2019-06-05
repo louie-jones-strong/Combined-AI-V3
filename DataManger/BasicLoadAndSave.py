@@ -1,6 +1,7 @@
 import pickle
 import os
-from Shared import LoadingBar as LoadingBar
+if __name__ != "__main__":
+	from Shared import LoadingBar as LoadingBar
 
 def serializer(inputObject):
 	outputObject = ""
@@ -18,7 +19,7 @@ def serializer(inputObject):
 		return outputObject + ")"
 	
 	elif type(inputObject) is str:
-		return inputObject
+		return "\'"+inputObject+"\'"
 
 	elif hasattr(inputObject, "__len__"):
 		outputObject = []
@@ -38,7 +39,7 @@ def deserializer(inputString):
 
 	elif inputString.startswith("["):
 		inputString = inputString.replace('[', '').replace(']', '')
-		outputObject = tuple(map(deserializer, inputString.split(", ")))
+		outputObject = list(map(deserializer, inputString.split(", ")))
 
 	elif inputString == "None":
 		outputObject = None
@@ -145,3 +146,14 @@ class DataSetTable:
 		self.Content ={}
 		self.IsLoaded = False
 		return
+
+if __name__ == "__main__":
+	testObject = [["ann", 50, "Tanh"], ["ann", 50, "Tanh"], ["ann", 7, "Linear"]]
+
+	print(testObject)
+	objectString = serializer(testObject)
+
+	print(objectString)
+	outputObject = deserializer(objectString)
+
+	print(outputObject)
