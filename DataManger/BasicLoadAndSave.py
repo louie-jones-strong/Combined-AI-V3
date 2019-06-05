@@ -5,7 +5,10 @@ from Shared import LoadingBar as LoadingBar
 def serializer(inputObject):
 	outputObject = ""
 
-	if type(inputObject) is bytes:
+	if inputObject == None:
+		return "None"
+
+	elif type(inputObject) is bytes:
 		outputObject = "b("
 		for loop in range(len(inputObject)):
 			outputObject += str(inputObject[loop])
@@ -13,6 +16,9 @@ def serializer(inputObject):
 				outputObject +=","
 
 		return outputObject + ")"
+	
+	elif type(inputObject) is str:
+		return inputObject
 
 	elif hasattr(inputObject, "__len__"):
 		outputObject = []
@@ -68,7 +74,8 @@ def DictSave(address, dictionary):
 	address += ".txt"
 	file = open(address, "w")
 	for key, value in dictionary.items():
-		file.write(str(key)+":"+serializer(value)+"\n")
+		serializerValue = serializer(value)
+		file.write(str(key)+":"+serializerValue+"\n")
 	file.close()
 	return
 def DictLoad(address, loadingBarOn=False):
