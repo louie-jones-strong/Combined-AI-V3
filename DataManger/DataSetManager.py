@@ -123,6 +123,11 @@ class DataSetManager:
 		if len(self.DataSetHashTable)>0:
 			return
 
+		if not DictFileExists(self.DataSetHashTableAddress):
+			return
+
+		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
+
 		numberOfTables = self.MetaData["NumberOfTables"]
 
 		self.DataSetTables = []
@@ -130,8 +135,6 @@ class DataSetManager:
 			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
 
 		self.FillingTable = self.MetaData["FillingTable"]
-
-		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
 		self.CanAppendData = True
 		return
 
@@ -182,10 +185,11 @@ class DataSetManager:
 		loadingBar = LoadingBar.LoadingBar()
 		isOneHotEncoding = True
 
-		if (self.MetaData["BruteForceTotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
+		if (self.MetaData["TotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
 			not ComplexFileExists(self.AnnDataSetAddress+"XDataSet") or 
 			not ComplexFileExists(self.AnnDataSetAddress+"YDataSet")):
-
+			
+			self.LoadTableInfo()
 			loop = 0
 			for key, value in self.DataSetHashTable.items():
 				index = value[0]

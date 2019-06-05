@@ -42,7 +42,6 @@ def PredictNetworkStructre(dataSetManager):
 		dataSetX = []
 		dataSetY = []
 
-		dataSetManager.LoadTableInfo()
 		while len(dataSetY) == 0:
 			dataSetX, dataSetY = dataSetManager.GetMoveDataSet()
 
