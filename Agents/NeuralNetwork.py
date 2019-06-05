@@ -1,165 +1,76 @@
-import Agents.AgentBase as AgentBase
 import os
 
 print("Importing Tflearn...")
 import tflearn
 
+def GetWeights(networkModel, numberOfLayers):
+	weightsValue = []
 
-class Agent(AgentBase.AgentBase):
-	TrainedEpochs = 0
+	for loop in range(numberOfLayers):
+		temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
+		with networkModel.session.as_default():
+			temp[0] = tflearn.variables.get_value(temp[0])
+			temp[1] = tflearn.variables.get_value(temp[1])
+			weightsValue += [temp]
+	return weightsValue
+def SetWeights(networkModel, numberOfLayers, newWeights):
 
-	def __init__(self, dataSetManager, loadData, winningModeON=False):
-		super().__init__(dataSetManager, loadData, winningModeON)
+	for loop in range(numberOfLayers):
+		temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
+		with networkModel.session.as_default():
+			tflearn.variables.set_value(temp[0],newWeights[loop][0])
+			tflearn.variables.set_value(temp[1],newWeights[loop][1])
+	return
 
-		self.DataSetX = []
-		self.DataSetY = []
-		self.IsOneHotEncoding = False
 
-		self.DataSetManager.LoadTableInfo()
-		while len(self.DataSetY) == 0:
-			self.DataSetX, self.DataSetY, self.IsOneHotEncoding = self.DataSetManager.GetMoveDataSet()
+def MakeModel(dataSetManager):
+	inputShape, structreArray = PredictNetworkStructre(dataSetManager)
 
-		inputShape, structreArray = self.PredictNetworkStructre()
+	runId = 0
+	if os.path.exists(dataSetManager.TesnorBoardLogAddress):
+		runId = len(os.listdir(dataSetManager.TesnorBoardLogAddress))
 
-		self.RunId = 0
-		if os.path.exists(self.DataSetManager.TesnorBoardLogAddress):
-			self.RunId = len(os.listdir(self.DataSetManager.TesnorBoardLogAddress))
+	model = ModelMaker(inputShape, structreArray, dataSetManager.TesnorBoardLogAddress, lr=0.001)#, optimizer="sgd")	
+	return model, runId, len(structreArray)
 
-		self.NetworkModel = ModelMaker(inputShape, structreArray, self.DataSetManager.TesnorBoardLogAddress, lr=0.001)#, optimizer="sgd")
-		self.BatchSize = 1000
-		return
-		
-	def PredictNetworkStructre(self):
-		inputShape = [len(self.DataSetX[0])]
-		if hasattr(self.DataSetX[0][0], "__len__"):
-			inputShape += [len(self.DataSetX[0][0])]
+def PredictNetworkStructre(dataSetManager):
 
-			if hasattr(self.DataSetX[0][0][0], "__len__"):
-				inputShape += [len(self.DataSetX[0][0][0])]
+	inputShape = dataSetManager.MetaData["AnnMoveInputShape"]
+	structreArray = dataSetManager.MetaData["AnnMoveStructreArray"]
 
-				if hasattr(self.DataSetX[0][0][0][0], "__len__"):
-					inputShape += [len(self.DataSetX[0][0][0][0])]
+	if structreArray == None or inputShape == None:
+		dataSetX = []
+		dataSetY = []
+
+		dataSetManager.LoadTableInfo()
+		while len(dataSetY) == 0:
+			dataSetX, dataSetY = dataSetManager.GetMoveDataSet()
+
+		inputShape = [len(dataSetX[0])]
+		if hasattr(dataSetX[0][0], "__len__"):
+			inputShape += [len(dataSetX[0][0])]
+
+			if hasattr(dataSetX[0][0][0], "__len__"):
+				inputShape += [len(dataSetX[0][0][0])]
+
+				if hasattr(dataSetX[0][0][0][0], "__len__"):
+					inputShape += [len(dataSetX[0][0][0][0])]
 
 		structreArray = []
 		structreArray += [["ann", 50, "Tanh"]]
 		structreArray += [["ann", 50, "Tanh"]]
 
-		if self.DataSetManager.MinOutputSize < -1 or self.DataSetManager.MaxOutputSize > 1:
-			structreArray += [["ann", len(self.DataSetY[0]), "Linear"]]
-		elif self.DataSetManager.MinOutputSize < 0:
-			structreArray += [["ann", len(self.DataSetY[0]), "Tanh"]]
+		if dataSetManager.MinOutputSize < -1 or dataSetManager.MaxOutputSize > 1:
+			structreArray += [["ann", len(dataSetY[0]), "Linear"]]
+		elif dataSetManager.MinOutputSize < 0:
+			structreArray += [["ann", len(dataSetY[0]), "Tanh"]]
 		else:
-			structreArray += [["ann", len(self.DataSetY[0]), "Sigmoid"]]
+			structreArray += [["ann", len(dataSetY[0]), "Sigmoid"]]
 
-		self.NumberOfLayers = len(structreArray)
-		return inputShape, structreArray
+		dataSetManager.MetaData["AnnMoveInputShape"] = inputShape
+		dataSetManager.MetaData["AnnMoveStructreArray"] = structreArray
 
-	def MoveCal(self, inputs, batch=False):
-		if not batch:
-			inputs = [inputs]
-
-		networkOutputs = self.NetworkModel.predict(inputs)
-
-		outputs = []
-		for loop in range(len(networkOutputs)):
-			networkOutput = list(networkOutputs[loop])
-
-			if self.IsOneHotEncoding:
-				output = [0] 
-				bestValue = 0
-				for loop2 in range(len(networkOutput)):
-					if networkOutput[loop2] >= bestValue:
-						bestValue = networkOutput[loop2]
-						output = self.DataSetManager.MoveIDToMove(loop2)
-
-			else:
-				output = []
-				for loop2 in range(len(networkOutput)):
-					temp = networkOutput[loop2]
-					temp = temp / self.DataSetManager.OutputResolution
-					temp = round(temp)
-					temp = temp * self.DataSetManager.OutputResolution
-
-					if temp < self.DataSetManager.MinOutputSize:
-						temp = self.DataSetManager.MinOutputSize
-
-					if temp > self.DataSetManager.MaxOutputSize:
-						temp = self.DataSetManager.MaxOutputSize
-
-					if self.DataSetManager.OutputResolution == int(self.DataSetManager.OutputResolution):
-						temp= int(temp)
-
-					output += [temp]
-
-			outputs += [output]
-
-		if not batch:
-			outputs = outputs[0]
-
-		return outputs
-
-	def UpdateInvalidMove(self, board, move):
-		print("Move was Invalid!! RETRAINING")
-		newMove = move[:]
-		
-		while move == newMove:
-			self.TrainNetWork()
-			newMove = self.MoveCal(board)
-
-		return
-
-	def TrainNetWork(self):
-		epochs = 1000
-		self.NetworkModel.fit(self.DataSetX, self.DataSetY, n_epoch=epochs, run_id=str(self.RunId), shuffle=True)
-		self.TrainedEpochs += epochs
-
-		if self.TrainedEpochs % (epochs*10) == 0:
-			self.SaveData(0)
-
-		correct, total = self.GetAccuracy()
-		print("Accuracy: "+str(correct/total)+" "+str(correct)+"/"+str(total))
-		return
-
-	def GetAccuracy(self):
-		
-		outputs = self.MoveCal(self.DataSetX, batch=True)
-
-		correct = 0
-		for loop in range(len(self.DataSetX)):
-
-			if outputs[loop] == self.DataSetY[loop]:
-				correct += 1
-
-		return correct, len(self.DataSetX)
-
-	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):
-		
-		return
-
-	def SaveData(self, fitness):
-		weights = self.GetWeights()
-		self.DataSetManager.SaveNetworkWeights(weights)
-		return
-
-	def GetWeights(self):
-		weightsValue = []
-
-		for loop in range(self.NumberOfLayers):
-			temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
-			with self.NetworkModel.session.as_default():
-				temp[0] = tflearn.variables.get_value(temp[0])
-				temp[1] = tflearn.variables.get_value(temp[1])
-				weightsValue += [temp]
-		return weightsValue
-
-	def SetWeights(self, newWeights):
-
-		for loop in range(self.NumberOfLayers):
-			temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
-			with self.NetworkModel.session.as_default():
-				tflearn.variables.set_value(temp[0],newWeights[loop][0])
-				tflearn.variables.set_value(temp[1],newWeights[loop][1])
-		return
+	return inputShape, structreArray
 
 def ModelMaker(inputShape, structreArray, tensorBoardAdress, lr=0.01, optimizer="adam"):
 	tflearn.config.init_graph(gpu_memory_fraction=0.95, soft_placement=True)

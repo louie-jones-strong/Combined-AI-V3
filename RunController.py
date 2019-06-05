@@ -43,7 +43,7 @@ class RunController:
 	Version = 0
 
 
-	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None):
+	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None):
 		self.PickSimulation(simNumber)
 
 		#setting
@@ -74,9 +74,17 @@ class RunController:
 
 		if userInput == "N" or userInput == "n":
 			self.RenderQuality = 0
-			import Agents.NeuralNetwork as NeuralNetwork
+			if trainNetwork == None:
+				userInput = input("Train Network[Y/N]: ")
+			else:
+				userInput = trainNetwork
+
+			import Agents.NeuralNetworkAgent as NeuralNetwork
 
 			Ais = [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+			if userInput == "Y" or userInput == "y":
+				Ais[0].Train()
 
 			for loop in range(self.NumberOfBots-1):
 				Ais += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
@@ -161,6 +169,8 @@ class RunController:
 			self.AiDataManager.MetaData["AnnTotalTime"] = 0
 			self.AiDataManager.MetaData["AnnDataMadeFromBruteForceTotalTime"] = 0
 			self.AiDataManager.MetaData["LastBackUpTotalTime"] = 0
+			self.AiDataManager.MetaData["AnnMoveInputShape"] = None
+			self.AiDataManager.MetaData["AnnMoveStructreArray"] = None
 			return False
 		
 		return True
@@ -266,5 +276,5 @@ class RunController:
 		return
 
 if __name__ == "__main__":
-	RunController(simNumber=None, loadData=None, aiType="b", renderQuality=0)
+	RunController(simNumber=None, loadData=None, aiType=None, renderQuality=0)
 	RunController()

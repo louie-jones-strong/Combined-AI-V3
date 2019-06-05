@@ -226,7 +226,7 @@ class DataSetManager:
 			dataSetY = ComplexLoad(self.AnnDataSetAddress+"YDataSet")
 			isOneHotEncoding = self.MetaData["NetworkUsingOneHotEncoding"]
 
-		return dataSetX, dataSetY, isOneHotEncoding
+		return dataSetX, dataSetY
 	def GetSimPredictionDataSet(self):
 		dataSetX = []
 		dataSetY = []
@@ -237,8 +237,11 @@ class DataSetManager:
 		ComplexSave(self.AnnDataSetAddress+"weights", weights)
 		return
 	def LoadNetworkWeights(self):
-		weights = ComplexLoad(self.AnnDataSetAddress+"weights")
-		return weights
+		if ComplexFileExists(self.AnnDataSetAddress+"weights"):
+			weights = ComplexLoad(self.AnnDataSetAddress+"weights")
+			return True, weights
+		else:
+			return False, []
 
 	def GetLoadedDataInfo(self):
 		loadedTables = 0

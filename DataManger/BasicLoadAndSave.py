@@ -33,6 +33,9 @@ def deserializer(inputString):
 		inputString = inputString.replace('[', '').replace(']', '')
 		outputObject = tuple(map(deserializer, inputString.split(", ")))
 
+	elif inputString == "None":
+		outputObject = None
+
 	elif inputString == "True":
 		outputObject = True
 
