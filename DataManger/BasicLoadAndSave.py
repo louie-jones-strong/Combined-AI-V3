@@ -30,6 +30,7 @@ def serializer(inputObject):
 	else:
 		return str(inputObject)
 def deserializer(inputString):
+
 	if inputString.startswith("b("):
 		subInputString = inputString[2:-1]
 		byteArray = list(map(int, subInputString.split(",")))
@@ -52,7 +53,11 @@ def deserializer(inputString):
 		outputObject = float(inputString)
 
 	else:
-		outputObject = int(inputString)
+		try:
+		    outputObject = int(inputString)
+		except:
+		    outputObject = inputString
+			
 	return outputObject
 
 def DictAppend(address, dictionary): 
