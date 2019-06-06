@@ -1,7 +1,6 @@
 import pickle
 import os
-if __name__ != "__main__":
-	from Shared import LoadingBar as LoadingBar
+from Shared import LoadingBar as LoadingBar
 
 def serializer(inputObject):
 	outputObject = ""
@@ -19,7 +18,7 @@ def serializer(inputObject):
 		return outputObject + ")"
 	
 	elif type(inputObject) is str:
-		return "\'"+inputObject+"\'"
+		return "'"+inputObject+"'"
 
 	elif hasattr(inputObject, "__len__"):
 		outputObject = []
@@ -38,8 +37,24 @@ def deserializer(inputString):
 		outputObject = bytes(byteArray)
 
 	elif inputString.startswith("["):
-		inputString = inputString.replace('[', '').replace(']', '')
-		outputObject = list(map(deserializer, inputString.split(", ")))
+		lastIndex = inputString.rfind("]")
+		inputString = inputString[1:lastIndex]
+
+		stringList = []
+		if inputString.count("[") == 0:
+			stringList = inputString.split(", ")
+
+		else:
+			index = 0
+			while index < len(inputString):
+				if inputString.startswith(", "):
+					inputString = inputString[2:]
+				index = inputString.find("]")+1
+				stringList += [inputString[0:index]]
+				inputString = inputString[index:]
+
+
+		outputObject = list(map(deserializer, stringList))
 
 	elif inputString == "None":
 		outputObject = None
@@ -49,6 +64,9 @@ def deserializer(inputString):
 
 	elif inputString == "False":
 		outputObject = False
+
+	elif inputString.startswith("'"):
+		outputObject = inputString.replace("'", "")
 
 	elif "." in inputString:
 		outputObject = float(inputString)
@@ -146,14 +164,3 @@ class DataSetTable:
 		self.Content ={}
 		self.IsLoaded = False
 		return
-
-if __name__ == "__main__":
-	testObject = [["ann", 50, "Tanh"], ["ann", 50, "Tanh"], ["ann", 7, "Linear"]]
-
-	print(testObject)
-	objectString = serializer(testObject)
-
-	print(objectString)
-	outputObject = deserializer(objectString)
-
-	print(outputObject)
