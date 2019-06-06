@@ -186,8 +186,8 @@ class DataSetManager:
 		isOneHotEncoding = True
 
 		if (self.MetaData["TotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
-			not ComplexFileExists(self.AnnDataSetAddress+"XDataSet") or 
-			not ComplexFileExists(self.AnnDataSetAddress+"YDataSet")):
+			(not ComplexFileExists(self.AnnDataSetAddress+"XDataSet")) or 
+			(not ComplexFileExists(self.AnnDataSetAddress+"YDataSet"))):
 			
 			self.LoadTableInfo()
 			loop = 0
@@ -216,14 +216,15 @@ class DataSetManager:
 						dataSetY += [temp]
 
 
-				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset")
+				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset", loop, len(self.DataSetHashTable))
 				loop += 1
 
 			ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
 			ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
-			self.MetaData["AnnDataMadeFromBruteForceTotalTime"] = self.MetaData["BruteForceTotalTime"]
+			self.MetaData["AnnDataMadeFromBruteForceTotalTime"] = self.MetaData["TotalTime"]
 			self.MetaData["NetworkUsingOneHotEncoding"] = isOneHotEncoding
 			self.SaveMetaData()
+			self.Clear()
 
 		elif ComplexFileExists(self.AnnDataSetAddress+"XDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YDataSet"):
 			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XDataSet")

@@ -114,16 +114,16 @@ def DictLoad(address, loadingBarOn=False):
 	file.close()
 	
 	numberOfLines = len(lines)
-	loadingBar.Update(0, "Loading dict line: "+str(0)+"/"+str(numberOfLines))
+	loadingBar.Update(0, "Loading dict", 0, numberOfLines)
 
 	for loop in range(numberOfLines):
 		line = lines[loop][:-1].split(":")
 		key = line[0]
 		dictionary[key] = deserializer(line[1])
 
-		loadingBar.Update(loop/numberOfLines, "Loading dict line: "+str(loop)+"/"+str(numberOfLines))
+		loadingBar.Update(loop/numberOfLines, "Loading dict", loop, numberOfLines)
 
-	loadingBar.Update(1, "Loading dict line: "+str(numberOfLines)+"/"+str(numberOfLines))
+	loadingBar.Update(loop/numberOfLines, "Loading dict", numberOfLines, numberOfLines)
 
 	return dictionary
 def DictFileExists(address):
