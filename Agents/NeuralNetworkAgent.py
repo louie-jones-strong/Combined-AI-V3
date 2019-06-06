@@ -8,8 +8,12 @@ import Agents.NeuralNetwork as NeuralNetwork
 class Agent(AgentBase.AgentBase):
 	TrainedEpochs = 0
 
-	def __init__(self, dataSetManager, loadData, winningModeON=False):
-		super().__init__(dataSetManager, loadData, winningModeON)
+	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False):
+		if not trainingMode:
+			super().__init__(dataSetManager, loadData, winningModeON)
+		else:
+			self.DataSetManager = dataSetManager
+
 		self.LoadData = loadData
 
 		self.NetworkModel, self.RunId, self.NumberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
@@ -20,6 +24,8 @@ class Agent(AgentBase.AgentBase):
 				NeuralNetwork.SetWeights(self.NetworkModel, self.NumberOfLayers, weights)
 
 		self.BatchSize = 4520
+		if trainingMode:
+			self.Train()
 		return
 
 	def MoveCal(self, inputs, batch=False):
@@ -88,8 +94,6 @@ class Agent(AgentBase.AgentBase):
 					datasetLoadedAtTime = time.time()
 
 		return
-
-
 
 	def SaveData(self, fitness):
 		super().SaveData(fitness)

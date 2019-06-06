@@ -80,11 +80,8 @@ class RunController:
 				userInput = trainNetwork
 
 			import Agents.NeuralNetworkAgent as NeuralNetwork
-
-			Ais = [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
-
-			if userInput == "Y" or userInput == "y":
-				Ais[0].Train()
+			trainingMode = userInput == "Y" or userInput == "y"
+			Ais = [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode, trainingMode=trainingMode)]
 
 			for loop in range(self.NumberOfBots-1):
 				Ais += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
