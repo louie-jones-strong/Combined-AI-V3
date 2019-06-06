@@ -84,7 +84,7 @@ class Agent(AgentBase.AgentBase):
 				self.DataSetManager.SaveNetworkWeights(weights)
 
 				if time.time() - datasetLoadedAtTime >= 60*5:
-					dataSetX, dataSetY, _ = self.DataSetManager.GetMoveDataSet()
+					dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 					datasetLoadedAtTime = time.time()
 
 		return
