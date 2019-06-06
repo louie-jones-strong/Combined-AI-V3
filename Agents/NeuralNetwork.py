@@ -55,9 +55,16 @@ def PredictNetworkStructre(dataSetManager):
 				if hasattr(dataSetX[0][0][0][0], "__len__"):
 					inputShape += [len(dataSetX[0][0][0][0])]
 
+		inputNodeSum = 1
+		for loop in range(len(inputShape)):
+			inputNodeSum *= inputShape[loop]
+
+
 		structreArray = []
-		structreArray += [["ann", 50, "Tanh"]]
-		structreArray += [["ann", 50, "Tanh"]]
+		structreArray += [["ann", inputNodeSum*5, "Tanh"]]
+		structreArray += [["ann", inputNodeSum*5, "Tanh"]]
+		structreArray += [["ann", inputNodeSum*5, "Tanh"]]
+		structreArray += [["ann", inputNodeSum*5, "Tanh"]]
 
 		if dataSetManager.MinOutputSize < -1 or dataSetManager.MaxOutputSize > 1:
 			structreArray += [["ann", len(dataSetY[0]), "Linear"]]
