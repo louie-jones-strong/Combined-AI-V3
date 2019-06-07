@@ -1,8 +1,6 @@
 import Agents.AgentBase as AgentBase
 import time
 
-#print("Importing Tflearn...")
-#import tflearn
 import Agents.NeuralNetwork as NeuralNetwork
 
 class Agent(AgentBase.AgentBase):

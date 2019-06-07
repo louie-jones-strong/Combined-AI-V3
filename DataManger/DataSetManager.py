@@ -185,6 +185,7 @@ class DataSetManager:
 		loadingBar = LoadingBar.LoadingBar()
 		isOneHotEncoding = True
 
+		self.GetMetaData()
 		if (self.MetaData["TotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
 			(not ComplexFileExists(self.AnnDataSetAddress+"XDataSet")) or 
 			(not ComplexFileExists(self.AnnDataSetAddress+"YDataSet"))):
