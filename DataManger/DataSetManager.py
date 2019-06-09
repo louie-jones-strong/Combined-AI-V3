@@ -202,19 +202,22 @@ class DataSetManager:
 				if key in self.DataSetTables[index].Content:
 					boardInfo = self.DataSetTables[index].Content[key]
 
-					if boardInfo.NumOfTriedMoves >= self.MaxMoveIDs:
-						dataSetX += [board]
-						
-						if isOneHotEncoding:
-							temp = []
-							for loop2 in range(self.MaxMoveIDs):
-								temp += [0]
+					dataSetX += [board]
+					
+					if isOneHotEncoding:
+						outputY = []
+						for loop2 in range(self.MaxMoveIDs):
+							temp = 0
+							if loop2 in boardInfo.Moves and boardInfo.BestAvgFitness != 0:
+								temp = boardInfo.Moves[loop2].AvgFitness / boardInfo.BestAvgFitness
 
-							temp[boardInfo.MoveIDOfBestAvgFitness] = 1
-						else:
-							temp = self.MoveIDToMove(boardInfo.MoveIDOfBestAvgFitness)
+							outputY += [temp]
 
-						dataSetY += [temp]
+						outputY[boardInfo.MoveIDOfBestAvgFitness] = 1
+					else:
+						outputY = self.MoveIDToMove(boardInfo.MoveIDOfBestAvgFitness)
+
+					dataSetY += [outputY]
 
 
 				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset", loop, len(self.DataSetHashTable))
