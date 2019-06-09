@@ -75,6 +75,7 @@ class Agent(AgentBase.AgentBase):
 		dataSetY = []
 
 		while len(dataSetY) == 0:
+			time.sleep(10)
 			dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 		datasetLoadedAtTime = time.time()
 
@@ -83,13 +84,11 @@ class Agent(AgentBase.AgentBase):
 			self.NetworkModel.fit(dataSetX, dataSetY, n_epoch=epochs, batch_size=self.BatchSize, run_id=str(self.RunId), shuffle=True)
 			self.TrainedEpochs += epochs
 
-			if self.TrainedEpochs % (epochs*10) == 0:
+			if time.time() - datasetLoadedAtTime >= 60*5:
 				weights = NeuralNetwork.GetWeights(self.NetworkModel, self.NumberOfLayers)
 				self.DataSetManager.SaveNetworkWeights(weights)
-
-				if time.time() - datasetLoadedAtTime >= 60*5:
-					dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
-					datasetLoadedAtTime = time.time()
+				dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
+				datasetLoadedAtTime = time.time()
 
 		return
 
