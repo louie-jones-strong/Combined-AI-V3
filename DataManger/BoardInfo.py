@@ -5,13 +5,16 @@ class BoardInfo():
 	MoveIDOfBestAvgFitness = 0
 	BestAvgFitness = -sys.maxsize
 	Moves = {}
+	PlayedMovesLookUpArray = 0
 
-	def __init__(self, NumOfTriedMoves=1, Moves={}, moveIDOfBestAvgFitness=0, bestAvgFitness=-sys.maxsize):
+	def __init__(self, NumOfTriedMoves=1, Moves={}, moveIDOfBestAvgFitness=0, bestAvgFitness=-sys.maxsize, playedMovesLookUpArray=0):
 		self.NumOfTriedMoves = NumOfTriedMoves
 		self.Moves = Moves
 		self.MoveIDOfBestAvgFitness = moveIDOfBestAvgFitness
 		self.BestAvgFitness = bestAvgFitness
+		self.PlayedMovesLookUpArray = playedMovesLookUpArray
 		return
+
 class MoveInfo():
 	AvgFitness = 0.0
 	TimesPlayed = 1
