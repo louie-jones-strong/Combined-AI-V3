@@ -23,6 +23,7 @@ class Agent(AgentBase.AgentBase):
 				NeuralNetwork.SetWeights(self.NetworkModel, self.NumberOfLayers, weights)
 
 		self.BatchSize = 4520
+		self.PredictionCache = {}
 		if trainingMode:
 			self.Train()
 		return
@@ -31,24 +32,42 @@ class Agent(AgentBase.AgentBase):
 		if not batch:
 			boards = [boards]
 
-		networkOutputs = self.NetworkModel.predict(boards)
+		networkOutputs = []
+		boardsInCache = True
+		for loop in range(len(boards)):
+			
+			key = self.DataSetManager.BoardToKey(boards[loop])
+			if key in self.PredictionCache:
+				networkOutputs += [self.PredictionCache[key]]
+
+			else:
+				boardsInCache = False
+				break
+
+		if not boardsInCache:
+			networkOutputs = self.NetworkModel.predict(boards)
+			self.PredictionCache = {}
+
+
 
 		outputs = []
 		for loop in range(len(networkOutputs)):
-			networkOutput = list(networkOutputs[loop])
+			
+			key = self.DataSetManager.BoardToKey(boards[loop])
+			if not boardsInCache:
+				self.PredictionCache[key] = networkOutputs[loop]
 
-			outputs += [self.PredictionToMove(networkOutput, boards[loop])]
+			networkOutput = list(networkOutputs[loop])
+			outputs += [self.PredictionToMove(networkOutput, key)]
 
 		if not batch:
 			outputs = outputs[0]
 			self.RecordMove(boards[0], outputs)
-
 		return outputs
 
-	def PredictionToMove(self, networkOutput, board):
+	def PredictionToMove(self, networkOutput, key):
 		if self.DataSetManager.MetaData["NetworkUsingOneHotEncoding"]:
 
-			key = self.DataSetManager.BoardToKey(board)
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
 			output = self.DataSetManager.MoveIDToMove(0)
