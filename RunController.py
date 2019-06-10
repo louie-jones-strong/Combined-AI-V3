@@ -40,7 +40,7 @@ def MakeAgentMove(turn, startBoard, AIs, game):
 
 class RunController:
 
-	Version = 0
+	Version = 1
 
 
 	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None):

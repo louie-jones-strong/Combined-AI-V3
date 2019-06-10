@@ -1,14 +1,12 @@
 import sys
 
 class BoardInfo():
-	NumOfTriedMoves = 1
 	MoveIDOfBestAvgFitness = 0
 	BestAvgFitness = -sys.maxsize
 	Moves = {}
 	PlayedMovesLookUpArray = 0
 
-	def __init__(self, NumOfTriedMoves=1, Moves={}, moveIDOfBestAvgFitness=0, bestAvgFitness=-sys.maxsize, playedMovesLookUpArray=0):
-		self.NumOfTriedMoves = NumOfTriedMoves
+	def __init__(self, Moves={}, moveIDOfBestAvgFitness=0, bestAvgFitness=-sys.maxsize, playedMovesLookUpArray=0):
 		self.Moves = Moves
 		self.MoveIDOfBestAvgFitness = moveIDOfBestAvgFitness
 		self.BestAvgFitness = bestAvgFitness

@@ -20,8 +20,12 @@ class Agent(AgentBase.AgentBase):
 				print("new Board!")
 		else:  # learning mode
 			if found:
-				if boardInfo.NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
-					moveID = boardInfo.NumOfTriedMoves
+				if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+					for loop in range(self.DataSetManager.MaxMoveIDs):
+
+						if not (2**loop & boardInfo.PlayedMovesLookUpArray):
+							moveID = loop
+							break
 
 				else:#played every move once already
 					leastPlayed = sys.maxsize

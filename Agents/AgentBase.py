@@ -7,6 +7,8 @@ class AgentBase:
 		self.WinningModeON = winningModeON
 		self.TempDataSet = {}
 		self.RecordMoves = True
+		
+		self.AllMovesPlayedValue = (2**self.DataSetManager.MaxMoveIDs)-1
 
 		if loadData:
 			self.DataSetManager.LoadTableInfo()
@@ -22,15 +24,21 @@ class AgentBase:
 
 
 		if found:
-			if boardInfo.NumOfTriedMoves < self.DataSetManager.MaxMoveIDs:
+			# never played this move before
+			if moveID not in boardInfo.Moves:
 				boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
-				boardInfo.NumOfTriedMoves += 1
+			else:
+				boardInfo.Moves[moveID].TimesPlayed += 1
 
-				if boardInfo.NumOfTriedMoves >= self.DataSetManager.MaxMoveIDs:
+			# mark move as played if never played before
+			if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+
+				if not (2**moveID & boardInfo.PlayedMovesLookUpArray):
+					boardInfo.PlayedMovesLookUpArray += 2**moveID
+
+				if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
 					self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
 
-			else:#played every move once already
-				boardInfo.Moves[moveID].TimesPlayed += 1
 
 		else:#never played board before
 			self.DataSetManager.AddNewBoard(key, board)
