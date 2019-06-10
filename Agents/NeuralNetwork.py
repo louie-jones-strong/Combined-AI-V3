@@ -2,6 +2,7 @@ import os
 
 print("Importing Tflearn...")
 import tflearn
+import time
 
 def GetWeights(networkModel, numberOfLayers):
 	weightsValue = []
@@ -43,6 +44,7 @@ def PredictNetworkStructre(dataSetManager):
 		dataSetY = []
 
 		while len(dataSetY) == 0:
+			time.sleep(10)
 			dataSetX, dataSetY = dataSetManager.GetMoveDataSet()
 
 		inputShape = [len(dataSetX[0])]

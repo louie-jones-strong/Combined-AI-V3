@@ -1,5 +1,6 @@
 import Agents.AgentBase as AgentBase
 import time
+import sys
 
 import Agents.NeuralNetwork as NeuralNetwork
 
@@ -37,10 +38,21 @@ class Agent(AgentBase.AgentBase):
 			networkOutput = list(networkOutputs[loop])
 
 			if self.DataSetManager.MetaData["NetworkUsingOneHotEncoding"]:
-				output = [0] 
-				bestValue = 0
+				key = self.DataSetManager.BoardToKey(inputs[loop])
+				found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+
+				output = self.DataSetManager.MoveIDToMove(0)
+				bestValue = -sys.maxsize
+
 				for loop2 in range(len(networkOutput)):
-					if networkOutput[loop2] >= bestValue:
+					invaild = False
+
+					if found:
+						if 2**loop2 & boardInfo.PlayedMovesLookUpArray:
+							if loop2 not in boardInfo.Moves:
+								invaild = True
+
+					if networkOutput[loop2] >= bestValue and (not invaild):
 						bestValue = networkOutput[loop2]
 						output = self.DataSetManager.MoveIDToMove(loop2)
 
@@ -67,6 +79,7 @@ class Agent(AgentBase.AgentBase):
 
 		if not batch:
 			outputs = outputs[0]
+			self.RecordMove(inputs[0], outputs)
 
 		return outputs
 
@@ -80,11 +93,11 @@ class Agent(AgentBase.AgentBase):
 		datasetLoadedAtTime = time.time()
 
 		while True:
-			epochs = 100
+			epochs = 10
 			self.NetworkModel.fit(dataSetX, dataSetY, n_epoch=epochs, batch_size=self.BatchSize, run_id=str(self.RunId), shuffle=True)
 			self.TrainedEpochs += epochs
 
-			if time.time() - datasetLoadedAtTime >= 60*5:
+			if time.time() - datasetLoadedAtTime >= 60:
 				weights = NeuralNetwork.GetWeights(self.NetworkModel, self.NumberOfLayers)
 				self.DataSetManager.SaveNetworkWeights(weights)
 				dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
