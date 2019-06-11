@@ -40,7 +40,7 @@ class DataSetManager:
 		self.DataSetHashTable = {}
 		self.NewDataSetHashTable = {}
 		self.DataSetTables = []
-		self.DataSetTablesToSave = {}
+		self.LoadedDataSetTables = {}
 		self.FillingTable = 0
 		self.TableBatchSize = 1000
 		return
@@ -79,14 +79,17 @@ class DataSetManager:
 
 			self.NewDataSetHashTable = {}
 
-		for loop in range(len(self.DataSetTables)):
-			if (self.DataSetTables[loop].IsLoaded):
-				if (loop in self.DataSetTablesToSave):
-					self.DataSetTables[loop].Save()
-				else:
-					self.DataSetTables[loop].Unload()
+		for tableKey, timesPlayed in self.LoadedDataSetTables.items():
 
-		self.DataSetTablesToSave = {}
+			if timesPlayed > 0:
+				self.DataSetTables[tableKey].Save()
+				self.LoadedDataSetTables[tableKey] = 0
+			else:
+				self.DataSetTables[tableKey].Unload()
+				del self.LoadedDataSetTables[tableKey]
+
+
+
 		self.CanAppendData = True
 
 		self.MetaData["SizeOfDataSet"] =  self.GetNumberOfBoards()
@@ -166,13 +169,15 @@ class DataSetManager:
 
 		if key in self.DataSetHashTable:
 			index = self.DataSetHashTable[key][0]
+
 			if not self.DataSetTables[index].IsLoaded:
 				self.DataSetTables[index].Load()
-			
-			if (index in self.DataSetTablesToSave):
-				self.DataSetTablesToSave[index] += 1
+
+			if index not in self.LoadedDataSetTables:
+				self.LoadedDataSetTables[index] = 1
 			else:
-				self.DataSetTablesToSave[index] = 1
+				self.LoadedDataSetTables[index] += 1
+
 
 			boardInfo = self.DataSetTables[index].Content[key]
 			found = True
@@ -263,7 +268,7 @@ class DataSetManager:
 		ramUsed += RamInfo.GetFullSizeOf(self.NewDataSetHashTable)
 
 		ramUsed += RamInfo.GetFullSizeOf(self.DataSetTables)
-		ramUsed += RamInfo.GetFullSizeOf(self.DataSetTablesToSave)
+		ramUsed += RamInfo.GetFullSizeOf(self.LoadedDataSetTables)
 		ramUsed += RamInfo.GetFullSizeOf(self.MetaData)
 		ramUsed += RamInfo.GetFullSizeOf(self.MoveIDLookUp)
 		ramUsed = Format.BytesOutputFormat(ramUsed)
