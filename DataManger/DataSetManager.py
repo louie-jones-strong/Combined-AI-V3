@@ -79,9 +79,10 @@ class DataSetManager:
 
 			self.NewDataSetHashTable = {}
 
-		for tableKey, timesPlayed in self.LoadedDataSetTables.items():
+		listOfKeys = self.LoadedDataSetTables.keys()
+		for tableKey in listOfKeys:
 
-			if timesPlayed > 0:
+			if self.LoadedDataSetTables[tableKey] > 0:
 				self.DataSetTables[tableKey].Save()
 				self.LoadedDataSetTables[tableKey] = 0
 			else:
