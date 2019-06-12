@@ -273,5 +273,18 @@ class RunController:
 		return
 
 if __name__ == "__main__":
-	RunController(simNumber=None, loadData=None, aiType=None, renderQuality=0)
-	RunController()
+	try:
+		RunController(simNumber=None, loadData=None, aiType=None, renderQuality=0)
+		RunController()
+
+	except Exception as error:
+		print("")
+		print("===================================================")
+		print("")
+		print(type(error))
+		print(error.args) 
+		print("there was a error!!!!")
+		print("")
+		print("===================================================")
+		input("Press any Key To contine...")
+
