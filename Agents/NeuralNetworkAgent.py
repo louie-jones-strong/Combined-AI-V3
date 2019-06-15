@@ -24,7 +24,6 @@ class Agent(AgentBase.AgentBase):
 			if found:
 				self.AnnModel.SetWeights(weights)
 
-		self.PredictionCache = {}
 		if trainingMode:
 			self.Train()
 		return
