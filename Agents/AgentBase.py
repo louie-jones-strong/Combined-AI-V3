@@ -1,4 +1,6 @@
 import DataManger.BoardInfo as BoardInfo
+from DataManger.BasicLoadAndSave import BoardToKey
+
 
 class AgentBase:
 
@@ -18,7 +20,7 @@ class AgentBase:
 		if not self.RecordMoves:
 			return
 
-		key = self.DataSetManager.BoardToKey(board)
+		key = BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
@@ -50,7 +52,7 @@ class AgentBase:
 		if not self.RecordMoves:
 			return
 
-		key = self.DataSetManager.BoardToKey(board)
+		key = BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
@@ -66,7 +68,7 @@ class AgentBase:
 		if not self.RecordMoves:
 			return
 
-		key = self.DataSetManager.BoardToKey(board)
+		key = BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
@@ -74,7 +76,7 @@ class AgentBase:
 			if gameFinished:
 				outComeKey = "GameFinished"
 			else:
-				outComeKey = self.DataSetManager.BoardToKey(outComeBoard)
+				outComeKey = BoardToKey(outComeBoard)
 
 			move = boardInfo.Moves[moveID]
 			if outComeKey in move.MoveOutComes:

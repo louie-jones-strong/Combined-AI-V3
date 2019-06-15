@@ -2,6 +2,13 @@ import pickle
 import os
 from Shared import LoadingBar as LoadingBar
 
+
+def BoardToKey(board):
+		key = str(board)
+		#key = hash(key)
+		return key
+
+
 def serializer(inputObject):
 	outputObject = ""
 

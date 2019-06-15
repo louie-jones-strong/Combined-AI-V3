@@ -290,7 +290,3 @@ class DataSetManager:
 			moveID = moveID % (temp)**((self.NumOfOutputs - loop)-1)
 
 		return move
-	def BoardToKey(self, board):
-		key = str(board)
-		#key = hash(key)
-		return key

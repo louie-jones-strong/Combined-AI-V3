@@ -82,7 +82,7 @@ class RunController:
 			import Agents.NeuralNetworkAgent as NeuralNetwork
 			trainingMode = userInput == "Y" or userInput == "y"
 			Ais = [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode, trainingMode=trainingMode)]
-
+		
 			for loop in range(self.NumberOfBots-1):
 				Ais += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 		else:
@@ -282,7 +282,8 @@ if __name__ == "__main__":
 		print("===================================================")
 		print("")
 		print(type(error))
-		print(error.args) 
+		for arg in error.args:
+			print(arg)
 		print("there was a error!!!!")
 		print("")
 		print("===================================================")

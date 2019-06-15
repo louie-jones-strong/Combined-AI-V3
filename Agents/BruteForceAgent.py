@@ -2,12 +2,13 @@ import random
 import sys
 import DataManger.BoardInfo as BoardInfo
 import Agents.AgentBase as AgentBase
+from DataManger.BasicLoadAndSave import BoardToKey
 
 
 class Agent(AgentBase.AgentBase):
 
 	def MoveCal(self, board):
-		key = self.DataSetManager.BoardToKey(board)
+		key = BoardToKey(board)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
 		if self.WinningModeON:
