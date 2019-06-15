@@ -1,28 +1,65 @@
 import os
+from DataManger.BasicLoadAndSave import BoardToKey
+import time
 
 print("Importing Tflearn...")
 import tflearn
-import time
 
-def GetWeights(networkModel, numberOfLayers):
-	weightsValue = []
+class NeuralNetwork:
 
-	for loop in range(numberOfLayers):
-		temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
-		with networkModel.session.as_default():
-			temp[0] = tflearn.variables.get_value(temp[0])
-			temp[1] = tflearn.variables.get_value(temp[1])
-			weightsValue += [temp]
-	return weightsValue
-def SetWeights(networkModel, numberOfLayers, newWeights):
+	def __init__(self, networkModel, numberOfLayers, batchSize, runId):
+		self.NetworkModel = networkModel
+		self.NumberOfLayers = numberOfLayers
+		self.BatchSize = batchSize
+		self.RunId = runId
+		self.PredictionCache = {}
+		self.MaxCacheSize = 5000
+		return
+	
+	def GetWeights(self):
+		weightsValue = []
+		for loop in range(self.NumberOfLayers):
+			temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
+			with self.NetworkModel.session.as_default():
+				temp[0] = tflearn.variables.get_value(temp[0])
+				temp[1] = tflearn.variables.get_value(temp[1])
+				weightsValue += [temp]
+		return weightsValue
 
-	for loop in range(numberOfLayers):
-		temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
-		with networkModel.session.as_default():
-			tflearn.variables.set_value(temp[0],newWeights[loop][0])
-			tflearn.variables.set_value(temp[1],newWeights[loop][1])
-	return
+	def SetWeights(self, newWeights):
+		for loop in range(self.NumberOfLayers):
+			temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
+			with self.NetworkModel.session.as_default():
+				tflearn.variables.set_value(temp[0],newWeights[loop][0])
+				tflearn.variables.set_value(temp[1],newWeights[loop][1])
 
+		self.PredictionCache = {}
+		return
+
+	def Predict(self, board):
+		key = BoardToKey(board)
+
+		if key in self.PredictionCache:
+			output = self.PredictionCache[key]
+		else:
+			output = self.NetworkModel.predict(board)
+			if len(self.PredictionCache) >= self.MaxCacheSize:
+				self.PredictionCache = {}
+			self.PredictionCache[key] = output
+
+		return output
+
+	def Train(self, dataSetX, dataSetY, trainingTime=60):
+		trainedEpochs = 0
+		trainingStartTime = time.time()
+		
+		while (time.time()-trainingStartTime) < trainingTime:
+			epochs = 10
+			self.NetworkModel.fit(dataSetX, dataSetY, n_epoch=epochs, batch_size=self.BatchSize, run_id=self.RunId, shuffle=True)
+			trainedEpochs += epochs
+
+		self.PredictionCache = {}
+		return trainedEpochs
 
 def MakeModel(dataSetManager):
 	inputShape, structreArray = PredictNetworkStructre(dataSetManager)

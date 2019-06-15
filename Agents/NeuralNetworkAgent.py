@@ -1,4 +1,5 @@
 import Agents.AgentBase as AgentBase
+from DataManger.BasicLoadAndSave import BoardToKey
 import time
 import sys
 
@@ -15,14 +16,14 @@ class Agent(AgentBase.AgentBase):
 
 		self.LoadData = loadData
 
-		self.NetworkModel, self.RunId, self.NumberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
+		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
+		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, runId, 5000)
 
 		if loadData:
 			found, weights = self.DataSetManager.LoadNetworkWeights()
 			if found:
-				NeuralNetwork.SetWeights(self.NetworkModel, self.NumberOfLayers, weights)
+				self.AnnModel.SetWeights(weights)
 
-		self.BatchSize = 4520
 		self.PredictionCache = {}
 		if trainingMode:
 			self.Train()
@@ -32,42 +33,21 @@ class Agent(AgentBase.AgentBase):
 		if not batch:
 			boards = [boards]
 
-		networkOutputs = []
-		boardsInCache = True
-		for loop in range(len(boards)):
-			
-			key = self.DataSetManager.BoardToKey(boards[loop])
-			if key in self.PredictionCache:
-				networkOutputs += [self.PredictionCache[key]]
-
-			else:
-				boardsInCache = False
-				break
-
-		if not boardsInCache:
-			networkOutputs = self.NetworkModel.predict(boards)
-			self.PredictionCache = {}
-
-
+		networkOutputs = self.AnnModel.Predict(boards)
 
 		outputs = []
 		for loop in range(len(networkOutputs)):
-			
-			key = self.DataSetManager.BoardToKey(boards[loop])
-			if not boardsInCache:
-				self.PredictionCache[key] = networkOutputs[loop]
-
 			networkOutput = list(networkOutputs[loop])
-			outputs += [self.PredictionToMove(networkOutput, key)]
+			outputs += [self.PredictionToMove(networkOutput, boards[loop])]
 
 		if not batch:
 			outputs = outputs[0]
 			self.RecordMove(boards[0], outputs)
 		return outputs
 
-	def PredictionToMove(self, networkOutput, key):
+	def PredictionToMove(self, networkOutput, board):
 		if self.DataSetManager.MetaData["NetworkUsingOneHotEncoding"]:
-
+			key = BoardToKey(board)
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
 			output = self.DataSetManager.MoveIDToMove(0)
@@ -113,18 +93,13 @@ class Agent(AgentBase.AgentBase):
 		while len(dataSetY) == 0:
 			time.sleep(10)
 			dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
-		datasetLoadedAtTime = time.time()
 
 		while True:
-			epochs = 10
-			self.NetworkModel.fit(dataSetX, dataSetY, n_epoch=epochs, batch_size=self.BatchSize, run_id=str(self.RunId), shuffle=True)
-			self.TrainedEpochs += epochs
-
-			if time.time() - datasetLoadedAtTime >= 60:
-				weights = NeuralNetwork.GetWeights(self.NetworkModel, self.NumberOfLayers)
-				self.DataSetManager.SaveNetworkWeights(weights)
-				dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
-				datasetLoadedAtTime = time.time()
+			self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY, trainingTime=60)
+			
+			weights = self.AnnModel.GetWeights()
+			self.DataSetManager.SaveNetworkWeights(weights)
+			dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 
 		return
 
@@ -133,5 +108,5 @@ class Agent(AgentBase.AgentBase):
 		if self.LoadData:
 			found, weights = self.DataSetManager.LoadNetworkWeights()
 			if found:
-				NeuralNetwork.SetWeights(self.NetworkModel, self.NumberOfLayers, weights)
+				self.AnnModel.SetWeights(weights)
 		return
