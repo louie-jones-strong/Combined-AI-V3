@@ -1,9 +1,10 @@
+import Agents.NeuralNetwork as NeuralNetwork
+from DataManger.BasicLoadAndSave import BoardToKey
 
 class SimOutputPredictor:
 
-	def __init__(self, dataSetManager, loadData):
+	def __init__(self, dataSetManager, loadData, trainingMode=False):
 		self.DataSetManager = dataSetManager
-		self.TempDataSet = {}
 
 		if loadData:
 			self.DataSetManager.LoadTableInfo()
@@ -12,7 +13,7 @@ class SimOutputPredictor:
 	def PredictOutput(self, board, move):
 		newBoard = board[:]
 
-		key = self.DataSetManager.BoardToKey(board)
+		key = BoardToKey(board)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
 		if found:
