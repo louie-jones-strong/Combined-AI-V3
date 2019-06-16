@@ -20,7 +20,7 @@ def OutputLog(logLines, logType):
 		logLines = logLines[:len(logLines)-1]
 
 	outputLines = ["========================================================="]
-	outputLines += ["IME:"+Format.TimeToDateTime(time.time(),True, True)+" LOGTYPE:"+str(logType)]
+	outputLines += ["TIME:"+Format.TimeToDateTime(time.time(),True, True)+" LOGTYPE:"+str(logType)]
 	outputLines += [""]
 	outputLines += logLines
 	outputLines += [""]
