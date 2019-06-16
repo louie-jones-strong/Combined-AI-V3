@@ -3,6 +3,7 @@ import Agents.BruteForceAgent as BruteForceAgent
 import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
+from Shared import Logger
 import importlib
 import time
 import os
@@ -278,14 +279,5 @@ if __name__ == "__main__":
 		RunController()
 
 	except Exception as error:
-		print("")
-		print("===================================================")
-		print("")
-		print(type(error))
-		for arg in error.args:
-			print(arg)
-		print("there was a error!!!!")
-		print("")
-		print("===================================================")
-		input("Press any Key To contine...")
+		Logger.LogError(error)
 
