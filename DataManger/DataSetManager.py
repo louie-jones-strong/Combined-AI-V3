@@ -248,8 +248,8 @@ class DataSetManager:
 
 		return dataSetX, dataSetY
 
-	def SaveNetworkWeights(self, weights):
-		ComplexSave(self.AnnDataSetAddress+"weights", weights)
+	def SaveNetworkWeights(self, networkType, weights):
+		ComplexSave(self.AnnDataSetAddress+str(networkType)+"weights", weights)
 		return
 	def LoadNetworkWeights(self):
 		if ComplexFileExists(self.AnnDataSetAddress+"weights"):

@@ -12,7 +12,7 @@ class SimOutputPredictor:
 			self.DataSetManager.LoadTableInfo()
 
 		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
-		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, runId, 5000)
+		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
 
 		if loadData:
 			found, weights = self.DataSetManager.LoadNetworkWeights()
@@ -57,7 +57,7 @@ class SimOutputPredictor:
 			self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY, trainingTime=60)
 			
 			weights = self.AnnModel.GetWeights()
-			self.DataSetManager.SaveNetworkWeights(weights)
+			self.DataSetManager.SaveNetworkWeights("Sim", weights)
 			dataSetX, dataSetY = self.DataSetManager.GetSimPredictionDataSet()
 
 		return

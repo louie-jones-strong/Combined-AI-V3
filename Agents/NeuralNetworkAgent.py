@@ -17,7 +17,7 @@ class Agent(AgentBase.AgentBase):
 		self.LoadData = loadData
 
 		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
-		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, runId, 5000)
+		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
 
 		if loadData:
 			found, weights = self.DataSetManager.LoadNetworkWeights()
@@ -97,7 +97,7 @@ class Agent(AgentBase.AgentBase):
 			self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY, trainingTime=60)
 			
 			weights = self.AnnModel.GetWeights()
-			self.DataSetManager.SaveNetworkWeights(weights)
+			self.DataSetManager.SaveNetworkWeights("BestMove", weights)
 			dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 
 		return

@@ -69,7 +69,7 @@ def MakeModel(dataSetManager):
 		runId = len(os.listdir(dataSetManager.TesnorBoardLogAddress))
 
 	model = ModelMaker(inputShape, structreArray, dataSetManager.TesnorBoardLogAddress, lr=0.001)#, optimizer="sgd")	
-	return model, runId, len(structreArray)
+	return model, str(runId), len(structreArray)
 
 def PredictNetworkStructre(dataSetManager):
 
@@ -120,6 +120,7 @@ def PredictNetworkStructre(dataSetManager):
 	return inputShape, structreArray
 
 def ModelMaker(inputShape, structreArray, tensorBoardAdress, lr=0.01, optimizer="adam"):
+	
 	tflearn.config.init_graph(gpu_memory_fraction=0.95, soft_placement=True)
 
 	if len(inputShape) == 1:
