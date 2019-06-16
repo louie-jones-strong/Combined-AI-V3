@@ -1,6 +1,7 @@
 import traceback
 import time
 import Shared.OutputFormating as Format
+import os
 
 def LogError(error):
 	if error == None:
@@ -26,8 +27,21 @@ def OutputLog(logLines, logType):
 	outputLines += [""]
 	outputLines += ["========================================================="]
 
-	for line in outputLines:
-		print(line)
+	output = "\n".join(outputLines)
+	print(output)	
+
+	address = "Logs//"
+	if not os.path.exists(address):
+		os.makedirs(address)
+
+	address += "ErrorLog.txt"
+
+	if not os.path.exists(address):
+		file = open(address, "w")
+	else:
+		file = open(address, "a")
+	file.write(output)
+	file.close()
 
 
 	return outputLines
