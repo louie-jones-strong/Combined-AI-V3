@@ -1,5 +1,5 @@
 import Agents.NeuralNetwork as NeuralNetwork
-from DataManger.BasicLoadAndSave import BoardToKey
+from DataManger.Serializer import BoardToKey
 import time
 
 class SimOutputPredictor:

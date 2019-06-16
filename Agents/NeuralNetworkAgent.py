@@ -1,5 +1,5 @@
 import Agents.AgentBase as AgentBase
-from DataManger.BasicLoadAndSave import BoardToKey
+from DataManger.Serializer import BoardToKey
 import time
 import sys
 

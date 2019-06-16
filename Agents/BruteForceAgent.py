@@ -2,8 +2,7 @@ import random
 import sys
 import DataManger.BoardInfo as BoardInfo
 import Agents.AgentBase as AgentBase
-from DataManger.BasicLoadAndSave import BoardToKey
-
+from DataManger.Serializer import BoardToKey
 
 class Agent(AgentBase.AgentBase):
 

@@ -1,5 +1,5 @@
 import os
-from DataManger.BasicLoadAndSave import BoardToKey
+from DataManger.Serializer import BoardToKey
 import time
 
 print("Importing Tflearn...")

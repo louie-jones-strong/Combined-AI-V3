@@ -1,5 +1,5 @@
 import DataManger.BoardInfo as BoardInfo
-from DataManger.BasicLoadAndSave import BoardToKey
+from DataManger.Serializer import BoardToKey
 
 
 class AgentBase:
