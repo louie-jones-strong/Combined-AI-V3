@@ -8,6 +8,7 @@ import importlib
 import time
 import os
 import sys
+os.system("cls")
 
 def MakeAgentMove(turn, startBoard, AIs, game):
 	startBoard = startBoard[:]  # copy to break references

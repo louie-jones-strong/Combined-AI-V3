@@ -134,8 +134,7 @@ def ModelMaker(inputShape, structreArray, tensorBoardAdress, lr=0.01, optimizer=
 
 	network = LayerMaker(network, structreArray)
 	
-	loss = loss='mean_square'
-	#loss = "categorical_crossentropy"
+	loss = 'mean_square'
 	if optimizer != "adam":
 		optimizer = tflearn.SGD(learning_rate=lr)
 	
