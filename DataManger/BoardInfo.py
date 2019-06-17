@@ -6,11 +6,11 @@ class BoardInfo():
 	Moves = {}
 	PlayedMovesLookUpArray = 0
 
-	def __init__(self, Moves={}, moveIDOfBestAvgFitness=0, bestAvgFitness=-sys.maxsize, playedMovesLookUpArray=0):
-		self.Moves = Moves
-		self.MoveIDOfBestAvgFitness = moveIDOfBestAvgFitness
-		self.BestAvgFitness = bestAvgFitness
-		self.PlayedMovesLookUpArray = playedMovesLookUpArray
+	def __init__(self):
+		self.Moves = {}
+		self.MoveIDOfBestAvgFitness = 0
+		self.BestAvgFitness = -sys.maxsize
+		self.PlayedMovesLookUpArray = 0
 		return
 
 class MoveInfo():

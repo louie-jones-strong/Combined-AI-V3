@@ -157,9 +157,7 @@ class DataSetManager:
 		if not self.DataSetTables[index].IsLoaded:
 			self.DataSetTables[index].Load()
 
-		moves = {}
-		moves[0] = BoardInfo.MoveInfo()
-		self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo(Moves=moves)
+		self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo()
 		if len(self.DataSetTables[index].Content) >= self.TableBatchSize:
 			self.FillingTable += 1
 

@@ -24,26 +24,24 @@ class AgentBase:
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
-
-		if found:
-			# never played this move before
-			if moveID not in boardInfo.Moves:
-				boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
-			else:
-				boardInfo.Moves[moveID].TimesPlayed += 1
-
-			# mark move as played if never played before
-			if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
-
-				if not (2**moveID & boardInfo.PlayedMovesLookUpArray):
-					boardInfo.PlayedMovesLookUpArray += 2**moveID
-
-				if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
-					self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
-
-
-		else:#never played board before
+		if not found:  # never played board before
 			self.DataSetManager.AddNewBoard(key, board)
+			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+
+		# never played this move before
+		if moveID not in boardInfo.Moves:
+			boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
+		else:
+			boardInfo.Moves[moveID].TimesPlayed += 1
+
+		# mark move as played if never played before
+		if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+
+			if not (2**moveID & boardInfo.PlayedMovesLookUpArray):
+				boardInfo.PlayedMovesLookUpArray += 2**moveID
+
+			if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
+				self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
 
 		self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID}
 		return
