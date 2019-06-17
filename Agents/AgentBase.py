@@ -8,6 +8,7 @@ class AgentBase:
 		self.DataSetManager = dataSetManager
 		self.WinningModeON = winningModeON
 		self.TempDataSet = {}
+		self.MoveNumber = 0
 		self.RecordMoves = True
 		
 		self.AllMovesPlayedValue = (2**self.DataSetManager.MaxMoveIDs)-1
@@ -43,7 +44,9 @@ class AgentBase:
 			if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
 				self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
 
-		self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID}
+		if self.RecordMoves:
+			self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID, "MoveNumber":self.MoveNumber}
+			self.MoveNumber += 1
 		return
 
 	def UpdateInvalidMove(self, board, move):
@@ -60,6 +63,8 @@ class AgentBase:
 
 		if str(key)+str(moveID) in self.TempDataSet:
 			del self.TempDataSet[str(key)+str(moveID)]
+
+		self.MoveNumber -= 1
 		return
 
 	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):
@@ -87,8 +92,15 @@ class AgentBase:
 	def SaveData(self, fitness):
 		if not self.RecordMoves:
 			return
-			
+		
+		TempDataSetList = []
+
 		for tempValue in self.TempDataSet.values():
+			TempDataSetList += [tempValue]
+
+		TempDataSetList.sort(key=GetSortKey, reverse=True)
+
+		for tempValue in TempDataSetList:
 			key = tempValue["BoardKey"]
 			moveID = tempValue["MoveID"]
 
@@ -104,7 +116,9 @@ class AgentBase:
 					boardInfo.MoveIDOfBestAvgFitness = moveID
 					boardInfo.BestAvgFitness = newFitness
 
-
-
 		self.TempDataSet = {}
+		self.MoveNumber = 0
 		return
+
+def GetSortKey(val):
+	return val["MoveNumber"]
