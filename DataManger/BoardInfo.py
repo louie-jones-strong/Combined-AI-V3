@@ -5,12 +5,14 @@ class BoardInfo():
 	BestAvgFitness = -sys.maxsize
 	Moves = {}
 	PlayedMovesLookUpArray = 0
+	Finished = False
 
 	def __init__(self):
 		self.Moves = {}
 		self.MoveIDOfBestAvgFitness = 0
 		self.BestAvgFitness = -sys.maxsize
 		self.PlayedMovesLookUpArray = 0
+		self.Finished = False
 		return
 
 class MoveInfo():
