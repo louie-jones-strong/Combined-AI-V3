@@ -116,9 +116,35 @@ class AgentBase:
 					boardInfo.MoveIDOfBestAvgFitness = moveID
 					boardInfo.BestAvgFitness = newFitness
 
+				if not boardInfo.Finished:
+					boardInfo.Finished = self.IsBoardFinished(boardInfo)
+					if boardInfo.Finished:
+						self.DataSetManager.MetaData["NumberOfFinishedBoards"] += 1
+
+
 		self.TempDataSet = {}
 		self.MoveNumber = 0
 		return
 
+	def IsBoardFinished(self, boardInfo):
+		if boardInfo.Finished:
+			return True
+
+		if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+			return False
+		
+		for moveId in range(self.DataSetManager.MaxMoveIDs):
+			if moveId in boardInfo.Moves:
+
+				for outComeKey in boardInfo.Moves[moveId].MoveOutComes:
+					if outComeKey != "GameFinished":
+						found, outComeBoardInfo = self.DataSetManager.GetBoardInfo(outComeKey)
+						if (not found) or (not outComeBoardInfo.Finished):
+							return False						
+						
+		
+		return True
+
 def GetSortKey(val):
 	return val["MoveNumber"]
+

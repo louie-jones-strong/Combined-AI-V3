@@ -42,7 +42,7 @@ def MakeAgentMove(turn, startBoard, AIs, game):
 
 class RunController:
 
-	Version = 1
+	Version = 1.1
 
 
 	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None):
@@ -141,6 +141,7 @@ class RunController:
 				print("")
 				print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
 				print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
+				print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaData["NumberOfFinishedBoards"]))
 				print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
 				print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
 				print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
@@ -161,6 +162,7 @@ class RunController:
 			self.AiDataManager.MetaData["NumberOfTables"] = 0
 			self.AiDataManager.MetaData["FillingTable"] = 0
 			self.AiDataManager.MetaData["NumberOfCompleteBoards"] = 0
+			self.AiDataManager.MetaData["NumberOfFinishedBoards"] = 0
 			self.AiDataManager.MetaData["NumberOfGames"] = 0
 			self.AiDataManager.MetaData["NetworkUsingOneHotEncoding"] = False
 			self.AiDataManager.MetaData["TotalTime"] = 0
@@ -202,6 +204,7 @@ class RunController:
 			print("")
 			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
 			print("Number Of Complete Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaData["NumberOfCompleteBoards"])))
+			print("Number Of Finished Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaData["NumberOfFinishedBoards"])))
 			if finished:
 				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)) + " finished game")
 			else:
