@@ -28,13 +28,26 @@ class Agent(AgentBase.AgentBase):
 							break
 
 				else:#played every move once already
-					leastPlayed = sys.maxsize
-					moveID = 0
+					nonFinishedLeastPlayed = sys.maxsize
+					nonFinishedMoveID = -1
+
+					finishedLeastPlayed = sys.maxsize
+					finishedMoveID = 0
+
 					for movekey, moveValue in boardInfo.Moves.items():
 						
-						if moveValue.TimesPlayed < leastPlayed:
-							leastPlayed = moveValue.TimesPlayed
-							moveID = movekey
+						if (not boardInfo.Finished) and moveValue.TimesPlayed < nonFinishedLeastPlayed and not self.IsMoveFinished(boardInfo, movekey):
+							nonFinishedLeastPlayed = moveValue.TimesPlayed
+							nonFinishedMoveID = movekey
+
+						if moveValue.TimesPlayed < finishedLeastPlayed:
+							finishedLeastPlayed = moveValue.TimesPlayed
+							finishedMoveID = movekey
+
+					#if nonFinishedMoveID != -1:
+					#	moveID = nonFinishedMoveID
+					#else:
+					moveID = finishedMoveID
 
 			else:#never played board before
 				moveID = 0

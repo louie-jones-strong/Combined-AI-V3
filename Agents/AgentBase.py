@@ -153,8 +153,19 @@ class AgentBase:
 
 				if outComeKey != "GameFinished":
 					found, outComeBoardInfo = self.DataSetManager.GetBoardInfo(outComeKey)
-					if (not found) or (not outComeBoardInfo.Finished):
-						return False						
+					if not found:
+						return False
+
+					if not outComeBoardInfo.Finished:
+						outComeBoardInfo.Finished = self.IsBoardFinished(outComeBoardInfo)
+						if outComeBoardInfo.Finished:
+							self.DataSetManager.MetaData["NumberOfFinishedBoards"] += 1
+
+					if not outComeBoardInfo.Finished:
+						return False	
+
+		else:
+			return False					
 						
 		
 		return True
