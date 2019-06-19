@@ -21,7 +21,7 @@ class MoveInfo():
 	MoveOutComes = {}
 
 
-	def __init__(self, AvgFitness=0.0, TimesPlayed=1):
+	def __init__(self, AvgFitness=0.0, TimesPlayed=0):
 		self.AvgFitness = AvgFitness
 		self.TimesPlayed = TimesPlayed
 		self.MoveOutComes = {"GameFinished":0}

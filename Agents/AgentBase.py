@@ -32,8 +32,6 @@ class AgentBase:
 		# never played this move before
 		if moveID not in boardInfo.Moves:
 			boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
-		else:
-			boardInfo.Moves[moveID].TimesPlayed += 1
 
 		# mark move as played if never played before
 		if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
@@ -141,6 +139,22 @@ class AgentBase:
 						found, outComeBoardInfo = self.DataSetManager.GetBoardInfo(outComeKey)
 						if (not found) or (not outComeBoardInfo.Finished):
 							return False						
+						
+		
+		return True
+
+	def IsMoveFinished(self, boardInfo, moveId):
+		if boardInfo.Finished:
+			return True
+
+		if moveId in boardInfo.Moves:
+
+			for outComeKey in boardInfo.Moves[moveId].MoveOutComes:
+
+				if outComeKey != "GameFinished":
+					found, outComeBoardInfo = self.DataSetManager.GetBoardInfo(outComeKey)
+					if (not found) or (not outComeBoardInfo.Finished):
+						return False						
 						
 		
 		return True
