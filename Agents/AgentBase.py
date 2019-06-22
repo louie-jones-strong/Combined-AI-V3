@@ -133,12 +133,8 @@ class AgentBase:
 		
 		for moveId in range(self.DataSetManager.MaxMoveIDs):
 			if moveId in boardInfo.Moves:
-
-				for outComeKey in boardInfo.Moves[moveId].MoveOutComes:
-					if outComeKey != "GameFinished":
-						found, outComeBoardInfo = self.DataSetManager.GetBoardInfo(outComeKey)
-						if (not found) or (not outComeBoardInfo.Finished):
-							return False						
+				if not self.IsMoveFinished(boardInfo, moveId):
+					return False
 						
 		
 		return True
@@ -146,6 +142,9 @@ class AgentBase:
 	def IsMoveFinished(self, boardInfo, moveId):
 		if boardInfo.Finished:
 			return True
+
+		if not (2**moveId & boardInfo.PlayedMovesLookUpArray):
+			return False
 
 		if moveId in boardInfo.Moves:
 
@@ -157,18 +156,9 @@ class AgentBase:
 						return False
 
 					if not outComeBoardInfo.Finished:
-						outComeBoardInfo.Finished = self.IsBoardFinished(outComeBoardInfo)
-						if outComeBoardInfo.Finished:
-							self.DataSetManager.MetaData["NumberOfFinishedBoards"] += 1
-
-					if not outComeBoardInfo.Finished:
-						return False	
-
-		else:
-			return False					
-						
-		
-		return True
+						return False
+			
+		return True					
 
 def GetSortKey(val):
 	return val["MoveNumber"]

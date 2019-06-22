@@ -24,6 +24,6 @@ class MoveInfo():
 	def __init__(self, AvgFitness=0.0, TimesPlayed=0):
 		self.AvgFitness = AvgFitness
 		self.TimesPlayed = TimesPlayed
-		self.MoveOutComes = {"GameFinished":0}
+		self.MoveOutComes = {}
 		return
 # 1) point to the move that is least played
