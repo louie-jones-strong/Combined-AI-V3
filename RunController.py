@@ -1,3 +1,4 @@
+#%% imports
 import RenderEngine.RenderEngine2D as RenderEngine
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.HumanAgent as HumanAgent
@@ -9,34 +10,35 @@ import time
 import os
 import sys
 os.system("cls")
+#%% setup
 
-def MakeAgentMove(turn, startBoard, AIs, game):
+def MakeAgentMove(turn, startBoard, agents, game):
 	startBoard = startBoard[:]  # copy to break references
 
-	AI = AIs[turn-1]
+	agent = agents[turn-1]
 	valid = False
 	if turn == 1:
 		startBoard = game.FlipBoard(startBoard)
 		while not valid:
-			move = AI.MoveCal(startBoard)
+			move = agent.MoveCal(startBoard)
 			flippedMove = game.FlipInput(move)
 
 			valid, outComeBoard, turn = game.MakeMove(flippedMove)
 
 			if not valid:
-				AI.UpdateInvalidMove(startBoard, move)
+				agent.UpdateInvalidMove(startBoard, move)
 	else:
 		while not valid:
-			move = AI.MoveCal(startBoard)
+			move = agent.MoveCal(startBoard)
 
 			valid, outComeBoard, turn = game.MakeMove(move)
 
 			if not valid:
-				AI.UpdateInvalidMove(startBoard, move)
+				agent.UpdateInvalidMove(startBoard, move)
 
 	finished, fit = game.CheckFinished()
 
-	AI.UpdateMoveOutCome(startBoard, move, outComeBoard, finished)
+	agent.UpdateMoveOutCome(startBoard, move, outComeBoard, finished)
 
 	return outComeBoard, turn, finished, fit
 
@@ -52,6 +54,7 @@ class RunController:
 		self.LastOutputTime = time.time()
 		self.LastSaveTook = 0
 		self.WinningMode = False
+		self.Agents = []
 
 		if self.SimInfo["RenderSetup"]:
 			self.RenderQuality = 1
@@ -67,11 +70,12 @@ class RunController:
 		else:
 			userInput = aiType
 
+
+
 		if userInput == "T" or userInput == "t":
 			import TreeVisualiser
 			TreeVisualiser.TreeVisualiser(self.AiDataManager)
 			return
-
 
 		elif userInput == "N" or userInput == "n":
 			self.RenderQuality = 0
@@ -82,21 +86,19 @@ class RunController:
 
 			import Agents.NeuralNetworkAgent as NeuralNetwork
 			trainingMode = userInput == "Y" or userInput == "y"
-			Ais = [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode, trainingMode=trainingMode)]
+			self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode, trainingMode=trainingMode)]
 		
 			for loop in range(self.NumberOfBots-1):
-				Ais += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 		else:
-			Ais = []
 			for loop in range(self.NumberOfBots):
-				Ais += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
 
 		if self.RenderQuality == 1:
 			self.RenderEngine = RenderEngine.RenderEngine()
-		self.RunTournament(Ais)
 		return
 	def PickSimulation(self, simNumber=None):
 		files = os.listdir("Simulations")
@@ -230,15 +232,15 @@ class RunController:
 
 		return
 	
-	def RunTournament(self, Ais):
+	def RunTournament(self):
 		
-		self.RunSimMatch(Ais, self.Sim)
+		self.RunSimMatch(self.Sim)
 		
 		game = self.Sim.CreateNew()
-		self.RunSimMatch(Ais, game)
+		self.RunSimMatch(game)
 		return
 
-	def RunSimMatch(self, Ais, game):
+	def RunSimMatch(self, game):
 		board, turn = game.Start()
 
 		numMoves = 0
@@ -246,7 +248,7 @@ class RunController:
 		gameStartTime = time.time()
 		self.LastSaveTime = time.time()
 		while True:
-			board, turn, finished, fit = MakeAgentMove(turn, board, Ais, game)
+			board, turn, finished, fit = MakeAgentMove(turn, board, self.Agents, game)
 
 			numMoves += 1
 			self.AiDataManager.MetaData["TotalTime"] += time.time()-totalStartTime
@@ -256,8 +258,8 @@ class RunController:
 			if finished:
 				self.AiDataManager.MetaData["NumberOfGames"] += 1
 
-				for loop in range(len(Ais)):
-					Ais[loop].SaveData(fit[loop])
+				for loop in range(len(self.Agents)):
+					self.Agents[loop].SaveData(fit[loop])
 
 				if time.time() - self.LastSaveTime > 60:
 					self.LastSaveTook = time.time()
@@ -276,11 +278,22 @@ class RunController:
 				gameStartTime = time.time()
 		return
 
+
 if __name__ == "__main__":
+	hadError = False
+
 	try:
-		RunController(renderQuality=0)
-		#RunController(simNumber=6, loadData="Y", aiType="T", renderQuality=0)
+		#controller = RunController(renderQuality=0)
+		controller = RunController(simNumber=6, loadData="Y", aiType="b", renderQuality=0)
 
 	except Exception as error:
 		Logger.LogError(error)
+		hadError= True
 
+#%%
+	if not hadError:
+		try:
+			controller.RunTournament()
+
+		except Exception as error:
+			Logger.LogError(error)
