@@ -44,7 +44,6 @@ class RunController:
 
 	Version = 1.1
 
-
 	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None):
 		self.PickSimulation(simNumber)
 
@@ -59,22 +58,22 @@ class RunController:
 		else:
 			self.RenderQuality = 0
 
-		#if self.NumberOfBots >= 1:
-		#	userInput = input("Human Player[Y/N]:")
-		#	if userInput == "y" or userInput == "Y":
-		#		self.WinningMode = True
-		#		self.NumberOfBots -= 1
-
 		self.AiDataManager = DataSetManager.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                                      self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
 
 		loadData = self.SetUpMetaData(loadData)
 		if aiType == None:
-			userInput = input("Brute b) network n):")
+			userInput = input("Brute b) network n) See Tree T):")
 		else:
 			userInput = aiType
 
-		if userInput == "N" or userInput == "n":
+		if userInput == "T" or userInput == "t":
+			import TreeVisualiser
+			TreeVisualiser.TreeVisualiser(self.AiDataManager)
+			return
+
+
+		elif userInput == "N" or userInput == "n":
 			self.RenderQuality = 0
 			if trainNetwork == None:
 				userInput = input("Train Network[Y/N]: ")
@@ -280,7 +279,7 @@ class RunController:
 if __name__ == "__main__":
 	try:
 		#RunController()
-		RunController(simNumber=6, loadData=None, aiType="B", renderQuality=0)
+		RunController(simNumber=6, loadData="Y", aiType="T", renderQuality=0)
 
 	except Exception as error:
 		Logger.LogError(error)
