@@ -6,22 +6,40 @@ class TreeVisualiser:
 
 	def __init__(self, dataSetManager):
 		self.DataSetManager = dataSetManager
-		self.DataSetManager.LoadTableInfo()
-		startBoard = "[0, 0, 0, 0, 0, 0, 0, 0, 0]"
+
+		startBoards = ["[0, 0, 0, 0, 0, 0, 0, 0, 0]", "[[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]"]
+		self.ClearTree()
+		self.MaxDepth = 12
+		self.EdgeCapPerNode = 15
+
+		self.LastOutput = time.time()
+		while True:
+			self.DataSetManager.LoadTableInfo()
+
+			self.LastLoadTime = time.time()
+			self.LastOutput = time.time()
+			self.ClearTree()
+
+			for startBoard in startBoards:
+				found, boardInfo = self.DataSetManager.GetBoardInfo(startBoard)
+				if found:
+					self.BuildTree(startBoard)
+
+			self.ShowTree()
+
+			delta = time.time()-self.LastLoadTime
+			if delta < 60:
+				print("Sleeping For: "+str(60-delta))
+				time.sleep(60-delta)
+		return
+
+	def ClearTree(self):
 		self.Tree = nx.Graph()
-		self.Tree.add_node(startBoard)
 		self.Pos = {}
 		self.DepthNumNodes = {}
 		self.Labels = {}
 		self.FinishedNodes = []
 		self.NonFinishedNodes = []
-		self.MaxDepth = 12
-		self.EdgeCapPerNode = 3
-
-		self.LastOutput = time.time()
-		self.BuildTree(startBoard)
-		self.DataSetManager.Clear()
-		self.ShowTree()
 		return
 	
 	def BuildTree(self, key, depth=0):
@@ -34,6 +52,8 @@ class TreeVisualiser:
 		x = self.DepthNumNodes[depth]
 		if x % 2 == 0:
 			x *= -1
+			x += 1
+
 		x /= 2
 		y = -depth*100
 
