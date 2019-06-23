@@ -13,12 +13,13 @@ class TreeVisualiser:
 		self.DepthNumNodes = {}
 		self.Labels = {}
 
-		depth = 9
+		depth = 12
 		self.Pos[startBoard] = [0,depth*100]
 		self.Labels[startBoard] = startBoard
 		self.DepthNumNodes[depth] = 1
 
 		self.BuildTree(startBoard, depth-1)
+		self.DataSetManager.Clear()
 		self.ShowTree()
 		return
 	
@@ -49,14 +50,16 @@ class TreeVisualiser:
 		plt.subplot(111)
 		#nx.draw_shell(self.Tree, with_labels=True, font_weight='bold')
 
-		nx.draw_networkx_nodes(self.Tree, self.Pos, self.Labels)
+		nx.draw_networkx_nodes(self.Tree, self.Pos)
 
 		# edges
 		nx.draw_networkx_edges(self.Tree, self.Pos, alpha=0.5)
 
+		#nx.draw_networkx_labels(self.Tree, self.Pos, self.Labels)
+
 		print("Nodes: "+str(self.Tree.number_of_nodes()))
 		print("edges: "+str(self.Tree.number_of_edges()))
-		#plt.axis('off')
-		#plt.savefig("tree.png", transparent=False)
+		plt.axis('off')
+		plt.savefig("tree.svg", transparent=False)
 		plt.show()
 		return
