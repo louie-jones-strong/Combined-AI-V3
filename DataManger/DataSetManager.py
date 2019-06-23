@@ -130,8 +130,6 @@ class DataSetManager:
 		if not DictFileExists(self.DataSetHashTableAddress):
 			return
 
-		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
-
 		numberOfTables = self.MetaData["NumberOfTables"]
 
 		self.DataSetTables = []
@@ -139,6 +137,7 @@ class DataSetManager:
 			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
 
 		self.FillingTable = self.MetaData["FillingTable"]
+		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
 		self.CanAppendData = True
 		return
 
