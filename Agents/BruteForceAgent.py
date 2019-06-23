@@ -36,7 +36,7 @@ class Agent(AgentBase.AgentBase):
 
 					for movekey, moveValue in boardInfo.Moves.items():
 						
-						if (not boardInfo.Finished) and moveValue.TimesPlayed < nonFinishedLeastPlayed and not self.IsMoveFinished(boardInfo, movekey):
+						if (not boardInfo.Finished) and moveValue.TimesPlayed < nonFinishedLeastPlayed:# and not self.IsMoveFinished(boardInfo, movekey):
 							nonFinishedLeastPlayed = moveValue.TimesPlayed
 							nonFinishedMoveID = movekey
 

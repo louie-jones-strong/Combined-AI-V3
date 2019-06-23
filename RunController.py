@@ -278,8 +278,8 @@ class RunController:
 
 if __name__ == "__main__":
 	try:
-		#RunController()
-		RunController(simNumber=6, loadData="Y", aiType="T", renderQuality=0)
+		RunController(renderQuality=0)
+		#RunController(simNumber=6, loadData="Y", aiType="T", renderQuality=0)
 
 	except Exception as error:
 		Logger.LogError(error)
