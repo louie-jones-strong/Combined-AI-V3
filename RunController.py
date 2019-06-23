@@ -1,7 +1,9 @@
 #%% imports
 import RenderEngine.RenderEngine2D as RenderEngine
 import Agents.BruteForceAgent as BruteForceAgent
+import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
+import TreeVisualiser
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
@@ -66,16 +68,21 @@ class RunController:
 
 		loadData = self.SetUpMetaData(loadData)
 		if aiType == None:
-			userInput = input("Brute b) network n) See Tree T):")
+			userInput = input("Brute b) Network n) Random n) See Tree T):")
 		else:
 			userInput = aiType
 
 
 
 		if userInput == "T" or userInput == "t":
-			import TreeVisualiser
 			TreeVisualiser.TreeVisualiser(self.AiDataManager)
-			return
+			input("hold here error!!!!!")
+
+		elif userInput == "R" or userInput == "r":
+			self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+			for loop in range(self.NumberOfBots-1):
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 		elif userInput == "N" or userInput == "n":
 			self.RenderQuality = 0
@@ -284,7 +291,7 @@ if __name__ == "__main__":
 
 	try:
 		#controller = RunController(renderQuality=0)
-		controller = RunController(simNumber=6, loadData="Y", aiType="b", renderQuality=0)
+		controller = RunController(simNumber=6, loadData=None, aiType="r", renderQuality=0)
 
 	except Exception as error:
 		Logger.LogError(error)
