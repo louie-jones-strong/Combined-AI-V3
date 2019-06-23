@@ -1,12 +1,8 @@
 # 3Dmath_render
 
-## To Do List:
-* add more simulations:
-```
-1) poker
-2) black jack
-3) an image based game
-```
-* get the ann working 
-* speed up loading files in datasetmanger
-* add evo
+
+## Rules:
+* agent can not have control over the sim
+* no paramertors can be changed between sims
+* must be able to learn with out human data
+* being able to learn all sims is more important then being able learn fast
