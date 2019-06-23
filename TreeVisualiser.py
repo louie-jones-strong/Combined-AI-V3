@@ -13,13 +13,12 @@ class TreeVisualiser:
 		self.DepthNumNodes = {}
 		self.Labels = {}
 
-		depth = 11
-		depth -= 1
-		self.Pos[startBoard] = [0,depth]
+		depth = 9
+		self.Pos[startBoard] = [0,depth*100]
 		self.Labels[startBoard] = startBoard
 		self.DepthNumNodes[depth] = 1
 
-		self.BuildTree(startBoard, depth)
+		self.BuildTree(startBoard, depth-1)
 		self.ShowTree()
 		return
 	
@@ -32,15 +31,17 @@ class TreeVisualiser:
 
 					self.Tree.add_edge(key, outComesKey)
 
-					if depth not in self.DepthNumNodes:
-						self.DepthNumNodes[depth] = 0
-					self.DepthNumNodes[depth] += 1
+					
+					if outComesKey not in self.Pos:
+						if depth not in self.DepthNumNodes:
+							self.DepthNumNodes[depth] = 0
 
-					self.Pos[outComesKey] = [self.DepthNumNodes[depth], depth]
-					self.Labels[outComesKey] = outComesKey
+						self.Pos[outComesKey] = [self.DepthNumNodes[depth], depth*100]
+						self.DepthNumNodes[depth] += 1
+						self.Labels[outComesKey] = outComesKey
 
 					if depth > 1:
-						self.BuildTree(outComesKey, depth)
+						self.BuildTree(outComesKey, depth-1)
 		return
 
 	def ShowTree(self):
@@ -51,11 +52,11 @@ class TreeVisualiser:
 		nx.draw_networkx_nodes(self.Tree, self.Pos, self.Labels)
 
 		# edges
-		nx.draw_networkx_edges(self.Tree, self.Pos)
+		nx.draw_networkx_edges(self.Tree, self.Pos, alpha=0.5)
 
 		print("Nodes: "+str(self.Tree.number_of_nodes()))
 		print("edges: "+str(self.Tree.number_of_edges()))
-		plt.axis('off')
-		plt.savefig("tree.png", transparent=False)
+		#plt.axis('off')
+		#plt.savefig("tree.png", transparent=False)
 		plt.show()
 		return
