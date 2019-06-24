@@ -79,7 +79,7 @@ class DataSetManager:
 
 			self.NewDataSetHashTable = {}
 
-		listOfKeys = self.LoadedDataSetTables.keys()
+		listOfKeys = list(self.LoadedDataSetTables.keys())
 		for tableKey in listOfKeys:
 
 			if self.LoadedDataSetTables[tableKey] > 0:
