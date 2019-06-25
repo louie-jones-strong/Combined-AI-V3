@@ -64,9 +64,13 @@ class NeuralNetwork:
 def MakeModel(dataSetManager):
 	inputShape, structreArray = PredictNetworkStructre(dataSetManager)
 
-	runId = 0
-	if os.path.exists(dataSetManager.TesnorBoardLogAddress):
-		runId = len(os.listdir(dataSetManager.TesnorBoardLogAddress))
+	runId = dataSetManager.MetaData["AnnRunId"]
+	if runId == None:
+		runId = 0
+		if os.path.exists(dataSetManager.TesnorBoardLogAddress):
+			runId = len(os.listdir(dataSetManager.TesnorBoardLogAddress))
+
+		dataSetManager.MetaData["AnnRunId"] = runId
 
 	model = ModelMaker(inputShape, structreArray, dataSetManager.TesnorBoardLogAddress, lr=0.001)#, optimizer="sgd")	
 	return model, str(runId), len(structreArray)

@@ -180,6 +180,7 @@ class RunController:
 			self.AiDataManager.MetaData["LastBackUpTotalTime"] = 0
 			self.AiDataManager.MetaData["AnnMoveInputShape"] = None
 			self.AiDataManager.MetaData["AnnMoveStructreArray"] = None
+			self.AiDataManager.MetaData["AnnRunId"] = None
 			return False
 		
 		return True
