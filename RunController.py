@@ -3,7 +3,7 @@ import RenderEngine.RenderEngine2D as RenderEngine
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
-import TreeVisualiser
+import RenderEngine.TreeVisualiser as TreeVisualiser
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
@@ -291,8 +291,8 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		#controller = RunController(renderQuality=0)
-		controller = RunController(simNumber=6, loadData=None, aiType="r", renderQuality=0)
+		controller = RunController(renderQuality=0)
+		#controller = RunController(simNumber=6, loadData=None, aiType="r", renderQuality=0)
 
 	except Exception as error:
 		Logger.LogError(error)
