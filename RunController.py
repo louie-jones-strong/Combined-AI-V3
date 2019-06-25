@@ -46,7 +46,7 @@ def MakeAgentMove(turn, startBoard, agents, game):
 
 class RunController:
 
-	Version = 1.1
+	Version = 1.2
 
 	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None):
 		self.PickSimulation(simNumber)

@@ -20,6 +20,8 @@ def DictAppend(address, dictionary):
 	return
 def DictSave(address, dictionary):
 	address += ".txt"
+	MakeFolderIfNeeded(address)
+
 	file = open(address, "w")
 	for key, value in dictionary.items():
 		serializerValue = serializer(value)
@@ -54,7 +56,9 @@ def DictFileExists(address):
 	return os.path.exists(address+".txt")
 
 def ComplexSave(address, objectInfo):
-	pickle.dump(objectInfo, open(address+".p", "wb"))
+	address += ".p"
+	MakeFolderIfNeeded(address)
+	pickle.dump(objectInfo, open(address, "wb"))
 	return
 def ComplexLoad(address):
 	file = open(address+".p", "rb")
@@ -66,6 +70,22 @@ def ComplexFileExists(address):
 	value = False
 	value = os.path.exists(address+".p")
 	return value
+
+
+def MakeFolderIfNeeded(address):
+	if "." in address:#has file type
+		if "/" not in address:#is at root
+			return True
+		else:
+			folderAddress = address[:address.rfind("//")+2]
+	else:
+		folderAddress = address
+
+	if not os.path.exists(folderAddress):
+		os.makedirs(folderAddress)
+		return False
+	else:
+		return True
 
 class DataSetTable:
 	Content = {}

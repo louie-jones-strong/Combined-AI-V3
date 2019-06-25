@@ -24,7 +24,7 @@ class DataSetManager:
 		self.OutputResolution = outputResolution
 		self.SimName = simName
 
-		self.SetupFoldersAndPaths()
+		self.SetupPaths()
 
 		#cal the max move ids from sim info
 		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
@@ -33,8 +33,6 @@ class DataSetManager:
 		self.MoveIDLookUp = []
 		for loop in range(self.MaxMoveIDs):
 			self.MoveIDLookUp += [self.MoveIDToMove(loop)]
-		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
-			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 
 		self.CanAppendData = False
 		self.DataSetHashTable = {}
@@ -44,15 +42,11 @@ class DataSetManager:
 		self.FillingTable = 0
 		self.TableBatchSize = 1000
 		return
-	def SetupFoldersAndPaths(self):
+	def SetupPaths(self):
 		temp = "DataSets//"+self.SimName
-		if not os.path.exists(temp):
-			os.makedirs(temp)
 		temp += "//"
 
 		self.DatasetAddress = temp+"Current"
-		if not os.path.exists(self.DatasetAddress):
-			os.makedirs(self.DatasetAddress)
 
 		self.DatasetAddress += "//"
 		self.DatasetBackUpAddress = temp+"BackUp//"
@@ -61,16 +55,12 @@ class DataSetManager:
 		self.AnnDataSetAddress = self.DatasetAddress+"NeuralNetworkData//"
 		self.TesnorBoardLogAddress = self.DatasetAddress+"Logs//"
 		self.MoveIDLookUpAdress = self.DatasetAddress+"LookUp//"+"MoveIdLookUp"
-
-		if not os.path.exists(self.TableAddress):
-			os.makedirs(self.TableAddress)
-		if not os.path.exists(self.DatasetAddress+"LookUp//"):
-			os.makedirs(self.DatasetAddress+"LookUp//")
-		if not os.path.exists(self.AnnDataSetAddress):
-			os.makedirs(self.AnnDataSetAddress)
 		return
 
 	def Save(self):
+		if (not self.CanAppendData) and os.path.exists(self.DatasetAddress):
+			shutil.rmtree(self.DatasetAddress)
+
 		if len(self.NewDataSetHashTable) > 0:
 			if self.CanAppendData:
 				DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
@@ -78,6 +68,9 @@ class DataSetManager:
 				DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
 
 			self.NewDataSetHashTable = {}
+
+		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
+			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 
 		listOfKeys = list(self.LoadedDataSetTables.keys())
 		for tableKey in listOfKeys:
@@ -230,7 +223,6 @@ class DataSetManager:
 			ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
 			self.MetaData["AnnDataMadeFromBruteForceTotalTime"] = self.MetaData["TotalTime"]
 			self.MetaData["NetworkUsingOneHotEncoding"] = isOneHotEncoding
-			self.SaveMetaData()
 			self.Clear()
 
 		elif ComplexFileExists(self.AnnDataSetAddress+"XDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YDataSet"):
