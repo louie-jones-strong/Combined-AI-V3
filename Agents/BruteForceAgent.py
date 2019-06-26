@@ -21,6 +21,7 @@ class Agent(AgentBase.AgentBase):
 		else:  # learning mode
 			if found:
 				if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+					#todo speed this part up as this part is slowing it down a lot!!!
 					for loop in range(self.DataSetManager.MaxMoveIDs):
 
 						if not (2**loop & boardInfo.PlayedMovesLookUpArray):
@@ -28,17 +29,17 @@ class Agent(AgentBase.AgentBase):
 							break
 
 				else:#played every move once already
-					nonFinishedLeastPlayed = sys.maxsize
-					nonFinishedMoveID = -1
+					#nonFinishedLeastPlayed = sys.maxsize
+					#nonFinishedMoveID = -1
 
 					finishedLeastPlayed = sys.maxsize
 					finishedMoveID = 0
 
 					for movekey, moveValue in boardInfo.Moves.items():
 						
-						if (not boardInfo.Finished) and moveValue.TimesPlayed < nonFinishedLeastPlayed:# and not self.IsMoveFinished(boardInfo, movekey):
-							nonFinishedLeastPlayed = moveValue.TimesPlayed
-							nonFinishedMoveID = movekey
+						#if (not boardInfo.Finished) and moveValue.TimesPlayed < nonFinishedLeastPlayed:# and not self.IsMoveFinished(boardInfo, movekey):
+						#	nonFinishedLeastPlayed = moveValue.TimesPlayed
+						#	nonFinishedMoveID = movekey
 
 						if moveValue.TimesPlayed < finishedLeastPlayed:
 							finishedLeastPlayed = moveValue.TimesPlayed

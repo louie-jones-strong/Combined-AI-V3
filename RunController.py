@@ -17,31 +17,61 @@ os.system("cls")
 def MakeAgentMove(turn, startBoard, agents, game):
 	startBoard = startBoard[:]  # copy to break references
 
+	moveCalTime = 0
+	makeMoveTime = 0
+	updateInvalidMoveTime = 0
+	checkFinishedTime = 0
+	updateMoveOutComeTime = 0
+
 	agent = agents[turn-1]
 	valid = False
 	if turn == 1:
 		startBoard = game.FlipBoard(startBoard)
 		while not valid:
+			timeMark = time.time()
 			move = agent.MoveCal(startBoard)
+			moveCalTime += time.time()-timeMark
 			flippedMove = game.FlipInput(move)
-
+			
+			timeMark = time.time()
 			valid, outComeBoard, turn = game.MakeMove(flippedMove)
+			makeMoveTime += time.time()-timeMark
 
 			if not valid:
+				timeMark = time.time()
 				agent.UpdateInvalidMove(startBoard, move)
+				updateInvalidMoveTime += time.time()-timeMark
 	else:
 		while not valid:
+			timeMark = time.time()
 			move = agent.MoveCal(startBoard)
+			moveCalTime += time.time()-timeMark
 
+			timeMark = time.time()
 			valid, outComeBoard, turn = game.MakeMove(move)
+			makeMoveTime += time.time()-timeMark
 
 			if not valid:
+				timeMark = time.time()
 				agent.UpdateInvalidMove(startBoard, move)
+				updateInvalidMoveTime += time.time()-timeMark
 
+	timeMark = time.time()
 	finished, fit = game.CheckFinished()
+	checkFinishedTime += time.time()-timeMark
 
+	timeMark = time.time()
 	agent.UpdateMoveOutCome(startBoard, move, outComeBoard, finished)
+	updateMoveOutComeTime += time.time()-timeMark
 
+	totalTime = moveCalTime+makeMoveTime+updateInvalidMoveTime+checkFinishedTime+updateMoveOutComeTime
+
+	#print("AI  MoveCal Time:           "+str(moveCalTime))
+	#print("Sim MakeMove Time:          "+str(makeMoveTime))
+	#print("AI  UpdateInvalidMove Time: "+str(updateInvalidMoveTime))
+	#print("Sim CheckFinished Time:     "+str(checkFinishedTime))
+	#print("AI  UpdateMoveOutCome Time: "+str(updateMoveOutComeTime))
+	#print("total Time: "+str(totalTime))
 	return outComeBoard, turn, finished, fit
 
 class RunController:
@@ -66,7 +96,6 @@ class RunController:
 		self.AiDataManager = DataSetManager.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                                      self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
 
-		loadData = self.SetUpMetaData(loadData)
 		if aiType == None:
 			userInput = input("Brute b) Network n) Random n) See Tree T):")
 		else:
@@ -75,31 +104,37 @@ class RunController:
 
 
 		if userInput == "T" or userInput == "t":
-			TreeVisualiser.TreeVisualiser(self.AiDataManager)
+			loadData = self.SetUpMetaData("Y")
+			if loadData:
+				TreeVisualiser.TreeVisualiser(self.AiDataManager)
+
 			input("hold here error!!!!!")
 
-		elif userInput == "R" or userInput == "r":
-			self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
-			for loop in range(self.NumberOfBots-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
-
-		elif userInput == "N" or userInput == "n":
-			self.RenderQuality = 0
-			if trainNetwork == None:
-				userInput = input("Train Network[Y/N]: ")
-			else:
-				userInput = trainNetwork
-
-			import Agents.NeuralNetworkAgent as NeuralNetwork
-			trainingMode = userInput == "Y" or userInput == "y"
-			self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode, trainingMode=trainingMode)]
-		
-			for loop in range(self.NumberOfBots-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 		else:
-			for loop in range(self.NumberOfBots):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+			loadData = self.SetUpMetaData(loadData)
+			if userInput == "R" or userInput == "r":
+				self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+				for loop in range(self.NumberOfBots-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+			elif userInput == "N" or userInput == "n":
+				self.RenderQuality = 0
+				if trainNetwork == None:
+					userInput = input("Train Network[Y/N]: ")
+				else:
+					userInput = trainNetwork
+
+				import Agents.NeuralNetworkAgent as NeuralNetwork
+				trainingMode = userInput == "Y" or userInput == "y"
+				self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode, trainingMode=trainingMode)]
+
+				for loop in range(self.NumberOfBots-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+			else:
+				for loop in range(self.NumberOfBots):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
