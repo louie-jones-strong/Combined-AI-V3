@@ -1,6 +1,8 @@
 import sys
 
 class BoardInfo():
+	MoveIDOfLeastPlayedMove = 0
+
 	MoveIDOfBestAvgFitness = 0
 	BestAvgFitness = -sys.maxsize
 	Moves = {}

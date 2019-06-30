@@ -42,6 +42,10 @@ class AgentBase:
 			if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
 				self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
 
+		if moveID == boardInfo.MoveIDOfLeastPlayedMove:
+			boardInfo.MoveIDOfLeastPlayedMove = self.GetLeastPlayedMove(boardInfo)
+				
+
 		if self.RecordMoves:
 			self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID, "MoveNumber":self.MoveNumber}
 			self.MoveNumber += 1
@@ -61,6 +65,9 @@ class AgentBase:
 
 		if str(key)+str(moveID) in self.TempDataSet:
 			del self.TempDataSet[str(key)+str(moveID)]
+
+		if moveID == boardInfo.MoveIDOfLeastPlayedMove:
+			boardInfo.MoveIDOfLeastPlayedMove = self.GetLeastPlayedMove(boardInfo)
 
 		self.MoveNumber -= 1
 		return
@@ -158,8 +165,23 @@ class AgentBase:
 					if not outComeBoardInfo.Finished:
 						return False
 			
-		return True					
+		return True	
+
+	def GetLeastPlayedMove(self, boardInfo):
+		LeastPlayedNum = boardInfo.MoveIDOfLeastPlayedMove
+		LeastPlayedMoveId = boardInfo.MoveIDOfLeastPlayedMove
+		for moveId in range(self.DataSetManager.MaxMoveIDs):
+
+			if moveId in boardInfo.Moves:
+
+				if boardInfo.Moves[moveId].TimesPlayed < LeastPlayedNum:
+					LeastPlayedNum = boardInfo.Moves[moveId].TimesPlayed
+					LeastPlayedMoveId = moveId
+			elif not (2**moveId & boardInfo.PlayedMovesLookUpArray):
+				LeastPlayedNum = 0
+				LeastPlayedMoveId = moveId
+
+		return LeastPlayedMoveId	
 
 def GetSortKey(val):
 	return val["MoveNumber"]
-
