@@ -97,7 +97,7 @@ class RunController:
                                                      self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
 
 		if aiType == None:
-			userInput = input("Brute b) Network n) Random n) See Tree T):")
+			userInput = input("Brute b) Network n) Random n) See Tree T) Human H):")
 		else:
 			userInput = aiType
 
@@ -113,7 +113,15 @@ class RunController:
 
 		else:
 			loadData = self.SetUpMetaData(loadData)
-			if userInput == "R" or userInput == "r":
+
+			if userInput == "H" or userInput == "h":
+				self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+				for loop in range(self.NumberOfBots-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+
+			elif userInput == "R" or userInput == "r":
 				self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 				for loop in range(self.NumberOfBots-1):
