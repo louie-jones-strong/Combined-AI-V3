@@ -42,6 +42,9 @@ class Agent(AgentBase.AgentBase):
 						if moveValue.TimesPlayed < finishedLeastPlayed:
 							finishedLeastPlayed = moveValue.TimesPlayed
 							finishedMoveID = movekey
+							
+							if finishedLeastPlayed == 1:
+								break
 
 					#if nonFinishedMoveID != -1:
 					#	moveID = nonFinishedMoveID
