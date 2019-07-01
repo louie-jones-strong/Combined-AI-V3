@@ -37,11 +37,11 @@ class Agent(AgentBase.AgentBase):
 					else:
 						notPlayedList = []
 						for moveId in range(self.DataSetManager.MaxMoveIDs):
-							if moveID == None:
-								moveID = moveId
-
-							elif not (2**moveId & boardInfo.PlayedMovesLookUpArray):
-								notPlayedList += [moveId]
+							if not (2**moveId & boardInfo.PlayedMovesLookUpArray):
+								if moveID == None:
+									moveID = moveId
+								else:
+									notPlayedList += [moveId]
 
 						self.MovesNotPlayedCache[key] = notPlayedList
 
