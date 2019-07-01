@@ -30,12 +30,16 @@ class Agent(AgentBase.AgentBase):
 						moveID = self.MovesNotPlayedCache[key][0]
 						del self.MovesNotPlayedCache[key][0]
 
+						if len(self.MovesNotPlayedCache[key]) == 0:
+							del self.MovesNotPlayedCache[key]
+
+
 					else:
 						notPlayedList = []
 						for moveId in range(self.DataSetManager.MaxMoveIDs):
 							if moveID == None:
 								moveID = moveId
-								
+
 							elif not (2**moveId & boardInfo.PlayedMovesLookUpArray):
 								notPlayedList += [moveId]
 
@@ -74,6 +78,8 @@ class Agent(AgentBase.AgentBase):
 		return move
 
 	def SaveData(self, fitness):
-		self.MovesNotPlayedCache = {}
+		if len(self.MovesNotPlayedCache) >= 1000:
+			self.MovesNotPlayedCache = {}
+
 		super().SaveData(fitness)
 		return
