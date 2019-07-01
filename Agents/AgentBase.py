@@ -41,9 +41,6 @@ class AgentBase:
 
 			if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
 				self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
-
-		if moveID == boardInfo.MoveIDOfLeastPlayedMove:
-			boardInfo.MoveIDOfLeastPlayedMove = self.GetLeastPlayedMove(boardInfo)
 				
 
 		if self.RecordMoves:
@@ -65,9 +62,6 @@ class AgentBase:
 
 		if str(key)+str(moveID) in self.TempDataSet:
 			del self.TempDataSet[str(key)+str(moveID)]
-
-		if moveID == boardInfo.MoveIDOfLeastPlayedMove:
-			boardInfo.MoveIDOfLeastPlayedMove = self.GetLeastPlayedMove(boardInfo)
 
 		self.MoveNumber -= 1
 		return

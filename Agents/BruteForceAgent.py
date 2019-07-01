@@ -21,7 +21,10 @@ class Agent(AgentBase.AgentBase):
 		else:  # learning mode
 			if found:
 				if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
-					moveID = boardInfo.MoveIDOfLeastPlayedMove
+
+					for moveID in range(self.DataSetManager.MaxMoveIDs):
+						if not (2**moveID & boardInfo.PlayedMovesLookUpArray):
+							break
 
 				else:#played every move once already
 					#nonFinishedLeastPlayed = sys.maxsize
@@ -51,4 +54,3 @@ class Agent(AgentBase.AgentBase):
 		move = self.DataSetManager.MoveIDLookUp[moveID]
 		self.RecordMove(board, move)
 		return move
-
