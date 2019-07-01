@@ -5,10 +5,13 @@ import Agents.AgentBase as AgentBase
 from DataManger.Serializer import BoardToKey
 
 class Agent(AgentBase.AgentBase):
+	MovesNotPlayedCache = {}
 
 	def MoveCal(self, board):
 		key = BoardToKey(board)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+
+		moveID = None
 
 		if self.WinningModeON:
 			print("winnning mode!")
@@ -18,13 +21,25 @@ class Agent(AgentBase.AgentBase):
 			else:#never played board before
 				moveID = random.randint(0,self.DataSetManager.MaxMoveIDs-1)
 				print("new Board!")
+
+
 		else:  # learning mode
 			if found:
 				if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+					if key in self.MovesNotPlayedCache:
+						moveID = self.MovesNotPlayedCache[key][0]
+						del self.MovesNotPlayedCache[key][0]
 
-					for moveID in range(self.DataSetManager.MaxMoveIDs):
-						if not (2**moveID & boardInfo.PlayedMovesLookUpArray):
-							break
+					else:
+						notPlayedList = []
+						for moveId in range(self.DataSetManager.MaxMoveIDs):
+							if moveID == None:
+								moveID = moveId
+								
+							elif not (2**moveId & boardInfo.PlayedMovesLookUpArray):
+								notPlayedList += [moveId]
+
+						self.MovesNotPlayedCache[key] = notPlayedList
 
 				else:#played every move once already
 					#nonFinishedLeastPlayed = sys.maxsize
@@ -57,3 +72,8 @@ class Agent(AgentBase.AgentBase):
 		move = self.DataSetManager.MoveIDLookUp[moveID]
 		self.RecordMove(board, move)
 		return move
+
+	def SaveData(self, fitness):
+		self.MovesNotPlayedCache = {}
+		super().SaveData(fitness)
+		return
