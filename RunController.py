@@ -115,6 +115,7 @@ class RunController:
 			loadData = self.SetUpMetaData(loadData)
 
 			if userInput == "H" or userInput == "h":
+				self.WinningMode = True
 				self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 				for loop in range(self.NumberOfBots-1):
@@ -243,7 +244,7 @@ class RunController:
 		return
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
 
-		if (time.time() - self.LastOutputTime) >= 0.5:
+		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
 			numGames = self.AiDataManager.MetaData["NumberOfGames"]+1
 			avgMoveTime = 0
 			if numMoves != 0:
@@ -299,18 +300,20 @@ class RunController:
 		gameStartTime = time.time()
 		self.LastSaveTime = time.time()
 		while True:
+			self.Output(game, numMoves, gameStartTime, board, turn)
 			board, turn, finished, fit = MakeAgentMove(turn, board, self.Agents, game)
 
 			numMoves += 1
 			self.AiDataManager.MetaData["TotalTime"] += time.time()-totalStartTime
 			totalStartTime = time.time()
-			self.Output(game, numMoves, gameStartTime, board, turn)
 
 			if finished:
 				self.AiDataManager.MetaData["NumberOfGames"] += 1
 
 				for loop in range(len(self.Agents)):
 					self.Agents[loop].SaveData(fit[loop])
+
+				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 
 				if time.time() - self.LastSaveTime > 60:
 					self.LastSaveTook = time.time()
@@ -321,8 +324,6 @@ class RunController:
 					self.AiDataManager.Save()
 					self.LastSaveTime = time.time()
 					self.LastSaveTook = time.time() - self.LastSaveTook
-
-				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 
 				board, turn = game.Start()
 				numMoves = 0
