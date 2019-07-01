@@ -170,16 +170,25 @@ class AgentBase:
 	def GetLeastPlayedMove(self, boardInfo):
 		LeastPlayedNum = boardInfo.MoveIDOfLeastPlayedMove
 		LeastPlayedMoveId = boardInfo.MoveIDOfLeastPlayedMove
-		for moveId in range(self.DataSetManager.MaxMoveIDs):
 
-			if moveId in boardInfo.Moves:
+		if boardInfo.Finished:
+			for movekey, moveValue in boardInfo.Moves.items():
 
-				if boardInfo.Moves[moveId].TimesPlayed < LeastPlayedNum:
-					LeastPlayedNum = boardInfo.Moves[moveId].TimesPlayed
+				if moveValue.TimesPlayed < LeastPlayedNum:
+					LeastPlayedNum = moveValue.TimesPlayed
+					LeastPlayedMoveId = movekey
+
+		else:
+			for moveId in range(self.DataSetManager.MaxMoveIDs):
+
+				if moveId in boardInfo.Moves:
+
+					if boardInfo.Moves[moveId].TimesPlayed < LeastPlayedNum:
+						LeastPlayedNum = boardInfo.Moves[moveId].TimesPlayed
+						LeastPlayedMoveId = moveId
+				elif not (2**moveId & boardInfo.PlayedMovesLookUpArray):
+					LeastPlayedNum = 0
 					LeastPlayedMoveId = moveId
-			elif not (2**moveId & boardInfo.PlayedMovesLookUpArray):
-				LeastPlayedNum = 0
-				LeastPlayedMoveId = moveId
 
 		return LeastPlayedMoveId	
 
