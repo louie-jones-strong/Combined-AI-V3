@@ -36,6 +36,7 @@ class DataSetManager:
 
 		self.CanAppendData = False
 		self.DataSetHashTable = {}
+		self.StartingBoards = {}
 		self.NewDataSetHashTable = {}
 		self.DataSetTables = []
 		self.LoadedDataSetTables = {}
@@ -51,6 +52,7 @@ class DataSetManager:
 		self.DatasetAddress += "//"
 		self.DatasetBackUpAddress = temp+"BackUp//"
 		self.DataSetHashTableAddress = self.DatasetAddress+"LookUp//DataSetHashTable"
+		self.StartingBoardsAddress = self.DatasetAddress+"LookUp//StartingBoards"
 		self.TableAddress = self.DatasetAddress+"BruteForceDataSet//"
 		self.AnnDataSetAddress = self.DatasetAddress+"NeuralNetworkData//"
 		self.TesnorBoardLogAddress = self.DatasetAddress+"Logs//"
@@ -68,6 +70,8 @@ class DataSetManager:
 				DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
 
 			self.NewDataSetHashTable = {}
+
+		DictSave(self.StartingBoardsAddress, self.StartingBoards)
 
 		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
 			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
@@ -131,6 +135,7 @@ class DataSetManager:
 
 		self.FillingTable = self.MetaData["FillingTable"]
 		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
+		self.StartingBoards = DictLoad(self.StartingBoardsAddress, False)
 		self.CanAppendData = True
 		return
 
@@ -174,6 +179,15 @@ class DataSetManager:
 			found = True
 		
 		return found, boardInfo
+	
+	def UpdateStartingBoards(self, board):
+		key = BoardToKey(board)
+		if key in self.StartingBoards:
+			self.StartingBoards[key] += 1
+		else:
+			self.StartingBoards[key] = 1
+		
+		return
 
 	def GetMoveDataSet(self):
 		dataSetX = []

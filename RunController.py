@@ -294,6 +294,7 @@ class RunController:
 
 	def RunSimMatch(self, game):
 		board, turn = game.Start()
+		self.AiDataManager.UpdateStartingBoards(board)
 
 		numMoves = 0
 		totalStartTime = time.time()
@@ -326,6 +327,7 @@ class RunController:
 					self.LastSaveTook = time.time() - self.LastSaveTook
 
 				board, turn = game.Start()
+				self.AiDataManager.UpdateStartingBoards(board)
 				numMoves = 0
 				gameStartTime = time.time()
 		return
