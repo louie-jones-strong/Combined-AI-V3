@@ -7,7 +7,6 @@ class TreeVisualiser:
 	def __init__(self, dataSetManager):
 		self.DataSetManager = dataSetManager
 
-		startBoards = ["[0, 0, 0, 0, 0, 0, 0, 0, 0]", "[[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]"]
 		self.ClearTree()
 		self.MaxDepth = 12
 		self.EdgeCapPerNode = 15
@@ -20,10 +19,10 @@ class TreeVisualiser:
 			self.LastOutput = time.time()
 			self.ClearTree()
 
-			for startBoard in startBoards:
-				found, boardInfo = self.DataSetManager.GetBoardInfo(startBoard)
+			for boardKey, _ in self.DataSetManager.StartingBoards.items():
+				found, boardInfo = self.DataSetManager.GetBoardInfo(boardKey)
 				if found:
-					self.BuildTree(startBoard)
+					self.BuildTree(boardKey)
 
 			self.ShowTree()
 
