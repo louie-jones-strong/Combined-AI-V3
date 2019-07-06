@@ -44,12 +44,12 @@ jobs:
       #    command: |
       #      python RunTests.py
 
-      - Env_1_Ai_R:
+      Env_1_Ai_R:
           name: Env 1 Ai R
           command: |
             python RunTests.py
 
-      - store_artifacts:
+      store_artifacts:
           path: test-reports
           destination: test-reports
 
