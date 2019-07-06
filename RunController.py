@@ -1,5 +1,4 @@
 #%% imports
-import RenderEngine.RenderEngine2D as RenderEngine
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
@@ -149,6 +148,7 @@ class RunController:
 			self.RenderQuality = renderQuality
 
 		if self.RenderQuality == 1:
+			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 		return
 	def PickSimulation(self, simNumber=None):
