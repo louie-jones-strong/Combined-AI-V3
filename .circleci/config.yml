@@ -55,7 +55,7 @@ workflows:
       - Env_1_Ai_R:
           requires:
             - build
-          name: Env_1_Ai_R
+          name: Env 1 Ai R
           command: |
             python RunTests.py
 
