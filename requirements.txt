@@ -1,2 +1,4 @@
 pygame
 tflearn
+matplotlib
+networkx
