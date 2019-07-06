@@ -2,7 +2,6 @@
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
-import RenderEngine.TreeVisualiser as TreeVisualiser
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
@@ -105,6 +104,7 @@ class RunController:
 		if userInput == "T" or userInput == "t":
 			loadData = self.SetUpMetaData("Y")
 			if loadData:
+				import RenderEngine.TreeVisualiser as TreeVisualiser
 				TreeVisualiser.TreeVisualiser(self.AiDataManager)
 
 			input("hold here error!!!!!")
