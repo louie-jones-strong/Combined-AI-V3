@@ -44,6 +44,15 @@ jobs:
       #    command: |
       #      python RunTests.py
 
+      - Env_1_Ai_R:
+          name: Env 1 Ai R
+          command: |
+            python RunTests.py
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
+
 
 
 workflows:
@@ -55,9 +64,6 @@ workflows:
       - Env_1_Ai_R:
           requires:
             - build
-          name: Env 1 Ai R
-          command: |
-            python RunTests.py
 
       #- Env_2_Ai_R:
       #    requires:
@@ -77,6 +83,3 @@ workflows:
             #- Env_2_Ai_R
             #- Env_3_Ai_R
             #- Env_4_Ai_R
-
-          path: test-reports
-          destination: test-reports
