@@ -39,11 +39,44 @@ jobs:
       # other common Python testing frameworks include pytest and nose
       # https://pytest.org
       # https://nose.readthedocs.io
-      - run:
-          name: run tests
+      #- run:
+      #    name: run tests
+      #    command: |
+      #      python RunTests.py
+
+
+
+workflows:
+  version: 2
+  build_accept_deploy:
+    jobs:
+      - build
+
+      - Env_1_Ai_R:
+          requires:
+            - build
+          name: Env_1_Ai_R
           command: |
             python RunTests.py
 
+      #- Env_2_Ai_R:
+      #    requires:
+      #      - build
+#
+      #- Env_3_Ai_R:
+      #    requires:
+      #      - build
+#
+      #- Env_4_Ai_R:
+      #    requires:
+      #      - build
+
       - store_artifacts:
+          requires:
+            - Env_1_Ai_R
+            #- Env_2_Ai_R
+            #- Env_3_Ai_R
+            #- Env_4_Ai_R
+
           path: test-reports
           destination: test-reports
