@@ -76,8 +76,9 @@ class RunController:
 
 	Version = 1.2
 
-	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None):
+	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None, stopTime=None):
 		self.PickSimulation(simNumber)
+		self.StopTime = stopTime
 
 		#setting
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
@@ -288,8 +289,8 @@ class RunController:
 		
 		self.RunSimMatch(self.Sim)
 		
-		game = self.Sim.CreateNew()
-		self.RunSimMatch(game)
+		#game = self.Sim.CreateNew()
+		#self.RunSimMatch(game)
 		return
 
 	def RunSimMatch(self, game):
@@ -315,7 +316,7 @@ class RunController:
 					self.Agents[loop].SaveData(fit[loop])
 
 				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
-
+				
 				if time.time() - self.LastSaveTime > 60:
 					self.LastSaveTook = time.time()
 					# save back up every hour
@@ -325,6 +326,9 @@ class RunController:
 					self.AiDataManager.Save()
 					self.LastSaveTime = time.time()
 					self.LastSaveTook = time.time() - self.LastSaveTook
+
+				if self.StopTime != None and self.AiDataManager.MetaData["TotalTime"] >= self.StopTime:
+					break
 
 				board, turn = game.Start()
 				self.AiDataManager.UpdateStartingBoards(board)
@@ -337,8 +341,8 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		#controller = RunController(renderQuality=0)
-		controller = RunController(simNumber=6, loadData="N", aiType="r", renderQuality=0)
+		controller = RunController(renderQuality=0)
+		#controller = RunController(simNumber=6, loadData="N", aiType="r", renderQuality=0)
 
 	except Exception as error:
 		Logger.LogError(error)

@@ -42,7 +42,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            python RunController.py
+            python RunTests.py
 
       - store_artifacts:
           path: test-reports
