@@ -159,9 +159,10 @@ class RunController:
 		if "SimulationBase.py" in files:
 			files.remove("SimulationBase.py")
 
-
+		files = sorted(files)
 		for loop in range(len(files)):
 			files[loop] = files[loop][:-3]
+
 			if len(files) > 1 and simNumber == None:
 				print(str(loop+1)+") " + files[loop])
 
