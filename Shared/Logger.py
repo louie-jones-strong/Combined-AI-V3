@@ -3,7 +3,7 @@ import time
 import Shared.OutputFormating as Format
 import os
 
-def LogError(error):
+def LogError(error, holdOnInput=True):
 	if error == None:
 		return
 
@@ -13,7 +13,8 @@ def LogError(error):
 
 	OutputLog(strTrace.split("\n"), "ERROR")
 
-	input("Press any Key To contine...")
+	if holdOnInput:
+		input("Press any Key To contine...")
 	return
 
 def OutputLog(logLines, logType):
