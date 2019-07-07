@@ -7,11 +7,17 @@ def LogError(error, holdOnInput=True):
 	if error == None:
 		return
 
-
-
 	strTrace = traceback.format_exc()
 
 	OutputLog(strTrace.split("\n"), "ERROR")
+
+	if holdOnInput:
+		input("Press any Key To contine...")
+	return
+
+def LogWarning(warningString, holdOnInput=False):
+
+	OutputLog(warningString.split("\n"), "Warning")
 
 	if holdOnInput:
 		input("Press any Key To contine...")

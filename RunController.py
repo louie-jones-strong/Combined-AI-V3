@@ -190,17 +190,16 @@ class RunController:
 
 		if self.AiDataManager.GetMetaData():
 			if self.AiDataManager.MetaData["Version"] == self.Version:
-				os.system("cls")
-				print("")
-				print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
-				print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
-				print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaData["NumberOfFinishedBoards"]))
-				print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
-				print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
-				print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
-				print("")
-
 				if loadData == None:
+					os.system("cls")
+					print("")
+					print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
+					print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
+					print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaData["NumberOfFinishedBoards"]))
+					print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
+					print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
+					print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
+					print("")
 					userInput = input("load Dataset[Y/N]:")
 				else:
 					userInput = loadData
