@@ -5,11 +5,12 @@ import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
+from Shared.OSCalls import *
 import importlib
 import time
 import os
 import sys
-os.system("cls")
+ClearShell()
 #%% setup
 
 def MakeAgentMove(turn, startBoard, agents, game):
@@ -183,7 +184,7 @@ class RunController:
 		self.Sim = self.Sim.Simulation()
 		self.SimInfo = self.Sim.Info
 
-		os.system("title "+"AI Playing:"+self.SimInfo["SimName"])
+		SetTitle("AI Playing:"+self.SimInfo["SimName"])
 
 		return
 	def SetUpMetaData(self, loadData=None):
@@ -192,7 +193,7 @@ class RunController:
 		if self.AiDataManager.GetMetaData():
 			if self.AiDataManager.MetaData["Version"] == self.Version:
 				if loadData == None:
-					os.system("cls")
+					ClearShell()
 					print("")
 					print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
 					print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
@@ -254,7 +255,7 @@ class RunController:
 				avgMoveTime = round(avgMoveTime, 6)
 
 
-			os.system("cls")
+			ClearShell()
 			self.RenderBoard(game, board)
 			print("")
 			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
@@ -277,7 +278,7 @@ class RunController:
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
 			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
 			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook, roundTo=2)
-			os.system("title "+title)
+			SetTitle(title)
 			self.LastOutputTime = time.time()
 
 		elif self.RenderQuality == 2:
