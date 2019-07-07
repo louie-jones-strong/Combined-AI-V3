@@ -129,7 +129,6 @@ class RunController:
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 			elif userInput == "N" or userInput == "n":
-				self.RenderQuality = 0
 				if trainNetwork == None:
 					userInput = input("Train Network[Y/N]: ")
 				else:
@@ -148,7 +147,7 @@ class RunController:
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
 
-		if self.RenderQuality == 1:
+		if self.RenderQuality == 2:
 			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 		return
@@ -245,7 +244,8 @@ class RunController:
 
 		return
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
-
+		if self.RenderQuality == 0:
+			return
 		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
 			numGames = self.AiDataManager.MetaData["NumberOfGames"]+1
 			avgMoveTime = 0
@@ -280,7 +280,7 @@ class RunController:
 			os.system("title "+title)
 			self.LastOutputTime = time.time()
 
-		elif self.RenderQuality == 1:
+		elif self.RenderQuality == 2:
 			self.RenderBoard(game, board)
 
 
@@ -342,8 +342,8 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(renderQuality=0)
-		#controller = RunController(simNumber=6, loadData="N", aiType="r", renderQuality=0)
+		controller = RunController(renderQuality=1)
+		#controller = RunController(simNumber=6, loadData="N", aiType="r", renderQuality=1)
 
 	except Exception as error:
 		Logger.LogError(error)

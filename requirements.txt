@@ -2,3 +2,4 @@ pygame
 tflearn
 matplotlib
 networkx
+gym
