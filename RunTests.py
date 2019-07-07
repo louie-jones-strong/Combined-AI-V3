@@ -2,6 +2,7 @@ import RunController as runner
 from Shared import Logger
 
 sims = [1, 2, 3, 4, 6]
+hadError = False
 
 for simNum in sims:
 
@@ -14,5 +15,9 @@ for simNum in sims:
 		controller.RunTournament()
 
 	except Exception as error:
+		hadError = True
 		Logger.LogError(error, holdOnInput=False)
+
+if hadError:
+	exit(code=1)
 	
