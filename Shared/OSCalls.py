@@ -6,6 +6,5 @@ def ClearShell():
 	return
 
 def SetTitle(titleText):
-	if "win" in os.environ["OS"].lower():
-		os.system("title "+str(titleText))
+	os.system("title "+str(titleText))
 	return
