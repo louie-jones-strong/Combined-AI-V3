@@ -79,6 +79,7 @@ class RunController:
 	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None, stopTime=None):
 		self.PickSimulation(simNumber)
 		self.StopTime = stopTime
+		test = 100/0
 
 		#setting
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
