@@ -1,6 +1,6 @@
 import time
-import os
 import Shared.OutputFormating as Formating
+from Shared.OSCalls import ClearShell
 
 class LoadingBar():
 
@@ -21,7 +21,7 @@ class LoadingBar():
 		if time.time()-self.LastUpdateTime >= 0.15 or progress == self.Resolution:
 
 			if progress != self.CurrentProgress or text != self.CurrentText:
-				os.system("cls")
+				ClearShell()
 				bar = "#"*progress
 				fill = " "*(self.Resolution-progress)
 				print("|"+bar+fill+"|")

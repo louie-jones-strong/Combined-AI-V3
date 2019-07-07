@@ -1,17 +1,16 @@
 #%% imports
-import RenderEngine.RenderEngine2D as RenderEngine
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
-import RenderEngine.TreeVisualiser as TreeVisualiser
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
+from Shared.OSCalls import *
 import importlib
 import time
 import os
 import sys
-os.system("cls")
+ClearShell()
 #%% setup
 
 def MakeAgentMove(turn, startBoard, agents, game):
@@ -78,8 +77,9 @@ class RunController:
 
 	Version = 1.2
 
-	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None):
+	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None, stopTime=None):
 		self.PickSimulation(simNumber)
+		self.StopTime = stopTime
 
 		#setting
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
@@ -106,6 +106,7 @@ class RunController:
 		if userInput == "T" or userInput == "t":
 			loadData = self.SetUpMetaData("Y")
 			if loadData:
+				import RenderEngine.TreeVisualiser as TreeVisualiser
 				TreeVisualiser.TreeVisualiser(self.AiDataManager)
 
 			input("hold here error!!!!!")
@@ -129,7 +130,6 @@ class RunController:
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 			elif userInput == "N" or userInput == "n":
-				self.RenderQuality = 0
 				if trainNetwork == None:
 					userInput = input("Train Network[Y/N]: ")
 				else:
@@ -148,7 +148,8 @@ class RunController:
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
 
-		if self.RenderQuality == 1:
+		if self.RenderQuality == 2:
+			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 		return
 	def PickSimulation(self, simNumber=None):
@@ -158,9 +159,10 @@ class RunController:
 		if "SimulationBase.py" in files:
 			files.remove("SimulationBase.py")
 
-
+		files = sorted(files)
 		for loop in range(len(files)):
 			files[loop] = files[loop][:-3]
+
 			if len(files) > 1 and simNumber == None:
 				print(str(loop+1)+") " + files[loop])
 
@@ -181,7 +183,7 @@ class RunController:
 		self.Sim = self.Sim.Simulation()
 		self.SimInfo = self.Sim.Info
 
-		os.system("title "+"AI Playing:"+self.SimInfo["SimName"])
+		SetTitle("AI Playing:"+self.SimInfo["SimName"])
 
 		return
 	def SetUpMetaData(self, loadData=None):
@@ -189,17 +191,16 @@ class RunController:
 
 		if self.AiDataManager.GetMetaData():
 			if self.AiDataManager.MetaData["Version"] == self.Version:
-				os.system("cls")
-				print("")
-				print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
-				print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
-				print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaData["NumberOfFinishedBoards"]))
-				print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
-				print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
-				print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
-				print("")
-
 				if loadData == None:
+					ClearShell()
+					print("")
+					print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
+					print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
+					print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaData["NumberOfFinishedBoards"]))
+					print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
+					print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
+					print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
+					print("")
 					userInput = input("load Dataset[Y/N]:")
 				else:
 					userInput = loadData
@@ -243,7 +244,8 @@ class RunController:
 
 		return
 	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
-
+		if self.RenderQuality == 0:
+			return
 		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
 			numGames = self.AiDataManager.MetaData["NumberOfGames"]+1
 			avgMoveTime = 0
@@ -252,7 +254,7 @@ class RunController:
 				avgMoveTime = round(avgMoveTime, 6)
 
 
-			os.system("cls")
+			ClearShell()
 			self.RenderBoard(game, board)
 			print("")
 			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
@@ -275,10 +277,10 @@ class RunController:
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
 			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
 			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook, roundTo=2)
-			os.system("title "+title)
+			SetTitle(title)
 			self.LastOutputTime = time.time()
 
-		elif self.RenderQuality == 1:
+		elif self.RenderQuality == 2:
 			self.RenderBoard(game, board)
 
 
@@ -288,8 +290,8 @@ class RunController:
 		
 		self.RunSimMatch(self.Sim)
 		
-		game = self.Sim.CreateNew()
-		self.RunSimMatch(game)
+		#game = self.Sim.CreateNew()
+		#self.RunSimMatch(game)
 		return
 
 	def RunSimMatch(self, game):
@@ -315,7 +317,7 @@ class RunController:
 					self.Agents[loop].SaveData(fit[loop])
 
 				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
-
+				
 				if time.time() - self.LastSaveTime > 60:
 					self.LastSaveTook = time.time()
 					# save back up every hour
@@ -325,6 +327,9 @@ class RunController:
 					self.AiDataManager.Save()
 					self.LastSaveTime = time.time()
 					self.LastSaveTook = time.time() - self.LastSaveTook
+
+				if self.StopTime != None and self.AiDataManager.MetaData["TotalTime"] >= self.StopTime:
+					break
 
 				board, turn = game.Start()
 				self.AiDataManager.UpdateStartingBoards(board)
@@ -337,8 +342,8 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(renderQuality=0)
-		#controller = RunController(simNumber=6, loadData=None, aiType="r", renderQuality=0)
+		controller = RunController(renderQuality=1)
+		#controller = RunController(simNumber=6, loadData="N", aiType="r", renderQuality=1)
 
 	except Exception as error:
 		Logger.LogError(error)

@@ -3,17 +3,24 @@ import time
 import Shared.OutputFormating as Format
 import os
 
-def LogError(error):
+def LogError(error, holdOnInput=True):
 	if error == None:
 		return
-
-
 
 	strTrace = traceback.format_exc()
 
 	OutputLog(strTrace.split("\n"), "ERROR")
 
-	input("Press any Key To contine...")
+	if holdOnInput:
+		input("Press any Key To contine...")
+	return
+
+def LogWarning(warningString, holdOnInput=False):
+
+	OutputLog(warningString.split("\n"), "Warning")
+
+	if holdOnInput:
+		input("Press any Key To contine...")
 	return
 
 def OutputLog(logLines, logType):
