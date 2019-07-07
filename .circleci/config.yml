@@ -1,85 +1,32 @@
-# Check https://circleci.com/docs/2.0/language-python/ for more details
 version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
       - image: circleci/python:3.5.4
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
     working_directory: ~/root
 
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
       - run:
           name: install dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-
       - save_cache:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
-      # run tests!
-      # other common Python testing frameworks include pytest and nose
-      # https://pytest.org
-      # https://nose.readthedocs.io
-      #- run:
-      #    name: run tests
-      #    command: |
-      #      python RunTests.py
-
-      Env_1_Ai_R:
-          name: Env 1 Ai R
+      - run:
+          name: run tests
           command: |
             python RunTests.py
 
-      store_artifacts:
+      - store_artifacts:
           path: test-reports
           destination: test-reports
-
-
-
-workflows:
-  version: 2
-  build_accept_deploy:
-    jobs:
-      - build
-
-      - Env_1_Ai_R:
-          requires:
-            - build
-
-      #- Env_2_Ai_R:
-      #    requires:
-      #      - build
-#
-      #- Env_3_Ai_R:
-      #    requires:
-      #      - build
-#
-      #- Env_4_Ai_R:
-      #    requires:
-      #      - build
-
-      - store_artifacts:
-          requires:
-            - Env_1_Ai_R
-            #- Env_2_Ai_R
-            #- Env_3_Ai_R
-            #- Env_4_Ai_R
