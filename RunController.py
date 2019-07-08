@@ -232,9 +232,9 @@ class RunController:
 
 	def RenderBoard(self, game, board):
 
-		if self.RenderQuality == 0:
+		if self.RenderQuality == 1:
 			game.SimpleBoardOutput(board)
-		else:
+		elif self.RenderQuality == 2:
 			timeMark = time.time()
 			self.RenderEngine.PieceList = game.ComplexBoardOutput(board)
 			timeMark = time.time()-timeMark
