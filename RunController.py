@@ -15,6 +15,7 @@ ClearShell()
 
 def MakeAgentMove(turn, startBoard, agents, game):
 	startBoard = startBoard[:]  # copy to break references
+	board = tuple(startBoard)
 
 	moveCalTime = 0
 	makeMoveTime = 0
@@ -24,36 +25,34 @@ def MakeAgentMove(turn, startBoard, agents, game):
 
 	agent = agents[turn-1]
 	valid = False
-	if turn == 1:
-		startBoard = game.FlipBoard(startBoard)
-		while not valid:
+#	if turn == 1:
+#		board = game.FlipBoard(board)
+#		while not valid:
+#			timeMark = time.time()
+#			move = agent.MoveCal(board)
+#			moveCalTime += time.time()-timeMark
+#			flippedMove = game.FlipInput(move)
+#			
+#			timeMark = time.time()
+#			valid, outComeBoard, turn = game.MakeMove(flippedMove)
+#			makeMoveTime += time.time()-timeMark
+#
+#			if not valid:
+#				timeMark = time.time()
+#				agent.UpdateInvalidMove(board, move)
+#				updateInvalidMoveTime += time.time()-timeMark
+#	else:
+	while not valid:
+		timeMark = time.time()
+		move = agent.MoveCal(board)
+		moveCalTime += time.time()-timeMark
+		timeMark = time.time()
+		valid, outComeBoard, turn = game.MakeMove(move)
+		makeMoveTime += time.time()-timeMark
+		if not valid:
 			timeMark = time.time()
-			move = agent.MoveCal(startBoard)
-			moveCalTime += time.time()-timeMark
-			flippedMove = game.FlipInput(move)
-			
-			timeMark = time.time()
-			valid, outComeBoard, turn = game.MakeMove(flippedMove)
-			makeMoveTime += time.time()-timeMark
-
-			if not valid:
-				timeMark = time.time()
-				agent.UpdateInvalidMove(startBoard, move)
-				updateInvalidMoveTime += time.time()-timeMark
-	else:
-		while not valid:
-			timeMark = time.time()
-			move = agent.MoveCal(startBoard)
-			moveCalTime += time.time()-timeMark
-
-			timeMark = time.time()
-			valid, outComeBoard, turn = game.MakeMove(move)
-			makeMoveTime += time.time()-timeMark
-
-			if not valid:
-				timeMark = time.time()
-				agent.UpdateInvalidMove(startBoard, move)
-				updateInvalidMoveTime += time.time()-timeMark
+			agent.UpdateInvalidMove(board, move)
+			updateInvalidMoveTime += time.time()-timeMark
 
 	timeMark = time.time()
 	finished, fit = game.CheckFinished()
