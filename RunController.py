@@ -3,6 +3,7 @@ import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
+from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
 from Shared import Logger
 from Shared.OSCalls import *
@@ -13,9 +14,8 @@ import sys
 ClearShell()
 #%% setup
 
-def MakeAgentMove(turn, startBoard, agents, game):
-	startBoard = startBoard[:]  # copy to break references
-	board = tuple(startBoard)
+def MakeAgentMove(turn, board, agents, game):
+	startBoardKey = BoardToKey(board)
 
 	moveCalTime = 0
 	makeMoveTime = 0
@@ -25,23 +25,7 @@ def MakeAgentMove(turn, startBoard, agents, game):
 
 	agent = agents[turn-1]
 	valid = False
-#	if turn == 1:
-#		board = game.FlipBoard(board)
-#		while not valid:
-#			timeMark = time.time()
-#			move = agent.MoveCal(board)
-#			moveCalTime += time.time()-timeMark
-#			flippedMove = game.FlipInput(move)
-#			
-#			timeMark = time.time()
-#			valid, outComeBoard, turn = game.MakeMove(flippedMove)
-#			makeMoveTime += time.time()-timeMark
-#
-#			if not valid:
-#				timeMark = time.time()
-#				agent.UpdateInvalidMove(board, move)
-#				updateInvalidMoveTime += time.time()-timeMark
-#	else:
+	#if turn == 1:
 	while not valid:
 		timeMark = time.time()
 		move = agent.MoveCal(board)
@@ -53,16 +37,31 @@ def MakeAgentMove(turn, startBoard, agents, game):
 			timeMark = time.time()
 			agent.UpdateInvalidMove(board, move)
 			updateInvalidMoveTime += time.time()-timeMark
+	#else:
+	#	board = game.FlipBoard(board)
+	#	while not valid:
+	#		timeMark = time.time()
+	#		move = agent.MoveCal(board)
+	#		moveCalTime += time.time()-timeMark
+	#		flippedMove = game.FlipInput(move)
+	#		
+	#		timeMark = time.time()
+	#		valid, outComeBoard, turn = game.MakeMove(flippedMove)
+	#		makeMoveTime += time.time()-timeMark
+	#		if not valid:
+	#			timeMark = time.time()
+	#			agent.UpdateInvalidMove(board, move)
+	#			updateInvalidMoveTime += time.time()-timeMark
 
 	timeMark = time.time()
 	finished, fit = game.CheckFinished()
 	checkFinishedTime += time.time()-timeMark
 
 	timeMark = time.time()
-	agent.UpdateMoveOutCome(startBoard, move, outComeBoard, finished)
+	agent.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
 	updateMoveOutComeTime += time.time()-timeMark
 
-	totalTime = moveCalTime+makeMoveTime+updateInvalidMoveTime+checkFinishedTime+updateMoveOutComeTime
+	#totalTime = moveCalTime+makeMoveTime+updateInvalidMoveTime+checkFinishedTime+updateMoveOutComeTime
 
 	#print("AI  MoveCal Time:           "+str(moveCalTime))
 	#print("Sim MakeMove Time:          "+str(makeMoveTime))

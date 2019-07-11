@@ -66,13 +66,12 @@ class AgentBase:
 		self.MoveNumber -= 1
 		return
 
-	def UpdateMoveOutCome(self, board, move, outComeBoard, gameFinished=False):
+	def UpdateMoveOutCome(self, boardKey, move, outComeBoard, gameFinished=False):
 		if not self.RecordMoves:
 			return
 
-		key = BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
-		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+		found, boardInfo = self.DataSetManager.GetBoardInfo(boardKey)
 
 		if found and moveID in boardInfo.Moves:
 			if gameFinished:

@@ -8,8 +8,8 @@ class TreeVisualiser:
 		self.DataSetManager = dataSetManager
 
 		self.ClearTree()
-		self.MaxDepth = 12
-		self.EdgeCapPerNode = 15
+		self.MaxDepth = 100
+		self.EdgeCapPerNode = 0
 
 		self.LastOutput = time.time()
 		while True:
@@ -67,7 +67,7 @@ class TreeVisualiser:
 			else:
 				self.NonFinishedNodes += [key]
 
-			if time.time() - self.LastOutput >= 1:
+			if time.time() - self.LastOutput >= 5:
 				self.ShowTree()
 				self.LastOutput = time.time()
 
