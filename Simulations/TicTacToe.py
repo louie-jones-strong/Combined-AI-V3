@@ -61,6 +61,10 @@ class Simulation(SimBase.SimBase):
 
 		return finished, [player1Fitness, player2Fitness]
 
+	def CreateNew(self):
+		sim = Simulation()
+		return sim
+
 	def FlipBoard(self, board):
 		output = []
 		for loop in range(len(board)):
