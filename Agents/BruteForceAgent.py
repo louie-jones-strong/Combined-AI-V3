@@ -69,14 +69,10 @@ class Agent(AgentBase.AgentBase):
 					#	moveID = nonFinishedMoveID
 					#else:
 					moveID = finishedMoveID
-					if moveID == None:
-						print("")
 
 			else:#never played board before
 				moveID = 0
 
-		if moveID == None:
-			print("")
 		move = self.DataSetManager.MoveIDLookUp[moveID]
 		self.RecordMove(board, move)
 		return move

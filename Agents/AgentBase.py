@@ -40,7 +40,7 @@ class AgentBase:
 				boardInfo.PlayedMovesLookUpArray += 2**moveID
 
 			if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
-				self.DataSetManager.MetaDataKeyAdd("NumberOfCompleteBoards", 1)
+				self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
 				
 
 		if self.RecordMoves:
@@ -117,7 +117,7 @@ class AgentBase:
 				if not boardInfo.Finished:
 					boardInfo.Finished = self.IsBoardFinished(boardInfo)
 					if boardInfo.Finished:
-						self.DataSetManager.MetaDataKeyAdd("NumberOfFinishedBoards", 1)
+						self.DataSetManager.MetaData["NumberOfFinishedBoards"] += 1
 
 
 		self.TempDataSet = {}

@@ -11,7 +11,6 @@ import importlib
 import time
 import os
 import sys
-import threading
 ClearShell()
 #%% setup
 
@@ -286,26 +285,14 @@ class RunController:
 		return
 	
 	def RunTournament(self):
-		threads = []
-
-		thread = threading.Thread(target=self.RunSimMatch, args=(self.Sim, self.Agents, True,))
-		threads += [thread]
-		thread.start()
-
-		for loop in range(1):
-			game = self.Sim.CreateNew()
-			agents = []
-			for loop in range(self.NumberOfBots):
-				agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
-			thread = threading.Thread(target=self.RunSimMatch, args=(game, agents, False,))
-			threads += [thread]
-			thread.start()
-
-		for thread in threads:
-			thread.join()
+		
+		self.RunSimMatch(self.Sim)
+		
+		#game = self.Sim.CreateNew()
+		#self.RunSimMatch(game)
 		return
 
-	def RunSimMatch(self, game, agents, isMainThread):
+	def RunSimMatch(self, game):
 		board, turn = game.Start()
 		self.AiDataManager.UpdateStartingBoards(board)
 
@@ -314,22 +301,20 @@ class RunController:
 		gameStartTime = time.time()
 		self.LastSaveTime = time.time()
 		while True:
-			if isMainThread:
-				self.Output(game, numMoves, gameStartTime, board, turn)
-			board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
+			self.Output(game, numMoves, gameStartTime, board, turn)
+			board, turn, finished, fit = MakeAgentMove(turn, board, self.Agents, game)
 
 			numMoves += 1
 			self.AiDataManager.MetaData["TotalTime"] += time.time()-totalStartTime
 			totalStartTime = time.time()
 
 			if finished:
-				self.AiDataManager.MetaDataKeyAdd("NumberOfGames", 1)
+				self.AiDataManager.MetaData["NumberOfGames"] += 1
 
-				for loop in range(len(agents)):
-					agents[loop].SaveData(fit[loop])
+				for loop in range(len(self.Agents)):
+					self.Agents[loop].SaveData(fit[loop])
 
-				if isMainThread:
-					self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
+				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 				
 				if time.time() - self.LastSaveTime > 60:
 					self.LastSaveTook = time.time()
