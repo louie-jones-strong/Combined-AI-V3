@@ -340,8 +340,8 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(renderQuality=1)
-		#controller = RunController(simNumber=6, loadData="N", aiType="r", renderQuality=1)
+		#controller = RunController(renderQuality=1)
+		controller = RunController(simNumber=6, loadData="N", aiType="b", renderQuality=1)
 
 	except Exception as error:
 		Logger.LogError(error)
