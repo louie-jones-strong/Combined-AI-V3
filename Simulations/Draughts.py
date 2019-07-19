@@ -31,6 +31,10 @@ class Simulation(SimBase.SimBase):
 				boardColor = True
 		return
 
+	def CreateNew(self):
+		sim = Simulation()
+		return sim
+
 	def Start(self):
 		self.Board = NewBoard()
 		self.Turn = 1

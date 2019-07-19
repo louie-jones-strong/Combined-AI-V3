@@ -13,6 +13,10 @@ class Simulation(SimBase.SimBase):
 		self.DataSetY = [[0],[2],[4],[6],[8],[10],[12]]
 		self.BackGroundpieceList = []
 		return
+	
+	def CreateNew(self):
+		sim = Simulation()
+		return sim
 
 	def Start(self):
 

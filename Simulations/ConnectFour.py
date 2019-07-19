@@ -16,6 +16,10 @@ class Simulation(SimBase.SimBase):
 		self.BackGroundpieceList += [Shape.Piece([350, 350], [grid[0]*gridSize, grid[1]*gridSize], Shape.Square(), [0, 0, 255])]
 		return
 
+	def CreateNew(self):
+		sim = Simulation()
+		return sim
+
 	def Start(self):
 		self.Board = [[0,0,0,0,0,0],[0,0,0,0,0,0],
 					[0,0,0,0,0,0],[0,0,0,0,0,0],
