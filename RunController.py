@@ -286,7 +286,7 @@ class RunController:
 		return
 	
 	def RunTournament(self):
-		targetThreadNum = 1
+		targetThreadNum = 2
 
 		threads = []
 
@@ -333,15 +333,15 @@ class RunController:
 				if isMainThread:
 					self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 				
-				if time.time() - self.LastSaveTime > 60:
-					self.LastSaveTook = time.time()
-					# save back up every hour
-					if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
-						self.AiDataManager.BackUp()
+					if time.time() - self.LastSaveTime > 60:
+						self.LastSaveTook = time.time()
+						# save back up every hour
+						if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
+							self.AiDataManager.BackUp()
 
-					self.AiDataManager.Save()
-					self.LastSaveTime = time.time()
-					self.LastSaveTook = time.time() - self.LastSaveTook
+						self.AiDataManager.Save()
+						self.LastSaveTime = time.time()
+						self.LastSaveTook = time.time() - self.LastSaveTook
 
 				if self.StopTime != None and self.AiDataManager.MetaData["TotalTime"] >= self.StopTime:
 					break

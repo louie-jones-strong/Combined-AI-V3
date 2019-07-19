@@ -5,6 +5,7 @@ from Shared import OutputFormating as Format
 from Shared import RamUsedInfo as RamInfo
 from DataManger.BasicLoadAndSave import *
 import shutil
+import threading
 
 class DataSetManager:
 	MetaData = {}
@@ -23,6 +24,7 @@ class DataSetManager:
 		self.MaxOutputSize = maxOutputSize
 		self.OutputResolution = outputResolution
 		self.SimName = simName
+		self.Lock = threading.Lock()
 
 		self.SetupPaths()
 
@@ -60,41 +62,42 @@ class DataSetManager:
 		return
 
 	def Save(self):
-		if (not self.CanAppendData) and os.path.exists(self.DatasetAddress):
-			shutil.rmtree(self.DatasetAddress)
+		with self.Lock:
+			if (not self.CanAppendData) and os.path.exists(self.DatasetAddress):
+				shutil.rmtree(self.DatasetAddress)
 
-		if len(self.NewDataSetHashTable) > 0:
-			if self.CanAppendData:
-				DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
-			else:
-				DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+			if len(self.NewDataSetHashTable) > 0:
+				if self.CanAppendData:
+					DictAppend(self.DataSetHashTableAddress, self.NewDataSetHashTable)
+				else:
+					DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
 
-			self.NewDataSetHashTable = {}
+				self.NewDataSetHashTable = {}
 
-		DictSave(self.StartingBoardsAddress, self.StartingBoards)
+			DictSave(self.StartingBoardsAddress, self.StartingBoards)
 
-		if (not ComplexFileExists(self.MoveIDLookUpAdress)):
-			ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+			if (not ComplexFileExists(self.MoveIDLookUpAdress)):
+				ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 
-		listOfKeys = list(self.LoadedDataSetTables.keys())
-		for tableKey in listOfKeys:
+			listOfKeys = list(self.LoadedDataSetTables.keys())
+			for tableKey in listOfKeys:
 
-			if self.LoadedDataSetTables[tableKey] > 0:
-				self.DataSetTables[tableKey].Save()
-				self.LoadedDataSetTables[tableKey] = 0
-			else:
-				self.DataSetTables[tableKey].Unload()
-				del self.LoadedDataSetTables[tableKey]
+				if self.LoadedDataSetTables[tableKey] > 0:
+					self.DataSetTables[tableKey].Save()
+					self.LoadedDataSetTables[tableKey] = 0
+				else:
+					self.DataSetTables[tableKey].Unload()
+					del self.LoadedDataSetTables[tableKey]
 
 
 
-		self.CanAppendData = True
+			self.CanAppendData = True
 
-		self.MetaData["SizeOfDataSet"] =  self.GetNumberOfBoards()
-		self.MetaData["NumberOfTables"] = len(self.DataSetTables)
-		self.MetaData["FillingTable"] =   self.FillingTable
+			self.MetaData["SizeOfDataSet"] =  self.GetNumberOfBoards()
+			self.MetaData["NumberOfTables"] = len(self.DataSetTables)
+			self.MetaData["FillingTable"] =   self.FillingTable
 
-		self.SaveMetaData()
+			self.SaveMetaData()
 		return
 	def Clear(self):
 		self.DataSetHashTable = {}
@@ -102,10 +105,11 @@ class DataSetManager:
 		return
 
 	def BackUp(self):
-		if (os.path.exists(self.DatasetBackUpAddress)):
-			shutil.rmtree(self.DatasetBackUpAddress)
-		shutil.copytree(self.DatasetAddress, self.DatasetBackUpAddress)
-		self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
+		with self.Lock:
+			if (os.path.exists(self.DatasetBackUpAddress)):
+				shutil.rmtree(self.DatasetBackUpAddress)
+			shutil.copytree(self.DatasetAddress, self.DatasetBackUpAddress)
+			self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
 		return
 
 	def GetMetaData(self):
