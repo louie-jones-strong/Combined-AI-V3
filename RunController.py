@@ -323,9 +323,10 @@ class RunController:
 			board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
 
 			numMoves += 1
-			self.AiDataManager.MetaData["TotalTime"] += time.time()-totalStartTime
+			temp = time.time()-totalStartTime
+			self.AiDataManager.MetaData["TotalTime"] += temp
 			if isMainThread:
-				self.AiDataManager.MetaData["RealTime"]  += time.time()-totalStartTime
+				self.AiDataManager.MetaData["RealTime"]  += temp
 			totalStartTime = time.time()
 
 			if finished:
@@ -337,7 +338,7 @@ class RunController:
 				if isMainThread:
 					self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 				
-					if time.time() - self.LastSaveTime > 60:
+					if self.AiDataManager.MetaData["RealTime"] > 60:
 						self.LastSaveTook = time.time()
 						# save back up every hour
 						if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
@@ -347,7 +348,7 @@ class RunController:
 						self.LastSaveTime = time.time()
 						self.LastSaveTook = time.time() - self.LastSaveTook
 
-				if self.StopTime != None and self.AiDataManager.MetaData["TotalTime"] >= self.StopTime:
+				if self.StopTime != None and self.AiDataManager.MetaData["RealTime"] >= self.StopTime:
 					break
 
 				board, turn = game.Start()

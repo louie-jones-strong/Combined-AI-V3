@@ -148,12 +148,14 @@ class DataSetManager:
 			return
 
 		index = self.FillingTable
-		if (len(self.DataSetTables) <= index):
-			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(index), True)]
-
 		pickledBoard = pickle.dumps(board)
-		self.DataSetHashTable[key] = (index, pickledBoard)
-		self.NewDataSetHashTable[key] = (index, pickledBoard)
+		
+		with self.Lock:
+			if (len(self.DataSetTables) <= index):
+				self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(index), True)]
+
+			self.DataSetHashTable[key] = (index, pickledBoard)
+			self.NewDataSetHashTable[key] = (index, pickledBoard)
 
 		if not self.DataSetTables[index].IsLoaded:
 			self.DataSetTables[index].Load()
