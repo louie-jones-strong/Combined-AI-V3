@@ -209,23 +209,23 @@ class RunController:
 
 		if userInput == "n" or userInput == "N":
 			self.AiDataManager.MetaData = {}
-			self.AiDataManager.MetaData["Version"] = self.Version
-			self.AiDataManager.MetaData["SizeOfDataSet"] = 0
-			self.AiDataManager.MetaData["NumberOfTables"] = 0
-			self.AiDataManager.MetaData["FillingTable"] = 0
-			self.AiDataManager.MetaData["NumberOfCompleteBoards"] = 0
-			self.AiDataManager.MetaData["NumberOfFinishedBoards"] = 0
-			self.AiDataManager.MetaData["NumberOfGames"] = 0
-			self.AiDataManager.MetaData["NetworkUsingOneHotEncoding"] = False
-			self.AiDataManager.MetaData["RealTime"] = 0
-			self.AiDataManager.MetaData["TotalTime"] = 0
-			self.AiDataManager.MetaData["BruteForceTotalTime"] = 0
-			self.AiDataManager.MetaData["AnnTotalTime"] = 0
-			self.AiDataManager.MetaData["AnnDataMadeFromBruteForceTotalTime"] = 0
-			self.AiDataManager.MetaData["LastBackUpTotalTime"] = 0
-			self.AiDataManager.MetaData["AnnMoveInputShape"] = None
-			self.AiDataManager.MetaData["AnnMoveStructreArray"] = None
-			self.AiDataManager.MetaData["AnnRunId"] = None
+			self.AiDataManager.MetaDataSet("Version", self.Version)
+			self.AiDataManager.MetaDataSet("SizeOfDataSet", 0)
+			self.AiDataManager.MetaDataSet("NumberOfTables", 0)
+			self.AiDataManager.MetaDataSet("FillingTable", 0)
+			self.AiDataManager.MetaDataSet("NumberOfCompleteBoards", 0)
+			self.AiDataManager.MetaDataSet("NumberOfFinishedBoards", 0)
+			self.AiDataManager.MetaDataSet("NumberOfGames", 0)
+			self.AiDataManager.MetaDataSet("NetworkUsingOneHotEncoding", False)
+			self.AiDataManager.MetaDataSet("RealTime", 0)
+			self.AiDataManager.MetaDataSet("TotalTime", 0)
+			self.AiDataManager.MetaDataSet("BruteForceTotalTime", 0)
+			self.AiDataManager.MetaDataSet("AnnTotalTime", 0)
+			self.AiDataManager.MetaDataSet("AnnDataMadeFromBruteForceTotalTime", 0)
+			self.AiDataManager.MetaDataSet("LastBackUpTotalTime", 0)
+			self.AiDataManager.MetaDataSet("AnnMoveInputShape", None)
+			self.AiDataManager.MetaDataSet("AnnMoveStructreArray", None)
+			self.AiDataManager.MetaDataSet("AnnRunId", None)
 			return False
 		
 		return True
@@ -326,13 +326,13 @@ class RunController:
 
 				numMoves += 1
 				temp = time.time()-totalStartTime
-				self.AiDataManager.MetaData["TotalTime"] += temp
+				self.AiDataManager.MetaDataAdd("TotalTime", temp)
 				if isMainThread:
-					self.AiDataManager.MetaData["RealTime"]  += temp
+					self.AiDataManager.MetaDataAdd("RealTime", temp)
 				totalStartTime = time.time()
 
 				if finished:
-					self.AiDataManager.MetaData["NumberOfGames"] += 1
+					self.AiDataManager.MetaDataAdd("NumberOfGames", 1)
 
 					for loop in range(len(agents)):
 						agents[loop].SaveData(fit[loop])

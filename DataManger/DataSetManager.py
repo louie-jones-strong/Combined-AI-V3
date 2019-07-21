@@ -94,9 +94,9 @@ class DataSetManager:
 
 			self.CanAppendData = True
 
-			self.MetaData["SizeOfDataSet"] =  self.GetNumberOfBoards()
-			self.MetaData["NumberOfTables"] = len(self.DataSetTables)
-			self.MetaData["FillingTable"] =   self.FillingTable
+			self.MetaDataSet("SizeOfDataSet", self.GetNumberOfBoards())
+			self.MetaDataSet("NumberOfTables", len(self.DataSetTables))
+			self.MetaDataSet("FillingTable", self.FillingTable)
 
 			self.SaveMetaData()
 		return
@@ -124,6 +124,14 @@ class DataSetManager:
 		return found
 	def SaveMetaData(self):
 		DictSave(self.DatasetAddress+"MetaData", self.MetaData)
+		return
+	def MetaDataAdd(self, key, value):
+		with self.Lock:
+			self.MetaData[key] += value
+		return
+	def MetaDataSet(self, key, value):
+		with self.Lock:
+			self.MetaData[key] = value
 		return
 
 	def LoadTableInfo(self):
@@ -244,8 +252,8 @@ class DataSetManager:
 
 			ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
 			ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
-			self.MetaData["AnnDataMadeFromBruteForceTotalTime"] = self.MetaData["TotalTime"]
-			self.MetaData["NetworkUsingOneHotEncoding"] = isOneHotEncoding
+			self.MetaDataSet("AnnDataMadeFromBruteForceTotalTime", self.MetaData["TotalTime"])
+			self.MetaDataSet("NetworkUsingOneHotEncoding", isOneHotEncoding)
 			self.Clear()
 
 		elif ComplexFileExists(self.AnnDataSetAddress+"XDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YDataSet"):
