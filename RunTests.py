@@ -32,11 +32,15 @@ for simNum in Sims:
 			print("Run Done Took: "+SplitTime(time.time()-timeMarkRun, 2))
 			
 			metaData2 = controller.AiDataManager.MetaData
-
 			address = metaDataAddress+"MetaData_"+controller.SimInfo["SimName"]+"_"+agent+"_2"
-			BasicLoadAndSave.DictSave(address, metaData1)
+			BasicLoadAndSave.DictSave(address, metaData2)
 
-			if metaData1 != metaData2:
+			metaDataSame = True
+			for key in metaData1.keys():
+				if key not in metaData2 or metaData1[key] != metaData2[key]:
+					metaDataSame = False
+
+			if metaDataSame:
 				Logger.LogWarning("metaData1 != metaData2: save error?", holdOnInput=False)
 				hadError = True
 			else:
