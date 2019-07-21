@@ -10,7 +10,6 @@ hadError = False
 for simNum in Sims:
 	for agent in Agents:
 		print("Setup Sim: "+str(simNum)+" With Agent: "+str(agent))
-		input()
 		try:
 			timeMarkSetup = time.time()
 			controller = runner.RunController(simNumber=simNum, loadData="N", aiType=agent, renderQuality=0, stopTime=60)
@@ -18,7 +17,6 @@ for simNum in Sims:
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup, 2))
 			print("Sim = "+str(controller.SimInfo["SimName"]))
 			print("Starting Run...")
-			input()
 			timeMarkRun = time.time()
 
 			controller.RunTournament()
