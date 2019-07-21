@@ -93,12 +93,11 @@ class DataSetManager:
 
 
 			self.CanAppendData = True
+			self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
+			self.MetaData["NumberOfTables"] = len(self.DataSetTables)
+			self.MetaData["FillingTable"] = self.FillingTable
 
-			self.MetaDataSet("SizeOfDataSet", self.GetNumberOfBoards())
-			self.MetaDataSet("NumberOfTables", len(self.DataSetTables))
-			self.MetaDataSet("FillingTable", self.FillingTable)
-
-			self.SaveMetaData()
+		self.SaveMetaData()
 		return
 	def Clear(self):
 		with self.Lock:

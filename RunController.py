@@ -291,11 +291,6 @@ class RunController:
 		targetThreadNum = 2
 
 		threads = []
-
-		thread = threading.Thread(target=self.RunSimMatch, args=(self.Sim, self.Agents, True,))
-		threads += [thread]
-		thread.start()
-
 		for loop in range(targetThreadNum-1):
 			game = self.Sim.CreateNew()
 			agents = []
@@ -305,6 +300,8 @@ class RunController:
 			threads += [thread]
 			thread.start()
 
+
+		self.RunSimMatch(self.Sim, self.Agents, True)
 		for thread in threads:
 			thread.join()
 		return
