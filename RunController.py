@@ -217,6 +217,7 @@ class RunController:
 			self.AiDataManager.MetaData["NumberOfFinishedBoards"] = 0
 			self.AiDataManager.MetaData["NumberOfGames"] = 0
 			self.AiDataManager.MetaData["NetworkUsingOneHotEncoding"] = False
+			self.AiDataManager.MetaData["RealTime"] = 0
 			self.AiDataManager.MetaData["TotalTime"] = 0
 			self.AiDataManager.MetaData["BruteForceTotalTime"] = 0
 			self.AiDataManager.MetaData["AnnTotalTime"] = 0
@@ -267,6 +268,7 @@ class RunController:
 			totalTime = self.AiDataManager.MetaData["TotalTime"]
 			print("Games avg took: " + str(Format.SplitTime(totalTime/numGames, roundTo=6)))
 			print("time since start: " + str(Format.SplitTime(totalTime, roundTo=2)))
+			print("Real Time since start: " + str(Format.SplitTime(self.AiDataManager.MetaData["RealTime"], roundTo=2)))
 
 			backUpTime = self.AiDataManager.MetaData["LastBackUpTotalTime"]
 			print("time since last BackUp: " + str(Format.SplitTime(totalTime-backUpTime, roundTo=2)))
@@ -322,6 +324,8 @@ class RunController:
 
 			numMoves += 1
 			self.AiDataManager.MetaData["TotalTime"] += time.time()-totalStartTime
+			if isMainThread:
+				self.AiDataManager.MetaData["RealTime"]  += time.time()-totalStartTime
 			totalStartTime = time.time()
 
 			if finished:
