@@ -28,8 +28,5 @@ jobs:
             python RunTests.py
 
       - store_artifacts:
-          path: DataSets
-          destination: DataSets
-      - store_artifacts:
           path: Logs
-          destination: Logs
+          destination: 
