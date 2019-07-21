@@ -17,6 +17,7 @@ class DataSetManager:
 	MinOutputSize = 0
 	MaxOutputSize = 0
 	OutputResolution = 0
+	Lock = threading.Lock()
 	
 	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, simName):
 		self.NumOfOutputs = numOfOutputs
@@ -100,8 +101,9 @@ class DataSetManager:
 			self.SaveMetaData()
 		return
 	def Clear(self):
-		self.DataSetHashTable = {}
-		self.DataSetTables = []
+		with self.Lock:
+			self.DataSetHashTable = {}
+			self.DataSetTables = []
 		return
 
 	def BackUp(self):
@@ -125,44 +127,45 @@ class DataSetManager:
 		return
 
 	def LoadTableInfo(self):
-		if len(self.DataSetHashTable)>0:
-			return
+		with self.Lock:
+			if len(self.DataSetHashTable)>0:
+				return
 
-		if not DictFileExists(self.DataSetHashTableAddress):
-			return
+			if not DictFileExists(self.DataSetHashTableAddress):
+				return
 
-		numberOfTables = self.MetaData["NumberOfTables"]
+			numberOfTables = self.MetaData["NumberOfTables"]
 
-		self.DataSetTables = []
-		for loop in range(numberOfTables):
-			self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
+			self.DataSetTables = []
+			for loop in range(numberOfTables):
+				self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
 
-		self.FillingTable = self.MetaData["FillingTable"]
-		self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
-		self.StartingBoards = DictLoad(self.StartingBoardsAddress, False)
-		self.CanAppendData = True
+			self.FillingTable = self.MetaData["FillingTable"]
+			self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
+			self.StartingBoards = DictLoad(self.StartingBoardsAddress, False)
+			self.CanAppendData = True
 		return
 
 	def AddNewBoard(self, key, board):
 		if key in self.DataSetHashTable:
 			return
 
-		index = self.FillingTable
 		pickledBoard = pickle.dumps(board)
-		
+
 		with self.Lock:
+			index = self.FillingTable
 			if (len(self.DataSetTables) <= index):
 				self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(index), True)]
 
 			self.DataSetHashTable[key] = (index, pickledBoard)
 			self.NewDataSetHashTable[key] = (index, pickledBoard)
 
-		if not self.DataSetTables[index].IsLoaded:
-			self.DataSetTables[index].Load()
-
-		self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo()
-		if len(self.DataSetTables[index].Content) >= self.TableBatchSize:
-			self.FillingTable += 1
+			if not self.DataSetTables[index].IsLoaded:
+				self.DataSetTables[index].Load()
+	
+			self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo()
+			if len(self.DataSetTables[index].Content) >= self.TableBatchSize:
+				self.FillingTable += 1
 
 		return
 	def GetBoardInfo(self, key):
