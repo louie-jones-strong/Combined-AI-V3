@@ -310,51 +310,56 @@ class RunController:
 		return
 
 	def RunSimMatch(self, game, agents, isMainThread):
-		board, turn = game.Start()
-		self.AiDataManager.UpdateStartingBoards(board)
+		try:
 
-		numMoves = 0
-		totalStartTime = time.time()
-		gameStartTime = time.time()
-		self.LastSaveTime = time.time()
-		while True:
-			if isMainThread:
-				self.Output(game, numMoves, gameStartTime, board, turn)
-			board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
+			board, turn = game.Start()
+			self.AiDataManager.UpdateStartingBoards(board)
 
-			numMoves += 1
-			temp = time.time()-totalStartTime
-			self.AiDataManager.MetaData["TotalTime"] += temp
-			if isMainThread:
-				self.AiDataManager.MetaData["RealTime"]  += temp
+			numMoves = 0
 			totalStartTime = time.time()
-
-			if finished:
-				self.AiDataManager.MetaData["NumberOfGames"] += 1
-
-				for loop in range(len(agents)):
-					agents[loop].SaveData(fit[loop])
-
+			gameStartTime = time.time()
+			self.LastSaveTime = time.time()
+			while True:
 				if isMainThread:
-					self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
-				
-					if self.AiDataManager.MetaData["RealTime"] > 60:
-						self.LastSaveTook = time.time()
-						# save back up every hour
-						if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
-							self.AiDataManager.BackUp()
+					self.Output(game, numMoves, gameStartTime, board, turn)
+				board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
 
-						self.AiDataManager.Save()
-						self.LastSaveTime = time.time()
-						self.LastSaveTook = time.time() - self.LastSaveTook
+				numMoves += 1
+				temp = time.time()-totalStartTime
+				self.AiDataManager.MetaData["TotalTime"] += temp
+				if isMainThread:
+					self.AiDataManager.MetaData["RealTime"]  += temp
+				totalStartTime = time.time()
 
-				if self.StopTime != None and self.AiDataManager.MetaData["RealTime"] >= self.StopTime:
-					break
+				if finished:
+					self.AiDataManager.MetaData["NumberOfGames"] += 1
 
-				board, turn = game.Start()
-				self.AiDataManager.UpdateStartingBoards(board)
-				numMoves = 0
-				gameStartTime = time.time()
+					for loop in range(len(agents)):
+						agents[loop].SaveData(fit[loop])
+
+					if isMainThread:
+						self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
+
+						if time.time()-self.LastSaveTime > 60:
+							self.LastSaveTook = time.time()
+							# save back up every hour
+							if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
+								self.AiDataManager.BackUp()
+
+							self.AiDataManager.Save()
+							self.LastSaveTime = time.time()
+							self.LastSaveTook = time.time() - self.LastSaveTook
+
+					if self.StopTime != None and self.AiDataManager.MetaData["RealTime"] >= self.StopTime:
+						break
+
+					board, turn = game.Start()
+					self.AiDataManager.UpdateStartingBoards(board)
+					numMoves = 0
+					gameStartTime = time.time()
+
+		except Exception as error:
+			Logger.LogError(error)
 		return
 
 
