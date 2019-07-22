@@ -18,7 +18,7 @@ for simNum in Sims:
 			controller = runner.RunController(simNumber=simNum, loadData="N", aiType=agent, renderQuality=0, stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup, 2))
-			print("Sim = "+str(controller.SimInfo["SimName"]))
+			print("Sim = "+controller.SimInfo["SimName"])
 			print("Starting Run...")
 			timeMarkRun = time.time()
 
@@ -41,7 +41,7 @@ for simNum in Sims:
 					metaDataSame = False
 
 			if metaDataSame:
-				Logger.LogWarning("metaData1 != metaData2: save error?", holdOnInput=False)
+				Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: "+agent+" metaData1 != metaData2: save error?", holdOnInput=False)
 				hadError = True
 			else:
 				controller.RunTournament()
