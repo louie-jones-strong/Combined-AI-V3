@@ -30,6 +30,3 @@ jobs:
       - store_artifacts:
           path: Logs
           destination: Logs
-      - store_artifacts:
-          path: Logs/TestOutputs
-          destination: MetaData

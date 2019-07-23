@@ -304,6 +304,8 @@ class RunController:
 		self.RunSimMatch(self.Sim, self.Agents, True)
 		for thread in threads:
 			thread.join()
+
+		self.SaveData()
 		return
 
 	def RunSimMatch(self, game, agents, isMainThread):
@@ -336,14 +338,7 @@ class RunController:
 					self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 
 					if time.time()-self.LastSaveTime > 60:
-						self.LastSaveTook = time.time()
-						# save back up every hour
-						if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
-							self.AiDataManager.BackUp()
-
-						self.AiDataManager.Save()
-						self.LastSaveTime = time.time()
-						self.LastSaveTook = time.time() - self.LastSaveTook
+						self.SaveData()
 
 				if self.StopTime != None and self.AiDataManager.MetaData["RealTime"] >= self.StopTime:
 					break
@@ -352,6 +347,17 @@ class RunController:
 				self.AiDataManager.UpdateStartingBoards(board)
 				numMoves = 0
 				gameStartTime = time.time()
+		return
+
+	def SaveData(self):
+		self.LastSaveTook = time.time()
+		# save back up every hour
+		if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
+			self.AiDataManager.BackUp()
+
+		self.AiDataManager.Save()
+		self.LastSaveTime = time.time()
+		self.LastSaveTook = time.time() - self.LastSaveTook
 		return
 
 

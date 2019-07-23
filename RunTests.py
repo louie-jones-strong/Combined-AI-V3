@@ -41,7 +41,7 @@ for simNum in Sims:
 					metaDataSame = False
 					break
 
-			if metaDataSame:
+			if not metaDataSame:
 				Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: "+agent+" metaData1 != metaData2: save error?", holdOnInput=False)
 				hadError = True
 			else:
