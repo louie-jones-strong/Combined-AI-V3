@@ -7,7 +7,7 @@ from DataManger import BasicLoadAndSave
 Sims = [1, 2, 3, 4, 6]
 Agents = ["b"]
 
-metaDataAddress = "TestOutputs//"
+metaDataAddress = "Logs//TestOutputs//"
 hadError = False
 
 for simNum in Sims:
@@ -39,6 +39,7 @@ for simNum in Sims:
 			for key in metaData1.keys():
 				if key not in metaData2 or metaData1[key] != metaData2[key]:
 					metaDataSame = False
+					break
 
 			if metaDataSame:
 				Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: "+agent+" metaData1 != metaData2: save error?", holdOnInput=False)
