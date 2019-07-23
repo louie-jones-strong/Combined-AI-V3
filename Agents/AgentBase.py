@@ -28,19 +28,20 @@ class AgentBase:
 		if not found:  # never played board before
 			self.DataSetManager.AddNewBoard(key, board)
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+		
+		with boardInfo.Lock:
+			# never played this move before
+			if moveID not in boardInfo.Moves:
+				boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
 
-		# never played this move before
-		if moveID not in boardInfo.Moves:
-			boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
+			# mark move as played if never played before
+			if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
 
-		# mark move as played if never played before
-		if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+				if not (2**moveID & boardInfo.PlayedMovesLookUpArray):
+					boardInfo.PlayedMovesLookUpArray += 2**moveID
 
-			if not (2**moveID & boardInfo.PlayedMovesLookUpArray):
-				boardInfo.PlayedMovesLookUpArray += 2**moveID
-
-			if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
-				self.DataSetManager.MetaData["NumberOfCompleteBoards"] += 1
+				if boardInfo.PlayedMovesLookUpArray >= self.AllMovesPlayedValue:
+					self.DataSetManager.MetaDataAdd("NumberOfCompleteBoards", 1)
 				
 
 		if self.RecordMoves:
@@ -56,9 +57,9 @@ class AgentBase:
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
-
-		if found and moveID in boardInfo.Moves:
-			del boardInfo.Moves[moveID]
+		with boardInfo.Lock:
+			if found and moveID in boardInfo.Moves:
+				del boardInfo.Moves[moveID]
 
 		if str(key)+str(moveID) in self.TempDataSet:
 			del self.TempDataSet[str(key)+str(moveID)]
@@ -72,18 +73,19 @@ class AgentBase:
 
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(boardKey)
-
-		if found and moveID in boardInfo.Moves:
-			if gameFinished:
-				outComeKey = "GameFinished"
-			else:
-				outComeKey = BoardToKey(outComeBoard)
-
-			move = boardInfo.Moves[moveID]
-			if outComeKey in move.MoveOutComes:
-				move.MoveOutComes[outComeKey] += 1
-			else:
-				move.MoveOutComes[outComeKey] = 1
+		
+		with boardInfo.Lock:
+			if found and moveID in boardInfo.Moves:
+				if gameFinished:
+					outComeKey = "GameFinished"
+				else:
+					outComeKey = BoardToKey(outComeBoard)
+	
+				move = boardInfo.Moves[moveID]
+				if outComeKey in move.MoveOutComes:
+					move.MoveOutComes[outComeKey] += 1
+				else:
+					move.MoveOutComes[outComeKey] = 1
 				
 		return
 
@@ -103,21 +105,23 @@ class AgentBase:
 			moveID = tempValue["MoveID"]
 
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
-			if found and moveID in boardInfo.Moves:
-				newFitness = boardInfo.Moves[moveID].AvgFitness*boardInfo.Moves[moveID].TimesPlayed
-				newFitness += fitness
-				boardInfo.Moves[moveID].TimesPlayed += 1
-				newFitness /= boardInfo.Moves[moveID].TimesPlayed
-				boardInfo.Moves[moveID].AvgFitness = newFitness
+			if found:
+				with boardInfo.Lock:
+					if moveID in boardInfo.Moves:
+						newFitness = boardInfo.Moves[moveID].AvgFitness*boardInfo.Moves[moveID].TimesPlayed
+						newFitness += fitness
+						boardInfo.Moves[moveID].TimesPlayed += 1
+						newFitness /= boardInfo.Moves[moveID].TimesPlayed
+						boardInfo.Moves[moveID].AvgFitness = newFitness
 
-				if newFitness > boardInfo.BestAvgFitness:
-					boardInfo.MoveIDOfBestAvgFitness = moveID
-					boardInfo.BestAvgFitness = newFitness
+						if newFitness > boardInfo.BestAvgFitness:
+							boardInfo.MoveIDOfBestAvgFitness = moveID
+							boardInfo.BestAvgFitness = newFitness
 
-				if not boardInfo.Finished:
-					boardInfo.Finished = self.IsBoardFinished(boardInfo)
-					if boardInfo.Finished:
-						self.DataSetManager.MetaData["NumberOfFinishedBoards"] += 1
+						if not boardInfo.Finished:
+							boardInfo.Finished = self.IsBoardFinished(boardInfo)
+							if boardInfo.Finished:
+								self.DataSetManager.MetaDataAdd("NumberOfFinishedBoards", 1)
 
 
 		self.TempDataSet = {}
@@ -154,7 +158,7 @@ class AgentBase:
 					found, outComeBoardInfo = self.DataSetManager.GetBoardInfo(outComeKey)
 					if not found:
 						return False
-
+					
 					if not outComeBoardInfo.Finished:
 						return False
 			

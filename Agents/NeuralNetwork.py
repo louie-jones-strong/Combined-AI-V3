@@ -70,7 +70,7 @@ def MakeModel(dataSetManager):
 		if os.path.exists(dataSetManager.TesnorBoardLogAddress):
 			runId = len(os.listdir(dataSetManager.TesnorBoardLogAddress))
 
-		dataSetManager.MetaData["AnnRunId"] = runId
+		dataSetManager.MetaDataSet("AnnRunId", runId)
 
 	model = ModelMaker(inputShape, structreArray, dataSetManager.TesnorBoardLogAddress, lr=0.001)#, optimizer="sgd")	
 	return model, str(runId), len(structreArray)
@@ -118,8 +118,8 @@ def PredictNetworkStructre(dataSetManager):
 		else:
 			structreArray += [["ann", len(dataSetY[0]), "Sigmoid"]]
 
-		dataSetManager.MetaData["AnnMoveInputShape"] = inputShape
-		dataSetManager.MetaData["AnnMoveStructreArray"] = structreArray
+		dataSetManager.MetaDataSet("AnnMoveInputShape", inputShape)
+		dataSetManager.MetaDataSet("AnnMoveStructreArray", structreArray)
 
 	return inputShape, structreArray
 

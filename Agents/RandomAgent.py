@@ -9,11 +9,12 @@ class Agent(AgentBase.AgentBase):
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
 		if found:
-			movesIds = []
-			for moveId in range(self.DataSetManager.MaxMoveIDs):
-
-				if not(2**moveId & boardInfo.PlayedMovesLookUpArray) or moveId in boardInfo.Moves:
-					movesIds += [moveId]
+			with boardInfo.Lock:
+				movesIds = []
+				for moveId in range(self.DataSetManager.MaxMoveIDs):
+				
+					if not(2**moveId & boardInfo.PlayedMovesLookUpArray) or moveId in boardInfo.Moves:
+						movesIds += [moveId]
 
 			pickedIndex = random.randint(0,len(movesIds)-1)
 			moveID = movesIds[pickedIndex]

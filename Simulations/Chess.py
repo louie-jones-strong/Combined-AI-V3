@@ -7,7 +7,11 @@ class Simulation(SimBase.SimBase):
 			"SimName":"Chess","NumInputs":4,
 			"MinInputSize":0,"MaxInputSize":7,
 			"Resolution":1,"RenderSetup":True}
-
+	
+	def CreateNew(self):
+		sim = Simulation()
+		return sim
+		
 	def Start(self):
 		self.Board = NewBoard()
 		self.Turn = 1

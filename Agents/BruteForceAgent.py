@@ -25,50 +25,51 @@ class Agent(AgentBase.AgentBase):
 
 		else:  # learning mode
 			if found:
-				if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
-					if key in self.MovesNotPlayedCache:
-						moveID = self.MovesNotPlayedCache[key][0]
-						del self.MovesNotPlayedCache[key][0]
-
-						if len(self.MovesNotPlayedCache[key]) == 0:
-							del self.MovesNotPlayedCache[key]
-
-
-					else:
-						notPlayedList = []
-						for moveId in range(self.DataSetManager.MaxMoveIDs):
-							if not (2**moveId & boardInfo.PlayedMovesLookUpArray):
-								if moveID == None:
-									moveID = moveId
-								else:
-									notPlayedList += [moveId]
-
-						self.MovesNotPlayedCache[key] = notPlayedList
-
-				else:#played every move once already
-					#nonFinishedLeastPlayed = sys.maxsize
-					#nonFinishedMoveID = -1
-
-					finishedLeastPlayed = sys.maxsize
-					finishedMoveID = 0
-
-					for movekey, moveValue in boardInfo.Moves.items():
-						
-						#if (not boardInfo.Finished) and moveValue.TimesPlayed < nonFinishedLeastPlayed:# and not self.IsMoveFinished(boardInfo, movekey):
-						#	nonFinishedLeastPlayed = moveValue.TimesPlayed
-						#	nonFinishedMoveID = movekey
-
-						if moveValue.TimesPlayed < finishedLeastPlayed:
-							finishedLeastPlayed = moveValue.TimesPlayed
-							finishedMoveID = movekey
+				with boardInfo.Lock:
+					if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+						if key in self.MovesNotPlayedCache:
+							moveID = self.MovesNotPlayedCache[key][0]
+							del self.MovesNotPlayedCache[key][0]
+	
+							if len(self.MovesNotPlayedCache[key]) == 0:
+								del self.MovesNotPlayedCache[key]
+	
+	
+						else:
+							notPlayedList = []
+							for moveId in range(self.DataSetManager.MaxMoveIDs):
+								if not (2**moveId & boardInfo.PlayedMovesLookUpArray):
+									if moveID == None:
+										moveID = moveId
+									else:
+										notPlayedList += [moveId]
+	
+							self.MovesNotPlayedCache[key] = notPlayedList
+	
+					else:#played every move once already
+						#nonFinishedLeastPlayed = sys.maxsize
+						#nonFinishedMoveID = -1
+	
+						finishedLeastPlayed = sys.maxsize
+						finishedMoveID = 0
+	
+						for movekey, moveValue in boardInfo.Moves.items():
 							
-							if finishedLeastPlayed == 1:
-								break
-
-					#if nonFinishedMoveID != -1:
-					#	moveID = nonFinishedMoveID
-					#else:
-					moveID = finishedMoveID
+							#if (not boardInfo.Finished) and moveValue.TimesPlayed < nonFinishedLeastPlayed:# and not self.IsMoveFinished(boardInfo, movekey):
+							#	nonFinishedLeastPlayed = moveValue.TimesPlayed
+							#	nonFinishedMoveID = movekey
+	
+							if moveValue.TimesPlayed < finishedLeastPlayed:
+								finishedLeastPlayed = moveValue.TimesPlayed
+								finishedMoveID = movekey
+								
+								if finishedLeastPlayed == 1:
+									break
+	
+						#if nonFinishedMoveID != -1:
+						#	moveID = nonFinishedMoveID
+						#else:
+						moveID = finishedMoveID
 
 			else:#never played board before
 				moveID = 0

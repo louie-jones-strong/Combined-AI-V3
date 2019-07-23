@@ -1,4 +1,5 @@
 import sys
+import threading
 
 class BoardInfo():
 	MoveIDOfBestAvgFitness = 0
@@ -6,13 +7,34 @@ class BoardInfo():
 	Moves = {}
 	PlayedMovesLookUpArray = 0
 	Finished = False
+	Lock = threading.Lock()
 
 	def __init__(self):
-		self.Moves = {}
 		self.MoveIDOfBestAvgFitness = 0
 		self.BestAvgFitness = -sys.maxsize
+		self.Moves = {}
 		self.PlayedMovesLookUpArray = 0
 		self.Finished = False
+		self.Lock = threading.Lock()
+		return
+
+	def __getstate__(self):
+		state = {}
+		state["Moves"] = self.Moves
+		state["MoveIDOfBestAvgFitness"] = self.MoveIDOfBestAvgFitness
+		state["BestAvgFitness"] = self.BestAvgFitness
+		state["PlayedMovesLookUpArray"] = self.PlayedMovesLookUpArray
+		state["Finished"] = self.Finished
+		self.Lock = threading.Lock()
+		return state
+
+	def __setstate__(self, state):
+		self.Moves = state["Moves"]
+		self.MoveIDOfBestAvgFitness = state["MoveIDOfBestAvgFitness"]
+		self.BestAvgFitness = state["BestAvgFitness"]
+		self.PlayedMovesLookUpArray = state["PlayedMovesLookUpArray"]
+		self.Finished = state["Finished"]
+		self.Lock = threading.Lock()
 		return
 
 class MoveInfo():
@@ -26,4 +48,3 @@ class MoveInfo():
 		self.TimesPlayed = TimesPlayed
 		self.MoveOutComes = {}
 		return
-# 1) point to the move that is least played

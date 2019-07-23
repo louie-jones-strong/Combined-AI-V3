@@ -28,5 +28,5 @@ jobs:
             python RunTests.py
 
       - store_artifacts:
-          path: test-reports
-          destination: test-reports
+          path: Logs
+          destination: Logs

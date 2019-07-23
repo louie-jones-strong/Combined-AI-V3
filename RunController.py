@@ -11,6 +11,7 @@ import importlib
 import time
 import os
 import sys
+import threading
 ClearShell()
 #%% setup
 
@@ -208,22 +209,23 @@ class RunController:
 
 		if userInput == "n" or userInput == "N":
 			self.AiDataManager.MetaData = {}
-			self.AiDataManager.MetaData["Version"] = self.Version
-			self.AiDataManager.MetaData["SizeOfDataSet"] = 0
-			self.AiDataManager.MetaData["NumberOfTables"] = 0
-			self.AiDataManager.MetaData["FillingTable"] = 0
-			self.AiDataManager.MetaData["NumberOfCompleteBoards"] = 0
-			self.AiDataManager.MetaData["NumberOfFinishedBoards"] = 0
-			self.AiDataManager.MetaData["NumberOfGames"] = 0
-			self.AiDataManager.MetaData["NetworkUsingOneHotEncoding"] = False
-			self.AiDataManager.MetaData["TotalTime"] = 0
-			self.AiDataManager.MetaData["BruteForceTotalTime"] = 0
-			self.AiDataManager.MetaData["AnnTotalTime"] = 0
-			self.AiDataManager.MetaData["AnnDataMadeFromBruteForceTotalTime"] = 0
-			self.AiDataManager.MetaData["LastBackUpTotalTime"] = 0
-			self.AiDataManager.MetaData["AnnMoveInputShape"] = None
-			self.AiDataManager.MetaData["AnnMoveStructreArray"] = None
-			self.AiDataManager.MetaData["AnnRunId"] = None
+			self.AiDataManager.MetaDataSet("Version", self.Version)
+			self.AiDataManager.MetaDataSet("SizeOfDataSet", 0)
+			self.AiDataManager.MetaDataSet("NumberOfTables", 0)
+			self.AiDataManager.MetaDataSet("FillingTable", 0)
+			self.AiDataManager.MetaDataSet("NumberOfCompleteBoards", 0)
+			self.AiDataManager.MetaDataSet("NumberOfFinishedBoards", 0)
+			self.AiDataManager.MetaDataSet("NumberOfGames", 0)
+			self.AiDataManager.MetaDataSet("NetworkUsingOneHotEncoding", False)
+			self.AiDataManager.MetaDataSet("RealTime", 0)
+			self.AiDataManager.MetaDataSet("TotalTime", 0)
+			self.AiDataManager.MetaDataSet("BruteForceTotalTime", 0)
+			self.AiDataManager.MetaDataSet("AnnTotalTime", 0)
+			self.AiDataManager.MetaDataSet("AnnDataMadeFromBruteForceTotalTime", 0)
+			self.AiDataManager.MetaDataSet("LastBackUpTotalTime", 0)
+			self.AiDataManager.MetaDataSet("AnnMoveInputShape", None)
+			self.AiDataManager.MetaDataSet("AnnMoveStructreArray", None)
+			self.AiDataManager.MetaDataSet("AnnRunId", None)
 			return False
 		
 		return True
@@ -266,6 +268,7 @@ class RunController:
 			totalTime = self.AiDataManager.MetaData["TotalTime"]
 			print("Games avg took: " + str(Format.SplitTime(totalTime/numGames, roundTo=6)))
 			print("time since start: " + str(Format.SplitTime(totalTime, roundTo=2)))
+			print("Real Time since start: " + str(Format.SplitTime(self.AiDataManager.MetaData["RealTime"], roundTo=2)))
 
 			backUpTime = self.AiDataManager.MetaData["LastBackUpTotalTime"]
 			print("time since last BackUp: " + str(Format.SplitTime(totalTime-backUpTime, roundTo=2)))
@@ -285,14 +288,27 @@ class RunController:
 		return
 	
 	def RunTournament(self):
-		
-		self.RunSimMatch(self.Sim)
-		
-		#game = self.Sim.CreateNew()
-		#self.RunSimMatch(game)
+		targetThreadNum = 2
+
+		threads = []
+		for loop in range(targetThreadNum-1):
+			game = self.Sim.CreateNew()
+			agents = []
+			for loop in range(self.NumberOfBots):
+				agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
+			thread = threading.Thread(target=self.RunSimMatch, args=(game, agents, False,))
+			threads += [thread]
+			thread.start()
+
+
+		self.RunSimMatch(self.Sim, self.Agents, True)
+		for thread in threads:
+			thread.join()
+
+		self.SaveData()
 		return
 
-	def RunSimMatch(self, game):
+	def RunSimMatch(self, game, agents, isMainThread):
 		board, turn = game.Start()
 		self.AiDataManager.UpdateStartingBoards(board)
 
@@ -301,32 +317,30 @@ class RunController:
 		gameStartTime = time.time()
 		self.LastSaveTime = time.time()
 		while True:
-			self.Output(game, numMoves, gameStartTime, board, turn)
-			board, turn, finished, fit = MakeAgentMove(turn, board, self.Agents, game)
+			if isMainThread:
+				self.Output(game, numMoves, gameStartTime, board, turn)
+			board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
 
 			numMoves += 1
-			self.AiDataManager.MetaData["TotalTime"] += time.time()-totalStartTime
+			temp = time.time()-totalStartTime
+			self.AiDataManager.MetaDataAdd("TotalTime", temp)
+			if isMainThread:
+				self.AiDataManager.MetaDataAdd("RealTime", temp)
 			totalStartTime = time.time()
 
 			if finished:
-				self.AiDataManager.MetaData["NumberOfGames"] += 1
+				self.AiDataManager.MetaDataAdd("NumberOfGames", 1)
 
-				for loop in range(len(self.Agents)):
-					self.Agents[loop].SaveData(fit[loop])
+				for loop in range(len(agents)):
+					agents[loop].SaveData(fit[loop])
 
-				self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
-				
-				if time.time() - self.LastSaveTime > 60:
-					self.LastSaveTook = time.time()
-					# save back up every hour
-					if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
-						self.AiDataManager.BackUp()
+				if isMainThread:
+					self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 
-					self.AiDataManager.Save()
-					self.LastSaveTime = time.time()
-					self.LastSaveTook = time.time() - self.LastSaveTook
+					if time.time()-self.LastSaveTime > 60:
+						self.SaveData()
 
-				if self.StopTime != None and self.AiDataManager.MetaData["TotalTime"] >= self.StopTime:
+				if self.StopTime != None and self.AiDataManager.MetaData["RealTime"] >= self.StopTime:
 					break
 
 				board, turn = game.Start()
@@ -335,13 +349,24 @@ class RunController:
 				gameStartTime = time.time()
 		return
 
+	def SaveData(self):
+		self.LastSaveTook = time.time()
+		# save back up every hour
+		if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
+			self.AiDataManager.BackUp()
+
+		self.AiDataManager.Save()
+		self.LastSaveTime = time.time()
+		self.LastSaveTook = time.time() - self.LastSaveTook
+		return
+
 
 if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(renderQuality=1)
-		#controller = RunController(simNumber=6, loadData="N", aiType="r", renderQuality=1)
+		#controller = RunController(renderQuality=1)
+		controller = RunController(simNumber=6, loadData="N", aiType="b", renderQuality=1)
 
 	except Exception as error:
 		Logger.LogError(error)

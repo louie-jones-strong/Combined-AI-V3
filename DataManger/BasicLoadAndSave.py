@@ -2,6 +2,7 @@ import pickle
 import os
 from Shared import LoadingBar as LoadingBar
 from DataManger.Serializer import *
+import threading
 
 def DictAppend(address, dictionary): 
 	if (dictionary == {}):
@@ -90,21 +91,26 @@ def MakeFolderIfNeeded(address):
 class DataSetTable:
 	Content = {}
 	IsLoaded = False
+	Lock = threading.Lock()
 
 	def __init__(self, address, isLoaded):
+		self.Lock = threading.Lock()
 		self.FileAddress = address
 		self.IsLoaded = isLoaded
 		self.Content = {}
 		return
 
 	def Load(self):
-		self.Content = ComplexLoad(self.FileAddress)
-		self.IsLoaded = True
+		with self.Lock:
+			self.Content = ComplexLoad(self.FileAddress)
+			self.IsLoaded = True
 		return
 	def Save(self):
-		ComplexSave(self.FileAddress, self.Content)
+		with self.Lock:
+			ComplexSave(self.FileAddress, self.Content)
 		return
 	def Unload(self):
-		self.Content ={}
-		self.IsLoaded = False
+		with self.Lock:
+			self.Content ={}
+			self.IsLoaded = False
 		return
