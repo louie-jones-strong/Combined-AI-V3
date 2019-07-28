@@ -101,8 +101,13 @@ class DataSetManager:
 		return
 	def Clear(self):
 		with self.Lock:
+			self.CanAppendData = False
 			self.DataSetHashTable = {}
+			self.StartingBoards = {}
+			self.NewDataSetHashTable = {}
 			self.DataSetTables = []
+			self.LoadedDataSetTables = {}
+			self.FillingTable = 0
 		return
 
 	def BackUp(self):
