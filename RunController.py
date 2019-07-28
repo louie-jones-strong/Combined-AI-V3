@@ -266,18 +266,18 @@ class RunController:
 				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
 			totalTime = self.AiDataManager.MetaData["TotalTime"]
-			print("Games avg took: " + str(Format.SplitTime(totalTime/numGames, roundTo=6)))
-			print("time since start: " + str(Format.SplitTime(totalTime, roundTo=2)))
-			print("Real Time since start: " + str(Format.SplitTime(self.AiDataManager.MetaData["RealTime"], roundTo=2)))
+			print("Games avg took: " + Format.SplitTime(totalTime/numGames, roundTo=6))
+			print("time since start: " + Format.SplitTime(totalTime))
+			print("Real Time since start: " + Format.SplitTime(self.AiDataManager.MetaData["RealTime"]))
 
 			backUpTime = self.AiDataManager.MetaData["LastBackUpTotalTime"]
-			print("time since last BackUp: " + str(Format.SplitTime(totalTime-backUpTime, roundTo=2)))
+			print("time since last BackUp: " + Format.SplitTime(totalTime-backUpTime))
 			print("press CTRl+Q to quit...")
 			
 			title = "AI Playing: "+self.SimInfo["SimName"]
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
 			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
-			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook, roundTo=2)
+			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
 			SetTitle(title)
 			self.LastOutputTime = time.time()
 

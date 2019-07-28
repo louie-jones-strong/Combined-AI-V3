@@ -19,7 +19,7 @@ def SplitNumber(number):
 				gap = 0
 	return output
 
-def SplitTime(seconds, roundTo=0):
+def SplitTime(seconds, roundTo=2):
 	#Convert seconds to string "[[[DD:]HH:]MM:]SS"
 	output = ""
 	for scale in 86400, 3600, 60:
