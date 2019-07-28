@@ -164,5 +164,23 @@ class AgentBase:
 			
 		return True		
 
+	def IsMoveLocked(self, boardInfo, moveId):
+		if not (2**moveId & boardInfo.PlayedMovesLookUpArray):
+			return False
+
+		if moveId in boardInfo.Moves:
+
+			for outComeKey in boardInfo.Moves[moveId].MoveOutComes:
+
+				if outComeKey != "GameFinished":
+					found, outComeBoardInfo = self.DataSetManager.GetBoardInfo(outComeKey)
+					if not found:
+						return False
+					
+					if outComeBoardInfo.Lock.locked():
+						return True
+			
+		return False		
+
 def GetSortKey(val):
 	return val["MoveNumber"]

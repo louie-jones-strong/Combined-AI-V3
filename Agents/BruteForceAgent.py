@@ -52,6 +52,7 @@ class Agent(AgentBase.AgentBase):
 	
 						finishedLeastPlayed = sys.maxsize
 						finishedMoveID = 0
+						foundNoneLockedBoard = False
 	
 						for movekey, moveValue in boardInfo.Moves.items():
 							
@@ -60,11 +61,13 @@ class Agent(AgentBase.AgentBase):
 							#	nonFinishedMoveID = movekey
 	
 							if moveValue.TimesPlayed < finishedLeastPlayed:
-								finishedLeastPlayed = moveValue.TimesPlayed
-								finishedMoveID = movekey
-								
-								if finishedLeastPlayed == 1:
-									break
+								if not (foundNoneLockedBoard and self.IsMoveLocked(boardInfo, movekey)):
+									foundNoneLockedBoard = True
+									finishedLeastPlayed = moveValue.TimesPlayed
+									finishedMoveID = movekey
+									
+									if finishedLeastPlayed == 1:
+										break
 	
 						#if nonFinishedMoveID != -1:
 						#	moveID = nonFinishedMoveID
