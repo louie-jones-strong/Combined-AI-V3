@@ -11,7 +11,8 @@ class Tests:
 		self.Logger = Logger.Logger()
 		self.Logger.ClearAllowed = False
 		self.Logger.SetTitleAllowed = False
-		
+		self.Logger.LoadingBarAllowed = False
+
 		Sims = [1, 2, 3, 4, 6]
 		Agents = ["b"]
 
@@ -31,6 +32,7 @@ class Tests:
 
 	def RunTest(self, simNum, agent):
 		hadError = False
+		print("")
 		print("Setup Sim: "+str(simNum)+" With Agent: "+str(agent))
 
 		try:

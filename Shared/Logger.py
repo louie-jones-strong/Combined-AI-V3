@@ -9,6 +9,7 @@ class Logger:
 	OutputAllowed = True
 	ClearAllowed = True
 	SetTitleAllowed = True
+	LoadingBarAllowed = True
 
 	def Clear(self):
 		if self.ClearAllowed:

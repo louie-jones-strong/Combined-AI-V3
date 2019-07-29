@@ -12,6 +12,9 @@ class LoadingBar():
 		return
 
 	def Update(self, progress, text=None, numDone=None, totalNum=None):
+		if not self.Logger.LoadingBarAllowed:
+			return
+			
 		progress = max(progress, 0)
 		progress = min(progress, 1)
 
