@@ -9,6 +9,9 @@ class Tests:
 
 	def __init__(self):
 		self.Logger = Logger.Logger()
+		self.Logger.ClearAllowed = False
+		self.Logger.SetTitleAllowed = False
+		
 		Sims = [1, 2, 3, 4, 6]
 		Agents = ["b"]
 
