@@ -4,18 +4,34 @@ import time
 from Shared.OutputFormating import SplitTime
 from DataManger import BasicLoadAndSave
 
-Sims = [1, 2, 3, 4, 6]
-Agents = ["b"]
+class Tests:
+	MetaDataAddress = "Logs//TestOutputs//"
 
-metaDataAddress = "Logs//TestOutputs//"
-hadError = False
+	def __init__(self):
+		Sims = [1, 2, 3, 4, 6]
+		Agents = ["b"]
+		hadError = False
 
-for simNum in Sims:
-	for agent in Agents:
+		for simNum in Sims:
+			for agent in Agents:
+				if self.RunTest(simNum, agent):
+					hadError = True
+
+		print("tests Finished")
+
+		if hadError:
+			exit(code=1)
+		return
+
+
+	def RunTest(self, simNum, agent):
+		hadError = False
 		print("Setup Sim: "+str(simNum)+" With Agent: "+str(agent))
+
 		try:
 			timeMarkSetup = time.time()
-			controller = runner.RunController(simNumber=simNum, loadData="N", aiType=agent, renderQuality=0, stopTime=60)
+			controller = runner.RunController(
+				simNumber=simNum, loadData="N", aiType=agent, renderQuality=0, stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup, 2))
 			print("Sim = "+controller.SimInfo["SimName"])
@@ -24,15 +40,18 @@ for simNum in Sims:
 
 			controller.RunTournament()
 			metaData1 = controller.AiDataManager.MetaData
-			
-			address = metaDataAddress+"MetaData_"+controller.SimInfo["SimName"]+"_"+agent+"_1"
+
+			address = self.MetaDataAddress+"MetaData_" + \
+				controller.SimInfo["SimName"]+"_"+agent+"_1"
 			BasicLoadAndSave.DictSave(address, metaData1)
 
-			controller = runner.RunController(simNumber=simNum, loadData="Y", aiType=agent, renderQuality=0, stopTime=10)
+			controller = runner.RunController(
+				simNumber=simNum, loadData="Y", aiType=agent, renderQuality=0, stopTime=10)
 			print("Run Done Took: "+SplitTime(time.time()-timeMarkRun, 2))
-			
+
 			metaData2 = controller.AiDataManager.MetaData
-			address = metaDataAddress+"MetaData_"+controller.SimInfo["SimName"]+"_"+agent+"_2"
+			address = self.MetaDataAddress+"MetaData_" + \
+				controller.SimInfo["SimName"]+"_"+agent+"_2"
 			BasicLoadAndSave.DictSave(address, metaData2)
 
 			metaDataSame = True
@@ -42,7 +61,8 @@ for simNum in Sims:
 					break
 
 			if not metaDataSame:
-				Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: "+agent+" metaData1 != metaData2: save error?", holdOnInput=False)
+				Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: " +
+									agent+" metaData1 != metaData2: save error?", holdOnInput=False)
 				hadError = True
 			else:
 				controller.RunTournament()
@@ -50,9 +70,9 @@ for simNum in Sims:
 		except Exception as error:
 			hadError = True
 			Logger.LogError(error, holdOnInput=False)
+			
+		return hadError
 
 
-print("test Finished")
-if hadError:
-	exit(code=1)
-	
+if __name__ == "__main__":
+	Tests()
