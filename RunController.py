@@ -6,13 +6,11 @@ import DataManger.DataSetManager as DataSetManager
 from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
 from Shared import Logger
-from Shared.OSCalls import *
 import importlib
 import time
 import os
 import sys
 import threading
-ClearShell()
 #%% setup
 
 def MakeAgentMove(turn, board, agents, game):
@@ -76,7 +74,8 @@ class RunController:
 
 	Version = 1.2
 
-	def __init__(self, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None, stopTime=None):
+	def __init__(self, logger, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None, stopTime=None):
+		self.Logger = logger
 		self.PickSimulation(simNumber)
 		self.StopTime = stopTime
 
@@ -92,7 +91,7 @@ class RunController:
 		else:
 			self.RenderQuality = 0
 
-		self.AiDataManager = DataSetManager.DataSetManager(self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
+		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                                      self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
 
 		if aiType == None:
@@ -182,7 +181,7 @@ class RunController:
 		self.Sim = self.Sim.Simulation()
 		self.SimInfo = self.Sim.Info
 
-		SetTitle("AI Playing:"+self.SimInfo["SimName"])
+		self.Logger.SetTitle("AI Playing:"+self.SimInfo["SimName"])
 
 		return
 	def SetUpMetaData(self, loadData=None):
@@ -191,7 +190,7 @@ class RunController:
 		if self.AiDataManager.GetMetaData():
 			if self.AiDataManager.MetaData["Version"] == self.Version:
 				if loadData == None:
-					ClearShell()
+					self.Logger.Clear()
 					print("")
 					print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
 					print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
@@ -253,8 +252,7 @@ class RunController:
 				avgMoveTime = (time.time() - gameStartTime)/numMoves
 				avgMoveTime = round(avgMoveTime, 6)
 
-
-			ClearShell()
+			self.Logger.Clear()
 			self.RenderBoard(game, board)
 			print("")
 			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
@@ -278,7 +276,7 @@ class RunController:
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
 			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
 			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
-			SetTitle(title)
+			self.Logger.SetTitle(title)
 			self.LastOutputTime = time.time()
 
 		elif self.RenderQuality == 2:
@@ -362,11 +360,13 @@ class RunController:
 
 
 if __name__ == "__main__":
+	Logger = Logger.Logger()
+	Logger.Clear()
 	hadError = False
 
 	try:
 		#controller = RunController(renderQuality=1)
-		controller = RunController(simNumber=6, loadData="N", aiType="b", renderQuality=1)
+		controller = RunController(Logger, simNumber=6, loadData="N", aiType="b", renderQuality=1)
 
 	except Exception as error:
 		Logger.LogError(error)

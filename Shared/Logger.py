@@ -3,52 +3,80 @@ import time
 import Shared.OutputFormating as Format
 import os
 
-def LogError(error, holdOnInput=True):
-	if error == None:
+class Logger:
+	MaxLogLines = 1000
+	LogsLinesList = []
+	OutputAllowed = True
+	ClearAllowed = True
+	SetTitleAllowed = True
+
+	def Clear(self):
+		if self.ClearAllowed:
+			os.system("cls")
 		return
 
-	strTrace = traceback.format_exc()
+	def SetTitle(self, titleText):
+		if self.SetTitleAllowed:
+			os.system("title "+str(titleText))
+		return
+	
+	def LogError(self, error, holdOnInput=True):
+		if error == None:
+			return
 
-	OutputLog(strTrace.split("\n"), "ERROR")
+		strTrace = traceback.format_exc()
 
-	if holdOnInput:
-		input("Press any Key To contine...")
-	return
+		self.SaveToErrorFile(strTrace.split("\n"), "ERROR")
 
-def LogWarning(warningString, holdOnInput=False):
+		if holdOnInput:
+			input("Press any Key To contine...")
+		return
 
-	OutputLog(warningString.split("\n"), "Warning")
+	def LogWarning(self, warningString, holdOnInput=False):
 
-	if holdOnInput:
-		input("Press any Key To contine...")
-	return
+		self.SaveToErrorFile(warningString.split("\n"), "Warning")
 
-def OutputLog(logLines, logType):
-	if logLines[-1] == "\n" or logLines[-1] == "":
-		logLines = logLines[:len(logLines)-1]
+		if holdOnInput:
+			input("Press any Key To contine...")
+		return
 
-	outputLines = ["========================================================="]
-	outputLines += ["TIME:"+Format.TimeToDateTime(time.time(),True, True)+" LOGTYPE:"+str(logType)]
-	outputLines += [""]
-	outputLines += logLines
-	outputLines += [""]
-	outputLines += ["========================================================="]
+	def Log(self, text):
+		print(text)
+		self.AddLineToList(text)
+		return
+	def AddLineToList(self, text):
+		self.LogsLinesList += [text]
 
-	output = "\n".join(outputLines)
-	print(output)	
+		if len(self.LogsLinesList) > self.MaxLogLines:
+			self.LogsLinesList = self.LogsLinesList[-self.MaxLogLines:]
+		return
 
-	address = "Logs//"
-	if not os.path.exists(address):
-		os.makedirs(address)
+	def SaveToErrorFile(self, logLines, logType):
+		if logLines[-1] == "\n" or logLines[-1] == "":
+			logLines = logLines[:len(logLines)-1]
 
-	address += "ErrorLog.txt"
+		outputLines = ["========================================================="]
+		outputLines += ["TIME:"+Format.TimeToDateTime(time.time(),True, True)+" LOGTYPE:"+str(logType)]
+		outputLines += [""]
+		outputLines += logLines
+		outputLines += [""]
+		outputLines += ["========================================================="]
 
-	if not os.path.exists(address):
-		file = open(address, "w")
-	else:
-		file = open(address, "a")
-	file.write(output)
-	file.close()
+		output = "\n".join(outputLines)
+		print(output)	
+
+		address = "Logs//"
+		if not os.path.exists(address):
+			os.makedirs(address)
+
+		address += "ErrorLog.txt"
+
+		if not os.path.exists(address):
+			file = open(address, "w")
+		else:
+			file = open(address, "a")
+		file.write(output)
+		file.close()
 
 
-	return outputLines
+		return outputLines

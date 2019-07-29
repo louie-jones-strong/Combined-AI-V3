@@ -1,15 +1,14 @@
 import time
 import Shared.OutputFormating as Formating
-from Shared.OSCalls import ClearShell
 
 class LoadingBar():
 
-	def __init__(self, allowUpdate=True):
+	def __init__(self, logger):
+		self.Logger = logger
 		self.CurrentProgress = 0
 		self.CurrentText = None
 		self.Resolution = 100
 		self.LastUpdateTime = 0
-		self.AllowUpdate = allowUpdate
 		return
 
 	def Update(self, progress, text=None, numDone=None, totalNum=None):
@@ -21,7 +20,7 @@ class LoadingBar():
 		if time.time()-self.LastUpdateTime >= 0.15 or progress == self.Resolution:
 
 			if progress != self.CurrentProgress or text != self.CurrentText:
-				ClearShell()
+				self.Logger.Clear()
 				bar = "#"*progress
 				fill = " "*(self.Resolution-progress)
 				print("|"+bar+fill+"|")

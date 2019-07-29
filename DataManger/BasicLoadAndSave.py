@@ -29,28 +29,31 @@ def DictSave(address, dictionary):
 		file.write(str(key)+":"+serializerValue+"\n")
 	file.close()
 	return
-def DictLoad(address, loadingBarOn=False):
+def DictLoad(address, loadingBar=None):
 	dictionary = {}
 	address += ".txt"
-
-	loadingBar = LoadingBar.LoadingBar(loadingBarOn)
-	loadingBar.Update(0, "Loading Dict")
+	
+	if loadingBar != None:
+		loadingBar.Update(0, "Loading Dict")
 
 	file = open(address, "r")
 	lines = file.readlines()
 	file.close()
 	
 	numberOfLines = len(lines)
-	loadingBar.Update(0, "Loading dict", 0, numberOfLines)
+	if loadingBar != None:
+		loadingBar.Update(0, "Loading dict", 0, numberOfLines)
 
 	for loop in range(numberOfLines):
 		line = lines[loop][:-1].split(":")
 		key = line[0]
 		dictionary[key] = deserializer(line[1])
 
-		loadingBar.Update(loop/numberOfLines, "Loading dict", loop, numberOfLines)
-
-	loadingBar.Update(loop/numberOfLines, "Loading dict", numberOfLines, numberOfLines)
+		if loadingBar != None:
+			loadingBar.Update(loop/numberOfLines, "Loading dict", loop, numberOfLines)
+			
+	if loadingBar != None:
+		loadingBar.Update(loop/numberOfLines, "Loading dict", numberOfLines, numberOfLines)
 
 	return dictionary
 def DictFileExists(address):

@@ -19,7 +19,8 @@ class DataSetManager:
 	OutputResolution = 0
 	Lock = threading.Lock()
 	
-	def __init__(self, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, simName):
+	def __init__(self, logger, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, simName):
+		self.Logger = logger
 		self.NumOfOutputs = numOfOutputs
 		self.MinOutputSize = minOutputSize
 		self.MaxOutputSize = maxOutputSize
@@ -153,8 +154,8 @@ class DataSetManager:
 				self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
 
 			self.FillingTable = self.MetaData["FillingTable"]
-			self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, True)
-			self.StartingBoards = DictLoad(self.StartingBoardsAddress, False)
+			self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, loadingBar=LoadingBar.LoadingBar(self.Logger))
+			self.StartingBoards = DictLoad(self.StartingBoardsAddress)
 			self.CanAppendData = True
 		return
 
@@ -213,7 +214,7 @@ class DataSetManager:
 	def GetMoveDataSet(self):
 		dataSetX = []
 		dataSetY = []
-		loadingBar = LoadingBar.LoadingBar()
+		loadingBar = LoadingBar.LoadingBar(self.Logger)
 		isOneHotEncoding = True
 
 		self.GetMetaData()
