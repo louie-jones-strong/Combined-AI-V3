@@ -3,3 +3,4 @@ tflearn
 matplotlib
 networkx
 gym
+tflearn
