@@ -10,6 +10,7 @@ class Logger:
 	ClearAllowed = True
 	SetTitleAllowed = True
 	LoadingBarAllowed = True
+	InputAllowed = True
 
 	def Clear(self):
 		if self.ClearAllowed:
@@ -21,7 +22,7 @@ class Logger:
 			os.system("title "+str(titleText))
 		return
 	
-	def LogError(self, error, holdOnInput=True):
+	def LogError(self, error):
 		if error == None:
 			return
 
@@ -29,29 +30,28 @@ class Logger:
 
 		self.SaveToErrorFile(strTrace.split("\n"), "ERROR")
 
-		if holdOnInput:
+		if self.InputAllowed:
 			input("Press any Key To contine...")
 		return
-
-	def LogWarning(self, warningString, holdOnInput=False):
+	def LogWarning(self, warningString):
 
 		self.SaveToErrorFile(warningString.split("\n"), "Warning")
 
-		if holdOnInput:
+		if self.InputAllowed:
 			input("Press any Key To contine...")
 		return
-
 	def Log(self, text):
-		print(text)
+		if self.OutputAllowed:
+			print(text)
 		self.AddLineToList(text)
 		return
+	
 	def AddLineToList(self, text):
 		self.LogsLinesList += [text]
 
 		if len(self.LogsLinesList) > self.MaxLogLines:
 			self.LogsLinesList = self.LogsLinesList[-self.MaxLogLines:]
 		return
-
 	def SaveToErrorFile(self, logLines, logType):
 		if logLines[-1] == "\n" or logLines[-1] == "":
 			logLines = logLines[:len(logLines)-1]
@@ -64,7 +64,10 @@ class Logger:
 		outputLines += ["========================================================="]
 
 		output = "\n".join(outputLines)
-		print(output)	
+		for line in outputLines:
+			self.AddLineToList(line)
+			if self.OutputAllowed:
+				print(line)	
 
 		address = "Logs//"
 		if not os.path.exists(address):

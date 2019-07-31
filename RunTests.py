@@ -12,6 +12,7 @@ class Tests:
 		self.Logger.ClearAllowed = False
 		self.Logger.SetTitleAllowed = False
 		self.Logger.LoadingBarAllowed = False
+		self.Logger.InputAllowed = False
 
 		Sims = [1, 2, 3, 4, 6]
 		Agents = ["b"]
@@ -68,14 +69,14 @@ class Tests:
 					break
 
 			if not metaDataSame:
-				self.Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: " +agent+" metaData1 != metaData2: save error?", holdOnInput=False)
+				self.Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: " +agent+" metaData1 != metaData2: save error?")
 				hadError = True
 			else:
 				controller.RunTournament()
 
 		except Exception as error:
 			hadError = True
-			self.Logger.LogError(error, holdOnInput=False)
+			self.Logger.LogError(error)
 
 		return hadError
 
