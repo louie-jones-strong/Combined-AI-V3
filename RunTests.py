@@ -14,7 +14,7 @@ class Tests:
 		self.Logger.LoadingBarAllowed = False
 
 		Sims = [1, 2, 3, 4, 6]
-		Agents = ["b","n"]
+		Agents = ["b"]
 
 		hadError = False
 
