@@ -1,6 +1,7 @@
 pygame
+tensorflow
+tensorflow-gpu
 tflearn
 matplotlib
 networkx
 gym
-tensorflow
