@@ -16,6 +16,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            pip install --upgrade pip
             pip install -r .circleci/requirements.txt
       - save_cache:
           paths:
