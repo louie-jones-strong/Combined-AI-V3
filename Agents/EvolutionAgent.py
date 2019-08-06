@@ -40,7 +40,7 @@ class Agent(AgentBase.AgentBase):
 		return outputs
 
 	def PredictionToMove(self, networkOutput, board):
-		if self.DataSetManager.MetaData["NetworkUsingOneHotEncoding"]:
+		if self.DataSetManager.MetaDataGet("NetworkUsingOneHotEncoding"):
 			key = BoardToKey(board)
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 

@@ -187,23 +187,23 @@ class RunController:
 	def SetUpMetaData(self, loadData=None):
 		userInput = "N"
 
-		if self.AiDataManager.GetMetaData():
-			if self.AiDataManager.MetaData["Version"] == self.Version:
+		if self.AiDataManager.LoadMetaData():
+			if self.AiDataManager.MetaDataGet("Version") == self.Version:
 				if loadData == None:
 					self.Logger.Clear()
 					print("")
-					print("SizeOfDataSet: "+str(self.AiDataManager.MetaData["SizeOfDataSet"]))
-					print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaData["NumberOfCompleteBoards"]))
-					print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaData["NumberOfFinishedBoards"]))
-					print("NumberOfGames: "+str(self.AiDataManager.MetaData["NumberOfGames"]))
-					print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["TotalTime"], roundTo=2))
-					print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaData["LastBackUpTotalTime"], roundTo=2))
+					print("SizeOfDataSet: "+str(self.AiDataManager.MetaDataGet("SizeOfDataSet")))
+					print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaDataGet("NumberOfCompleteBoards")))
+					print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaDataGet("NumberOfFinishedBoards")))
+					print("NumberOfGames: "+str(self.AiDataManager.MetaDataGet("NumberOfGames")))
+					print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaDataGet("TotalTime"), roundTo=2))
+					print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaDataGet("LastBackUpTotalTime"), roundTo=2))
 					print("")
 					userInput = input("load Dataset[Y/N]:")
 				else:
 					userInput = loadData
 			else:
-				print("MetaData Version "+str(self.AiDataManager.MetaData["Version"])+" != AiVersion "+str(self.Version)+" !")
+				print("MetaData Version "+str(self.AiDataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
 				input()
 
 		if userInput == "n" or userInput == "N":
@@ -246,7 +246,7 @@ class RunController:
 		if self.RenderQuality == 0:
 			return
 		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
-			numGames = self.AiDataManager.MetaData["NumberOfGames"]+1
+			numGames = self.AiDataManager.MetaDataGet("NumberOfGames")+1
 			avgMoveTime = 0
 			if numMoves != 0:
 				avgMoveTime = (time.time() - gameStartTime)/numMoves
@@ -256,19 +256,19 @@ class RunController:
 			self.RenderBoard(game, board)
 			print("")
 			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
-			print("Number Of Complete Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaData["NumberOfCompleteBoards"])))
-			print("Number Of Finished Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaData["NumberOfFinishedBoards"])))
+			print("Number Of Complete Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaDataGet("NumberOfCompleteBoards"))))
+			print("Number Of Finished Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaDataGet("NumberOfFinishedBoards"))))
 			if finished:
 				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)) + " finished game")
 			else:
 				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
-			totalTime = self.AiDataManager.MetaData["TotalTime"]
+			totalTime = self.AiDataManager.MetaDataGet("TotalTime")
 			print("Games avg took: " + Format.SplitTime(totalTime/numGames, roundTo=6))
 			print("time since start: " + Format.SplitTime(totalTime))
-			print("Real Time since start: " + Format.SplitTime(self.AiDataManager.MetaData["RealTime"]))
+			print("Real Time since start: " + Format.SplitTime(self.AiDataManager.MetaDataGet("RealTime")))
 
-			backUpTime = self.AiDataManager.MetaData["LastBackUpTotalTime"]
+			backUpTime = self.AiDataManager.MetaDataGet("LastBackUpTotalTime")
 			print("time since last BackUp: " + Format.SplitTime(totalTime-backUpTime))
 			print("press CTRl+Q to quit...")
 			
@@ -338,7 +338,7 @@ class RunController:
 					if time.time()-self.LastSaveTime > 60:
 						self.SaveData()
 
-				if self.StopTime != None and self.AiDataManager.MetaData["RealTime"] >= self.StopTime:
+				if self.StopTime != None and self.AiDataManager.MetaDataGet("RealTime") >= self.StopTime:
 					break
 
 				board, turn = game.Start()
@@ -350,7 +350,7 @@ class RunController:
 	def SaveData(self):
 		self.LastSaveTook = time.time()
 		# save back up every hour
-		if self.AiDataManager.MetaData["TotalTime"]-self.AiDataManager.MetaData["LastBackUpTotalTime"] > 60*60:
+		if self.AiDataManager.MetaDataGet("TotalTime")-self.AiDataManager.MetaDataGet("LastBackUpTotalTime") > 60*60:
 			self.AiDataManager.BackUp()
 
 		self.AiDataManager.Save()
@@ -366,7 +366,7 @@ if __name__ == "__main__":
 
 	try:
 		#controller = RunController(renderQuality=1)
-		controller = RunController(Logger, simNumber=6, loadData="N", aiType="b", renderQuality=1)
+		controller = RunController(Logger, renderQuality=1)
 
 	except Exception as error:
 		Logger.LogError(error)

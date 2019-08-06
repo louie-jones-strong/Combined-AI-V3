@@ -94,9 +94,9 @@ class DataSetManager:
 
 
 			self.CanAppendData = True
-			self.MetaData["SizeOfDataSet"] = self.GetNumberOfBoards()
-			self.MetaData["NumberOfTables"] = len(self.DataSetTables)
-			self.MetaData["FillingTable"] = self.FillingTable
+			self.MetaDataSet("SizeOfDataSet", self.GetNumberOfBoards())
+			self.MetaDataSet("NumberOfTables", len(self.DataSetTables))
+			self.MetaDataSet("FillingTable", self.FillingTable)
 
 		self.SaveMetaData()
 		return
@@ -116,10 +116,10 @@ class DataSetManager:
 			if (os.path.exists(self.DatasetBackUpAddress)):
 				shutil.rmtree(self.DatasetBackUpAddress)
 			shutil.copytree(self.DatasetAddress, self.DatasetBackUpAddress)
-			self.MetaData["LastBackUpTotalTime"] = self.MetaData["TotalTime"]
+			self.MetaDataSet("LastBackUpTotalTime", self.MetaDataGet("TotalTime"))
 		return
 
-	def GetMetaData(self):
+	def LoadMetaData(self):
 		found = False
 
 		if DictFileExists(self.DatasetAddress+"MetaData"):
@@ -139,6 +139,15 @@ class DataSetManager:
 			self.MetaData[key] = value
 		return
 
+	def MetaDataGet(self, key, defaultValue=None):
+				
+		if key in self.MetaData:
+			value = self.MetaData[key]
+		else:
+			value = defaultValue
+
+		return value
+
 	def LoadTableInfo(self):
 		with self.Lock:
 			if len(self.DataSetHashTable)>0:
@@ -147,13 +156,13 @@ class DataSetManager:
 			if not DictFileExists(self.DataSetHashTableAddress):
 				return
 
-			numberOfTables = self.MetaData["NumberOfTables"]
+			numberOfTables = self.MetaDataGet("NumberOfTables")
 
 			self.DataSetTables = []
 			for loop in range(numberOfTables):
 				self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(loop), False)]
 
-			self.FillingTable = self.MetaData["FillingTable"]
+			self.FillingTable = self.MetaDataGet("FillingTable")
 			self.DataSetHashTable = DictLoad(self.DataSetHashTableAddress, loadingBar=LoadingBar.LoadingBar(self.Logger))
 			self.StartingBoards = DictLoad(self.StartingBoardsAddress)
 			self.CanAppendData = True
@@ -217,8 +226,8 @@ class DataSetManager:
 		loadingBar = LoadingBar.LoadingBar(self.Logger)
 		isOneHotEncoding = True
 
-		self.GetMetaData()
-		if (self.MetaData["TotalTime"]>self.MetaData["AnnDataMadeFromBruteForceTotalTime"] or 
+		self.LoadMetaData()
+		if (self.MetaDataGet("TotalTime") > self.MetaDataGet("AnnDataMadeFromBruteForceTotalTime") or
 			(not ComplexFileExists(self.AnnDataSetAddress+"XDataSet")) or 
 			(not ComplexFileExists(self.AnnDataSetAddress+"YDataSet"))):
 			
@@ -257,14 +266,14 @@ class DataSetManager:
 
 			ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
 			ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
-			self.MetaDataSet("AnnDataMadeFromBruteForceTotalTime", self.MetaData["TotalTime"])
+			self.MetaDataSet("AnnDataMadeFromBruteForceTotalTime", self.MetaDataGet("TotalTime"))
 			self.MetaDataSet("NetworkUsingOneHotEncoding", isOneHotEncoding)
 			self.Clear()
 
 		elif ComplexFileExists(self.AnnDataSetAddress+"XDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YDataSet"):
 			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XDataSet")
 			dataSetY = ComplexLoad(self.AnnDataSetAddress+"YDataSet")
-			isOneHotEncoding = self.MetaData["NetworkUsingOneHotEncoding"]
+			isOneHotEncoding = self.MetaDataGet("NetworkUsingOneHotEncoding")
 
 		return dataSetX, dataSetY
 	def GetSimPredictionDataSet(self):

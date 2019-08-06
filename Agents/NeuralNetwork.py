@@ -64,7 +64,7 @@ class NeuralNetwork:
 def MakeModel(dataSetManager):
 	inputShape, structreArray = PredictNetworkStructre(dataSetManager)
 
-	runId = dataSetManager.MetaData["AnnRunId"]
+	runId = dataSetManager.MetaDataGet("AnnRunId")
 	if runId == None:
 		runId = 0
 		if os.path.exists(dataSetManager.TesnorBoardLogAddress):
@@ -77,8 +77,8 @@ def MakeModel(dataSetManager):
 
 def PredictNetworkStructre(dataSetManager):
 
-	inputShape = dataSetManager.MetaData["AnnMoveInputShape"]
-	structreArray = dataSetManager.MetaData["AnnMoveStructreArray"]
+	inputShape = dataSetManager.MetaDataGet("AnnMoveInputShape")
+	structreArray = dataSetManager.MetaDataGet("AnnMoveStructreArray")
 
 	if structreArray == None or inputShape == None:
 		dataSetX = []
