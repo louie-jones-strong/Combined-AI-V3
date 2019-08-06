@@ -8,7 +8,7 @@ import shutil
 import threading
 
 class DataSetManager:
-	MetaData = {}
+	MetaData = LockAbleObject()
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
 
@@ -27,6 +27,7 @@ class DataSetManager:
 		self.OutputResolution = outputResolution
 		self.SimName = simName
 		self.Lock = threading.Lock()
+		self.MetaData = LockAbleObject()
 
 		self.SetupPaths()
 
@@ -121,31 +122,29 @@ class DataSetManager:
 
 	def LoadMetaData(self):
 		found = False
-
 		if DictFileExists(self.DatasetAddress+"MetaData"):
-			self.MetaData = DictLoad(self.DatasetAddress+"MetaData")
+			with self.MetaData.Lock:
+				self.MetaData.Content = DictLoad(self.DatasetAddress+"MetaData")
 			found = True
-
 		return found
 	def SaveMetaData(self):
-		DictSave(self.DatasetAddress+"MetaData", self.MetaData)
+		with self.MetaData.Lock:
+			DictSave(self.DatasetAddress+"MetaData", self.MetaData.Content)
 		return
 	def MetaDataAdd(self, key, value):
-		with self.Lock:
-			self.MetaData[key] += value
+		with self.MetaData.Lock:
+			self.MetaData.Content[key] += value
 		return
 	def MetaDataSet(self, key, value):
-		with self.Lock:
-			self.MetaData[key] = value
+		with self.MetaData.Lock:
+			self.MetaData.Content[key] = value
 		return
-
 	def MetaDataGet(self, key, defaultValue=None):
-				
-		if key in self.MetaData:
-			value = self.MetaData[key]
-		else:
-			value = defaultValue
-
+		with self.MetaData.Lock:
+			if key in self.MetaData.Content:
+				value = self.MetaData.Content[key]
+			else:
+				value = defaultValue
 		return value
 
 	def LoadTableInfo(self):

@@ -207,7 +207,6 @@ class RunController:
 				input()
 
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager.MetaData = {}
 			self.AiDataManager.MetaDataSet("Version", self.Version)
 			self.AiDataManager.MetaDataSet("SizeOfDataSet", 0)
 			self.AiDataManager.MetaDataSet("NumberOfTables", 0)

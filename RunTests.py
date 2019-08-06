@@ -49,7 +49,7 @@ class Tests:
 			timeMarkRun = time.time()
 
 			controller.RunTournament()
-			metaData1 = controller.AiDataManager.MetaData
+			metaData1 = controller.AiDataManager.MetaData.Content
 
 			address = self.MetaDataAddress+"MetaData_" +controller.SimInfo["SimName"]+"_"+agent+"_1"
 			BasicLoadAndSave.DictSave(address, metaData1)
@@ -58,7 +58,7 @@ class Tests:
 
 			controller = runner.RunController(self.Logger, simNumber=simNum, loadData="Y", aiType=agent, renderQuality=0, trainNetwork="N", stopTime=10)
 
-			metaData2 = controller.AiDataManager.MetaData
+			metaData2 = controller.AiDataManager.MetaData.Content
 			address = self.MetaDataAddress+"MetaData_" + controller.SimInfo["SimName"]+"_"+agent+"_2"
 			BasicLoadAndSave.DictSave(address, metaData2)
 

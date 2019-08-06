@@ -117,3 +117,13 @@ class DataSetTable:
 			self.Content ={}
 			self.IsLoaded = False
 		return
+
+
+class LockAbleObject:
+	Lock = threading.Lock()
+	Content = {}
+
+	def __init__(self):
+		self.Lock = threading.Lock()
+		self.Content = {}
+		return
