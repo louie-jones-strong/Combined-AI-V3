@@ -41,7 +41,7 @@ class Tests:
 
 		try:
 			timeMarkSetup = time.time()
-			controller = runner.RunController(self.Logger, simNumber=simNum, loadData="Y", aiType=agent, renderQuality=0, trainNetwork="Y", stopTime=60)
+			controller = runner.RunController(self.Logger, simNumber=simNum, loadData="N", aiType=agent, renderQuality=0, trainNetwork="Y", stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup))
 			print("Sim = "+controller.SimInfo["SimName"])
