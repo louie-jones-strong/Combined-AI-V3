@@ -246,6 +246,12 @@ class RunController:
 			return
 		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
 			numGames = self.AiDataManager.MetaDataGet("NumberOfGames")+1
+
+			backUpTime = self.AiDataManager.MetaDataGet("LastBackUpTotalTime")
+			totalTime = self.AiDataManager.MetaDataGet("TotalTime")
+			realTime = self.AiDataManager.MetaDataGet("RealTime")
+			numberOfCompleteBoards = self.AiDataManager.MetaDataGet("NumberOfCompleteBoards")
+			numberOfFinishedBoards = self.AiDataManager.MetaDataGet("NumberOfFinishedBoards")
 			avgMoveTime = 0
 			if numMoves != 0:
 				avgMoveTime = (time.time() - gameStartTime)/numMoves
@@ -255,21 +261,18 @@ class RunController:
 			self.RenderBoard(game, board)
 			print("")
 			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
-			print("Number Of Complete Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaDataGet("NumberOfCompleteBoards"))))
-			print("Number Of Finished Boards: " + str(Format.SplitNumber(self.AiDataManager.MetaDataGet("NumberOfFinishedBoards"))))
+			print("Number Of Complete Boards: " + str(Format.SplitNumber(numberOfCompleteBoards)))
+			print("Number Of Finished Boards: " + str(Format.SplitNumber(numberOfFinishedBoards)))
 			if finished:
 				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)) + " finished game")
 			else:
 				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)))
 			print("moves avg took: " + str(avgMoveTime) + " seconds")
-			totalTime = self.AiDataManager.MetaDataGet("TotalTime")
 			print("Games avg took: " + Format.SplitTime(totalTime/numGames, roundTo=6))
 			print("time since start: " + Format.SplitTime(totalTime))
-			print("Real Time since start: " + Format.SplitTime(self.AiDataManager.MetaDataGet("RealTime")))
+			print("Real Time since start: " + Format.SplitTime(realTime))
 
-			backUpTime = self.AiDataManager.MetaDataGet("LastBackUpTotalTime")
 			print("time since last BackUp: " + Format.SplitTime(totalTime-backUpTime))
-			print("press CTRl+Q to quit...")
 			
 			title = "AI Playing: "+self.SimInfo["SimName"]
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
