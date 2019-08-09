@@ -55,6 +55,10 @@ class Tests:
 			BasicLoadAndSave.DictSave(address, metaData1)
 
 			print("Run+Save Took: "+SplitTime(time.time()-timeMarkRun))
+			print("Games Played: " + str(metaData1["NumberOfGames"]))
+			print("dataset size: " + str(metaData1["SizeOfDataSet"]))
+			print("number complete boards: " + str(metaData1["NumberOfCompleteBoards"]))
+			print("number finished boards: " + str(metaData1["NumberOfFinishedBoards"]))
 
 			controller = runner.RunController(self.Logger, simNumber=simNum, loadData="Y", aiType=agent, renderQuality=0, trainNetwork="N", stopTime=10)
 
