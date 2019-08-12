@@ -56,6 +56,7 @@ class Tests:
 
 			print("Run+Save Took: "+SplitTime(time.time()-timeMarkRun))
 			print("Games Played: " + str(metaData1["NumberOfGames"]))
+			print("Moves Played: " + str(metaData1["MovesPlayed"]))
 			print("dataset size: " + str(metaData1["SizeOfDataSet"]))
 			print("number complete boards: " + str(metaData1["NumberOfCompleteBoards"]))
 			print("number finished boards: " + str(metaData1["NumberOfFinishedBoards"]))

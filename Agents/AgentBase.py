@@ -21,6 +21,8 @@ class AgentBase:
 		if not self.RecordMoves:
 			return
 
+		self.DataSetManager.MetaDataAdd("MovesPlayed", 1)
+
 		key = BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
