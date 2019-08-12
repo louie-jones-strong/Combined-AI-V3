@@ -30,6 +30,7 @@ class AgentBase:
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 		
 		with boardInfo.Lock:
+			boardInfo.BeingUsed = True
 			# never played this move before
 			if moveID not in boardInfo.Moves:
 				boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
@@ -82,6 +83,7 @@ class AgentBase:
 					outComeKey = BoardToKey(outComeBoard)
 	
 				move = boardInfo.Moves[moveID]
+				boardInfo.BeingUsed = False
 				if outComeKey in move.MoveOutComes:
 					move.MoveOutComes[outComeKey] += 1
 				else:
@@ -177,7 +179,7 @@ class AgentBase:
 					if not found:
 						return False
 					
-					if outComeBoardInfo.Lock.locked():
+					if outComeBoardInfo.BeingUsed or outComeBoardInfo.Lock.locked():
 						return True
 			
 		return False		
