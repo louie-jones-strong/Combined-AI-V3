@@ -58,7 +58,7 @@ def TimeToDateTime(seconds, dateOn=False, secondsOn=False):
 	output = ""
 	if dateOn:
 		output += str(dateTime.tm_year)+"."+str(dateTime.tm_mon)+"."+str(dateTime.tm_mday)
-		output += " : "
+		output += ":"
 
 	output += str(dateTime.tm_hour)+":"+str(dateTime.tm_min)
 	if secondsOn:

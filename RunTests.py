@@ -1,13 +1,16 @@
 import RunController as runner
 from Shared import Logger
 import time
-from Shared.OutputFormating import SplitTime
+from Shared.OutputFormating import SplitTime, TimeToDateTime
 from DataManger import BasicLoadAndSave
 
 class Tests:
-	MetaDataAddress = "Logs//TestOutputs//"
-
 	def __init__(self):
+		self.MetaDataAddress = "Logs//TestOutputs_"
+		self.MetaDataAddress += TimeToDateTime(time.time(), dateOn=True)
+		self.MetaDataAddress += "//"
+
+
 		self.Logger = Logger.Logger()
 		self.Logger.ClearAllowed = False
 		self.Logger.SetTitleAllowed = False
