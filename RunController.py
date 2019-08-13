@@ -224,7 +224,8 @@ class RunController:
 			self.AiDataManager.MetaDataSet("AnnMoveInputShape", None)
 			self.AiDataManager.MetaDataSet("AnnMoveStructreArray", None)
 			self.AiDataManager.MetaDataSet("AnnRunId", None)
-			self.AiDataManager.MetaDataSet("MovesPlayed", 0)
+			self.AiDataManager.MetaDataSet("TriedMovesPlayed", 0)
+			self.AiDataManager.MetaDataSet("VaildMovesPlayed", 0)
 			return False
 		
 		return True

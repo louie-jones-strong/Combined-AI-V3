@@ -21,7 +21,7 @@ class AgentBase:
 		if not self.RecordMoves:
 			return
 
-		self.DataSetManager.MetaDataAdd("MovesPlayed", 1)
+		self.DataSetManager.MetaDataAdd("TriedMovesPlayed", 1)
 
 		key = BoardToKey(board)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
@@ -73,7 +73,8 @@ class AgentBase:
 	def UpdateMoveOutCome(self, boardKey, move, outComeBoard, gameFinished=False):
 		if not self.RecordMoves:
 			return
-
+		
+		self.DataSetManager.MetaDataAdd("VaildMovesPlayed", 1)
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(boardKey)
 		
