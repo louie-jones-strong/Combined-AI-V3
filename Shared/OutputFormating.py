@@ -53,15 +53,18 @@ def BytesOutputFormat(numberOfBytes, roundTo=2):
 	value = round(value, roundTo)
 	return str(value)+" "+suffix
 
-def TimeToDateTime(seconds, dateOn=False, secondsOn=False):
+
+def TimeToDateTime(seconds, dateOn=False, secondsOn=False, dateSplitter=".", timeSplitter=":", dateTimeSplitter=" : "):
 	dateTime = time.gmtime(seconds)
 	output = ""
 	if dateOn:
-		output += str(dateTime.tm_year)+"."+str(dateTime.tm_mon)+"."+str(dateTime.tm_mday)
-		output += ":"
+		output += str(dateTime.tm_year) + dateSplitter
+		output += str(dateTime.tm_mon) + dateSplitter
+		output += str(dateTime.tm_mday)
+		output += dateTimeSplitter
 
-	output += str(dateTime.tm_hour)+":"+str(dateTime.tm_min)
+	output += str(dateTime.tm_hour)+timeSplitter+str(dateTime.tm_min)
 	if secondsOn:
-		output += ":"+str(dateTime.tm_sec)
+		output += timeSplitter+str(dateTime.tm_sec)
 
 	return output

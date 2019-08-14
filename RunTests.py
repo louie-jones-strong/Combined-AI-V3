@@ -7,7 +7,9 @@ from DataManger import BasicLoadAndSave
 class Tests:
 	def __init__(self):
 		self.MetaDataAddress = "Logs//TestOutputs_"
-		self.MetaDataAddress += TimeToDateTime(time.time(), dateOn=True)
+		self.MetaDataAddress += TimeToDateTime(time.time(), dateOn=True, 
+				dateSplitter="_", dateTimeSplitter="_", timeSplitter="_")
+
 		self.MetaDataAddress += "//"
 
 
