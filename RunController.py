@@ -94,11 +94,21 @@ class RunController:
 		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                                      self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
 
+		self.SetupAgent(loadData, aiType, trainNetwork)
+		
+		if renderQuality != None:
+			self.RenderQuality = renderQuality
+
+		if self.RenderQuality == 2:
+			import RenderEngine.RenderEngine2D as RenderEngine
+			self.RenderEngine = RenderEngine.RenderEngine()
+		return
+
+	def SetupAgent(self, loadData=None, aiType=None, trainNetwork=None):
 		if aiType == None:
 			userInput = input("Brute b) Network n) Random n) See Tree T) Human H):")
 		else:
 			userInput = aiType
-
 
 
 		if userInput == "T" or userInput == "t":
@@ -143,13 +153,8 @@ class RunController:
 				for loop in range(self.NumberOfBots):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
-		if renderQuality != None:
-			self.RenderQuality = renderQuality
-
-		if self.RenderQuality == 2:
-			import RenderEngine.RenderEngine2D as RenderEngine
-			self.RenderEngine = RenderEngine.RenderEngine()
 		return
+
 	def PickSimulation(self, simNumber=None):
 		files = os.listdir("Simulations")
 		if "__pycache__" in files:
