@@ -1,27 +1,23 @@
 import Agents.AgentBase as AgentBase
 from DataManger.Serializer import BoardToKey
-import time
-import sys
-
 import Agents.NeuralNetwork as NeuralNetwork
 
 class Agent(AgentBase.AgentBase):
-	TrainedEpochs = 0
+	EvoAgentId = -1
 
 	def __init__(self, evoController, dataSetManager, loadData, winningModeON=False):
 		super().__init__(dataSetManager, loadData, winningModeON)
 		self.EvoController = evoController
 
+		self.EvoAgentId = self.EvoController.RegisterEvoAgent()
+
 		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
 		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
-		self.NetworkWeights = []
 
 		if loadData:
 			found, weights = self.DataSetManager.LoadNetworkWeights()
 			if found:
 				self.AnnModel.SetWeights(weights)
-
-		self.NetworkWeights += [self.AnnModel.GetWeights()]
 		return
 
 	def MoveCal(self, boards, batch=False):
@@ -42,4 +38,9 @@ class Agent(AgentBase.AgentBase):
 
 	def SaveData(self, fitness):
 		super().SaveData(fitness)
+		return
+
+	def TournamentFinished(self):
+		super().TournamentFinished()
+		self.EvoController.GetNextModelWeights(self.EvoAgentId)
 		return
