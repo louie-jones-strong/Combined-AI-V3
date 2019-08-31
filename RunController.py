@@ -84,7 +84,6 @@ class RunController:
 		self.LastOutputTime = time.time()
 		self.LastSaveTook = 0
 		self.WinningMode = False
-		self.Agents = []
 
 		if self.SimInfo["RenderSetup"]:
 			self.RenderQuality = 1
@@ -106,10 +105,11 @@ class RunController:
 
 	def SetupAgent(self, loadData=None, aiType=None, trainNetwork=None):
 		if aiType == None:
-			userInput = input("Brute b) Network n) Random n) See Tree T) Human H):")
+			userInput = input("Brute B) Network N) Evolution E) Random R) See Tree T) Human H):")
 		else:
 			userInput = aiType
 
+		self.Agents = []
 
 		if userInput == "T" or userInput == "t":
 			loadData = self.SetUpMetaData("Y")
@@ -149,6 +149,14 @@ class RunController:
 
 				for loop in range(self.NumberOfBots-1):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+			elif userInput == "E" or userInput == "e":
+				import Agents.EvolutionAgent as EvolutionAgent
+				self.Agents += [EvolutionAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+				for loop in range(self.NumberOfBots-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
 			else:
 				for loop in range(self.NumberOfBots):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
