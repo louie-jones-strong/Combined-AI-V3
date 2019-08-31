@@ -133,6 +133,10 @@ class AgentBase:
 		self.MoveNumber = 0
 		return
 
+	def TournamentFinished(self):
+		
+		return
+
 	def IsBoardFinished(self, boardInfo):
 		if boardInfo.Finished:
 			return True

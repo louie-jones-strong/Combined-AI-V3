@@ -53,7 +53,7 @@ class Tests:
 			print("Starting Run...")
 			timeMarkRun = time.time()
 
-			controller.RunTournament()
+			controller.RunTraning()
 			metaData1 = controller.AiDataManager.MetaData.Content
 
 			address = self.MetaDataAddress+"MetaData_" +controller.SimInfo["SimName"]+"_"+agent+"_1"
@@ -83,7 +83,7 @@ class Tests:
 				self.Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: " +agent+" metaData1 != metaData2: save error?")
 				hadError = True
 			else:
-				controller.RunTournament()
+				controller.RunTraning()
 
 		except Exception as error:
 			hadError = True

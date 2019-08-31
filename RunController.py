@@ -303,36 +303,40 @@ class RunController:
 
 		return
 	
-	def RunTournament(self):
+	def RunTraning(self):
 		targetThreadNum = 2
+		gamesToPlay = -1
+		self.LastSaveTime = time.time()
 
-		threads = []
-		for loop in range(targetThreadNum-1):
-			game = self.Sim.CreateNew()
-			agents = []
-			for loop in range(self.NumberOfBots):
-				agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
-			thread = threading.Thread(target=self.RunSimMatch, args=(game, agents, False,))
-			threads += [thread]
-			thread.start()
+		while not (self.StopTime != None and self.AiDataManager.MetaDataGet("RealTime") >= self.StopTime):
+
+			threads = []
+			for loop in range(targetThreadNum-1):
+				game = self.Sim.CreateNew()
+				agents = []
+				for loop in range(self.NumberOfBots):
+					agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
+				thread = threading.Thread(target=self.RunSimTournament, args=(gamesToPlay, game, agents, False,))
+				threads += [thread]
+				thread.start()
 
 
-		self.RunSimMatch(self.Sim, self.Agents, True)
-		for thread in threads:
-			thread.join()
+			self.RunSimTournament(gamesToPlay, self.Sim, self.Agents, True)
+			for thread in threads:
+				thread.join()
 
-		self.SaveData()
+		self.TrySaveData(True)
 		return
 
-	def RunSimMatch(self, game, agents, isMainThread):
+	def RunSimTournament(self, gamesToPlay, game, agents, isMainThread):
 		board, turn = game.Start()
 		self.AiDataManager.UpdateStartingBoards(board)
 
 		numMoves = 0
+		numGames = 0
 		totalStartTime = time.time()
 		gameStartTime = time.time()
-		self.LastSaveTime = time.time()
-		while True:
+		while gamesToPlay == -1 or numGames >= gamesToPlay:
 			if isMainThread:
 				self.Output(game, numMoves, gameStartTime, board, turn)
 			board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
@@ -353,8 +357,7 @@ class RunController:
 				if isMainThread:
 					self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
 
-					if time.time()-self.LastSaveTime > 60:
-						self.SaveData()
+					self.TrySaveData()
 
 				if self.StopTime != None and self.AiDataManager.MetaDataGet("RealTime") >= self.StopTime:
 					break
@@ -363,17 +366,23 @@ class RunController:
 				self.AiDataManager.UpdateStartingBoards(board)
 				numMoves = 0
 				gameStartTime = time.time()
+		
+		for loop in range(len(agents)):
+			agents[loop].TournamentFinished()
 		return
 
-	def SaveData(self):
-		self.LastSaveTook = time.time()
-		# save back up every hour
-		if self.AiDataManager.MetaDataGet("TotalTime")-self.AiDataManager.MetaDataGet("LastBackUpTotalTime") > 60*60:
-			self.AiDataManager.BackUp()
+	def TrySaveData(self, forceSave=False):
+		if time.time()-self.LastSaveTime > 60 or forceSave:
+			self.LastSaveTook = time.time()
 
-		self.AiDataManager.Save()
-		self.LastSaveTime = time.time()
-		self.LastSaveTook = time.time() - self.LastSaveTook
+
+			# save back up every hour
+			if self.AiDataManager.MetaDataGet("TotalTime")-self.AiDataManager.MetaDataGet("LastBackUpTotalTime") > 60*60:
+				self.AiDataManager.BackUp()
+
+			self.AiDataManager.Save()
+			self.LastSaveTime = time.time()
+			self.LastSaveTook = time.time() - self.LastSaveTook
 		return
 
 
@@ -383,7 +392,6 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		#controller = RunController(renderQuality=1)
 		controller = RunController(Logger, renderQuality=1)
 
 	except Exception as error:
@@ -392,7 +400,7 @@ if __name__ == "__main__":
 
 	if not hadError:
 		try:
-			controller.RunTournament()
+			controller.RunTraning()
 
 		except Exception as error:
 			Logger.LogError(error)
