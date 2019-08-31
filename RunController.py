@@ -1,4 +1,3 @@
-#%% imports
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
@@ -11,7 +10,6 @@ import time
 import os
 import sys
 import threading
-#%% setup
 
 def MakeAgentMove(turn, board, agents, game):
 	startBoardKey = BoardToKey(board)
@@ -152,7 +150,10 @@ class RunController:
 
 			elif userInput == "E" or userInput == "e":
 				import Agents.EvolutionAgent as EvolutionAgent
-				self.Agents += [EvolutionAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				import Agents.EvolutionController as EvolutionController
+				evoController = EvolutionController.EvolutionController(loadData, winningModeON=self.WinningMode)
+
+				self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 				for loop in range(self.NumberOfBots-1):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
@@ -389,7 +390,6 @@ if __name__ == "__main__":
 		Logger.LogError(error)
 		hadError= True
 
-#%%
 	if not hadError:
 		try:
 			controller.RunTournament()

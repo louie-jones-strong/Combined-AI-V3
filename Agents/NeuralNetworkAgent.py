@@ -37,53 +37,12 @@ class Agent(AgentBase.AgentBase):
 		outputs = []
 		for loop in range(len(networkOutputs)):
 			networkOutput = list(networkOutputs[loop])
-			outputs += [self.PredictionToMove(networkOutput, boards[loop])]
+			outputs += [NeuralNetwork.PredictionToMove(self.DataSetManager, networkOutput, boards[loop])]
 
 		if not batch:
 			outputs = outputs[0]
 			self.RecordMove(boards[0], outputs)
 		return outputs
-
-	def PredictionToMove(self, networkOutput, board):
-		if self.DataSetManager.MetaDataGet("NetworkUsingOneHotEncoding"):
-			key = BoardToKey(board)
-			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
-
-			output = self.DataSetManager.MoveIDToMove(0)
-			bestValue = -sys.maxsize
-
-			for loop in range(len(networkOutput)):
-				invaild = False
-
-				if found:
-					if 2**loop & boardInfo.PlayedMovesLookUpArray:
-						if loop not in boardInfo.Moves:
-							invaild = True
-
-				if networkOutput[loop] >= bestValue and (not invaild):
-					bestValue = networkOutput[loop]
-					output = self.DataSetManager.MoveIDToMove(loop)
-
-		else:
-			output = []
-			for loop in range(len(networkOutput)):
-				temp = networkOutput[loop]
-				temp = temp / self.DataSetManager.OutputResolution
-				temp = round(temp)
-				temp = temp * self.DataSetManager.OutputResolution
-
-				if temp < self.DataSetManager.MinOutputSize:
-					temp = self.DataSetManager.MinOutputSize
-
-				if temp > self.DataSetManager.MaxOutputSize:
-					temp = self.DataSetManager.MaxOutputSize
-
-				if self.DataSetManager.OutputResolution == int(self.DataSetManager.OutputResolution):
-					temp= int(temp)
-
-				output += [temp]
-
-		return output
 
 	def Train(self):
 		dataSetX = []

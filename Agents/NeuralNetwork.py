@@ -1,6 +1,7 @@
 import os
 from DataManger.Serializer import BoardToKey
 import time
+import sys
 
 print("Importing Tflearn...")
 import tflearn
@@ -176,3 +177,44 @@ def LayerMaker(network, structreArray, layerNumber=0):
 		network = LayerMaker(network, structreArray, layerNumber=layerNumber+1)
 
 	return network
+
+def PredictionToMove(dataSetManager, networkOutput, board):
+	if dataSetManager.MetaDataGet("NetworkUsingOneHotEncoding"):
+		key = BoardToKey(board)
+		found, boardInfo = dataSetManager.GetBoardInfo(key)
+
+		output = dataSetManager.MoveIDToMove(0)
+		bestValue = -sys.maxsize
+
+		for loop in range(len(networkOutput)):
+			invaild = False
+
+			if found:
+				if 2**loop & boardInfo.PlayedMovesLookUpArray:
+					if loop not in boardInfo.Moves:
+						invaild = True
+
+			if networkOutput[loop] >= bestValue and (not invaild):
+				bestValue = networkOutput[loop]
+				output = dataSetManager.MoveIDToMove(loop)
+
+	else:
+		output = []
+		for loop in range(len(networkOutput)):
+			temp = networkOutput[loop]
+			temp = temp / dataSetManager.OutputResolution
+			temp = round(temp)
+			temp = temp * dataSetManager.OutputResolution
+
+			if temp < dataSetManager.MinOutputSize:
+				temp = dataSetManager.MinOutputSize
+
+			if temp > dataSetManager.MaxOutputSize:
+				temp = dataSetManager.MaxOutputSize
+
+			if dataSetManager.OutputResolution == int(dataSetManager.OutputResolution):
+				temp= int(temp)
+
+			output += [temp]
+
+	return output
