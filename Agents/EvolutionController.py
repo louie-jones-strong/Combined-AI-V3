@@ -1,6 +1,7 @@
 import time
 import sys
 import random
+import numpy as np
 
 class EvolutionController:
 	NumberOfDNAInGenration = 10
@@ -45,17 +46,27 @@ class EvolutionController:
 		return
 
 def Mutation(weights, mutationRate, mutationAmount):
+	weightType = type(weights)
 
 	if hasattr(weights, "__len__"):
-		NewWeights = list(map(lambda w: Mutation(w, mutationRate, mutationAmount), weights))
+		if weightType == np.ndarray:
+			newWeights = np.ndarray(weights.shape)
+		else:
+			newWeights = list()
+
+		weightsList = map(lambda w: Mutation(w, mutationRate, mutationAmount), weights)
+		for weight in weightsList:
+			newWeights += [weight]
+			
 
 	else:
+		amount = 0
 		if mutationRate >= random.randint(0,100)/100:
-
 			amount = random.randint(-10000,10000)/(10**mutationAmount)
-			NewWeights = weights + amount
 
-	return NewWeights
+		newWeights = weightType(weights + amount)
+
+	return newWeights
 
 
 
