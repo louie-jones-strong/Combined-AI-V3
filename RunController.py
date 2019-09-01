@@ -153,7 +153,7 @@ class RunController:
 			elif userInput.upper() == "E":
 				import Agents.EvolutionAgent as EvolutionAgent
 				import Agents.EvolutionController as EvolutionController
-				evoController = EvolutionController.EvolutionController(loadData, winningModeON=self.WinningMode)
+				evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData, winningModeON=self.WinningMode)
 
 				self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 

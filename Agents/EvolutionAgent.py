@@ -9,15 +9,14 @@ class Agent(AgentBase.AgentBase):
 		super().__init__(dataSetManager, loadData, winningModeON)
 		self.EvoController = evoController
 
-		self.EvoAgentId = self.EvoController.RegisterEvoAgent()
-
 		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
 		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
+		weights = self.AnnModel.GetWeights()
 
-		if loadData:
-			found, weights = self.DataSetManager.LoadNetworkWeights()
-			if found:
-				self.AnnModel.SetWeights(weights)
+		self.EvoAgentId, weights = self.EvoController.RegisterEvoAgent(self, weights)
+
+		if weights != None:
+			self.AnnModel.SetWeights(weights)
 		return
 
 	def MoveCal(self, boards, batch=False):
