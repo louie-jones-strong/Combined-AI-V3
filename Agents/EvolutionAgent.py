@@ -14,9 +14,7 @@ class Agent(AgentBase.AgentBase):
 		weights = self.AnnModel.GetWeights()
 
 		self.EvoAgentId, weights = self.EvoController.RegisterEvoAgent(self, weights)
-
-		if weights != None:
-			self.AnnModel.SetWeights(weights)
+		self.AnnModel.SetWeights(weights)
 		return
 
 	def MoveCal(self, boards, batch=False):
