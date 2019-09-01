@@ -107,9 +107,11 @@ class RunController:
 		else:
 			userInput = aiType
 
+		userInput = userInput.upper()
+
 		self.Agents = []
 
-		if userInput == "T" or userInput == "t":
+		if userInput == "T":
 			loadData = self.SetUpMetaData("Y")
 			if loadData:
 				import RenderEngine.TreeVisualiser as TreeVisualiser
@@ -121,7 +123,7 @@ class RunController:
 		else:
 			loadData = self.SetUpMetaData(loadData)
 
-			if userInput == "H" or userInput == "h":
+			if userInput == "H":
 				self.WinningMode = True
 				self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
@@ -129,13 +131,13 @@ class RunController:
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 
-			elif userInput == "R" or userInput == "r":
+			elif userInput == "R":
 				self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 				for loop in range(self.NumberOfBots-1):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
-			elif userInput == "N" or userInput == "n":
+			elif userInput == "N":
 				if trainNetwork == None:
 					userInput = input("Train Network[Y/N]: ")
 				else:
@@ -148,7 +150,7 @@ class RunController:
 				for loop in range(self.NumberOfBots-1):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
-			elif userInput == "E" or userInput == "e":
+			elif userInput.upper() == "E":
 				import Agents.EvolutionAgent as EvolutionAgent
 				import Agents.EvolutionController as EvolutionController
 				evoController = EvolutionController.EvolutionController(loadData, winningModeON=self.WinningMode)
