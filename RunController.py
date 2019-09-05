@@ -155,7 +155,9 @@ class RunController:
 				import Agents.EvolutionController as EvolutionController
 				evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData, winningModeON=self.WinningMode)
 
-				self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				#self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager,
+				                                      loadData, winningModeON=self.WinningMode)]
 
 				for loop in range(self.NumberOfBots-1):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
