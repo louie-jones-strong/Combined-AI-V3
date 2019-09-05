@@ -67,10 +67,3 @@ def Mutation(weights, mutationRate, mutationAmount):
 		newWeights = weightType(weights + amount)
 
 	return newWeights
-
-
-
-class DNA:
-	Weights = []
-	Fittness = 0
-	AgentId = -1

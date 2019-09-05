@@ -151,13 +151,11 @@ class RunController:
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 			elif userInput.upper() == "E":
-				import Agents.EvolutionAgent as EvolutionAgent
-				import Agents.EvolutionController as EvolutionController
+				import Agents.Evolution.EvolutionAgent as EvolutionAgent
+				import Agents.Evolution.EvolutionController as EvolutionController
 				evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData, winningModeON=self.WinningMode)
 
-				#self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData, winningModeON=self.WinningMode)]
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager,
-				                                      loadData, winningModeON=self.WinningMode)]
+				self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
 				for loop in range(self.NumberOfBots-1):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
