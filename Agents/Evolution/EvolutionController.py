@@ -6,6 +6,7 @@ import Agents.Evolution.DNAObject as DNA
 
 class EvolutionController:
 	NumberOfDNAInGenration = 10
+	GenrationNum = 0
 	
 	def __init__(self, dataSetManager, loadData, winningModeON=False):
 		self.EvoAgentList = []
@@ -60,7 +61,14 @@ class EvolutionController:
 
 	def CalNextGen(self):
 		self.DNAList.sort(key=GetFittness)
-		
+
+		for dna in self.DNAList:
+			dna.NumberOfGames = 0
+			dna.AgentId = None
+			dna.Fittness = 0
+
+		self.GenrationNum += 1
+		print("Genration: " + str(self.GenrationNum))
 		return
 
 def GetFittness(dna):
