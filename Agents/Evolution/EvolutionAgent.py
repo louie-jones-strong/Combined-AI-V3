@@ -4,6 +4,7 @@ import Agents.NeuralNetwork as NeuralNetwork
 
 class Agent(AgentBase.AgentBase):
 	EvoAgentId = -1
+	CurrentDNA = None
 
 	def __init__(self, evoController, dataSetManager, loadData, winningModeON=False):
 		super().__init__(dataSetManager, loadData, winningModeON)
@@ -13,8 +14,8 @@ class Agent(AgentBase.AgentBase):
 		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
 		weights = self.AnnModel.GetWeights()
 
-		self.EvoAgentId, weights = self.EvoController.RegisterEvoAgent(self, weights)
-		self.AnnModel.SetWeights(weights)
+		self.EvoAgentId, self.CurrentDNA = self.EvoController.RegisterEvoAgent(self, weights)
+		self.AnnModel.SetWeights(self.CurrentDNA.Weights)
 		return
 
 	def MoveCal(self, boards, batch=False):
@@ -33,11 +34,19 @@ class Agent(AgentBase.AgentBase):
 			self.RecordMove(boards[0], outputs)
 		return outputs
 
-	def SaveData(self, fitness):
-		super().SaveData(fitness)
+	def SaveData(self, fittness):
+		super().SaveData(fittness)
+
+		tempFittness = self.CurrentDNA.Fittness*self.CurrentDNA.NumberOfGames
+		tempFittness += fittness
+
+		self.CurrentDNA.NumberOfGames += 1
+
+		self.CurrentDNA.Fittness = tempFittness/self.CurrentDNA.NumberOfGames
 		return
 
 	def TournamentFinished(self):
 		super().TournamentFinished()
-		self.EvoController.GetNextModelWeights(self.EvoAgentId)
+		self.CurrentDNA = self.EvoController.GetNextModelWeights(self.EvoAgentId)
+		self.AnnModel.SetWeights(self.CurrentDNA.Weights)
 		return

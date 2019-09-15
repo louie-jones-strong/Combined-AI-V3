@@ -394,7 +394,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=1)
+		controller = RunController(Logger, renderQuality=1, simNumber=6, loadData="N", aiType="E")
 
 	except Exception as error:
 		Logger.LogError(error)
