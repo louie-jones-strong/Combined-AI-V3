@@ -1,7 +1,7 @@
 import time
 import sys
 import random
-import numpy
+import numpy as np
 import Agents.Evolution.DNAObject as DNA
 
 class EvolutionController:
@@ -56,6 +56,7 @@ class EvolutionController:
 		for loop in range(self.NumberOfDNAInGenration-1):
 			self.DNAList += [DNA.DNAObject(Mutation(self.WeightsSeed, 1, 0.01))]
 
+
 		self.DNAList += [DNA.DNAObject(self.WeightsSeed)]
 		return
 
@@ -78,21 +79,19 @@ def Mutation(weights, mutationRate, mutationAmount):
 	weightType = type(weights)
 
 	if hasattr(weights, "__len__"):
-		if weightType == numpy.ndarray:
-			newWeights = numpy.ndarray(weights.shape, dtype=weights.dtype)
+		if weightType == np.ndarray:
+
+			d1 = np.random.random_integers(0, 1, weights.shape)
+			d2 = np.random.random_integers(-100, 100, weights.shape)
+			mutateArray = ((d1*d2)/1000)+1
+			newWeights = weights*mutateArray
+			return newWeights
 		else:
 			newWeights = list()
+			for weight in weights:
+				newWeights += [Mutation(weight, mutationRate, mutationAmount)]
+			return newWeights
 
-		weightsList = map(lambda w: Mutation(w, mutationRate, mutationAmount), weights)
-		for weight in weightsList:
-			newWeights += [weight]
-			
-
-	else:
-		amount = 0
-		if mutationRate >= random.randint(0,100)/100:
-			amount = random.randint(-mutationAmount*1000,mutationAmount*1000)/1000
-
-		newWeights = weightType(weights*(1+amount))
+		return newWeights
 
 	return newWeights

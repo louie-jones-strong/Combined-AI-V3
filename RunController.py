@@ -338,7 +338,7 @@ class RunController:
 		numGames = 0
 		totalStartTime = time.time()
 		gameStartTime = time.time()
-		while gamesToPlay == -1 or numGames >= gamesToPlay:
+		while gamesToPlay == -1 or numGames < gamesToPlay:
 			if isMainThread:
 				self.Output(game, numMoves, gameStartTime, board, turn)
 			board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
@@ -351,6 +351,7 @@ class RunController:
 			totalStartTime = time.time()
 
 			if finished:
+				numGames += 1
 				self.AiDataManager.MetaDataAdd("NumberOfGames", 1)
 
 				for loop in range(len(agents)):
@@ -394,7 +395,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=1, simNumber=6, loadData="N", aiType="E")
+		controller = RunController(Logger, renderQuality=1, simNumber=6, loadData="Y", aiType="E")
 
 	except Exception as error:
 		Logger.LogError(error)

@@ -86,6 +86,7 @@ def PredictNetworkStructre(dataSetManager):
 		dataSetY = []
 
 		while len(dataSetY) == 0:
+			print("waiting for move dataset")
 			time.sleep(10)
 			dataSetX, dataSetY = dataSetManager.GetMoveDataSet()
 
