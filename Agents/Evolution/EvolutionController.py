@@ -62,6 +62,10 @@ class EvolutionController:
 
 	def CalNextGen(self):
 		self.DNAList.sort(key=GetFittness)
+		self.DNAList = self.DNAList[:int(len(self.DNAList)/2)]
+
+		selectionChance = CalSelectionChance(self.DNAList)
+		self.DNAList = Breed(self.DNAList, selectionChance)
 
 		for dna in self.DNAList:
 			dna.NumberOfGames = 0
@@ -95,3 +99,33 @@ def Mutation(weights, mutationRate, mutationAmount):
 		return newWeights
 
 	return newWeights
+
+
+def Breed(dnaList, selectionChance):
+
+	newDnaList = []
+	for dna1 in dnaList:
+		dna2 = np.random.choice(dnaList, p=selectionChance)
+
+		newDnaList += [dna1]
+		newDnaList += [CrossFadeWithWeights(dna1, dna2, [0.5, 0.5])]
+	return newDnaList
+
+
+def CalSelectionChance(dnaList):
+
+	selectionChance = []
+	for dna in dnaList:
+		fittness = GetFittness(dna)
+
+		selectionChance += [pow(fittness, 3)]
+
+	selectionChance = selectionChance / np.amax(selectionChance)
+
+	selectionChance = selectionChance / np.sum(selectionChance)
+	
+	return selectionChance
+
+def CrossFadeWithWeights(dna1, dna2, weights):
+
+	return np.average(np.array([dna1.Weights, dna2.Weights]), axis=0, weights=weights)
