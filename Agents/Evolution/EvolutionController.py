@@ -108,7 +108,10 @@ def Breed(dnaList, selectionChance):
 		dna2 = np.random.choice(dnaList, p=selectionChance)
 
 		newDnaList += [dna1]
-		newDnaList += [CrossFadeWithWeights(dna1, dna2, [0.5, 0.5])]
+
+		newWeights = CrossFadeWithWeights(dna1.Weights, dna2.Weights, [0.5, 0.5])
+
+		newDnaList += [DNA.DNAObject(newWeights)]
 	return newDnaList
 
 
@@ -127,5 +130,15 @@ def CalSelectionChance(dnaList):
 	return selectionChance
 
 def CrossFadeWithWeights(dna1, dna2, weights):
+	newDna = []
+	for loop in range(len(dna1)):
+		temp = []
+		for loop2 in range(len(dna1[loop])):
 
-	return np.average(np.array([dna1.Weights, dna2.Weights]), axis=0, weights=weights)
+			joinArray = np.array([dna1[loop][loop2], dna2[loop][loop2]], dtype=dna1[loop][loop2].dtype)
+
+			temp += [np.average(joinArray, axis=0, weights=weights)]
+
+		newDna += [temp]
+
+	return newDna
