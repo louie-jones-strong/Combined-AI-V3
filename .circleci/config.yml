@@ -17,6 +17,16 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
+
+            # Ubuntu/Linux 64-bit, CPU only, Python 3.5
+            $ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.1.0-cp35-cp35m-linux_x86_64.whl
+
+            # Ubuntu/Linux 64-bit, GPU enabled, Python 3.5
+            # Requires CUDA toolkit 8.0 and CuDNN v5. For other versions, see "Installing from sources" below.
+            #$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.1.0-cp35-cp35m-linux_x86_64.whl
+
+            $ sudo pip3 install $TF_BINARY_URL
+
             pip install -r .circleci/requirements.txt
       - save_cache:
           paths:
