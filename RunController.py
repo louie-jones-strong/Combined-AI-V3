@@ -307,7 +307,7 @@ class RunController:
 	
 	def RunTraning(self):
 		targetThreadNum = 2
-		gamesToPlay = -1
+		gamesToPlay = 100
 		self.LastSaveTime = time.time()
 
 		while not (self.StopTime != None and self.AiDataManager.MetaDataGet("RealTime") >= self.StopTime):
