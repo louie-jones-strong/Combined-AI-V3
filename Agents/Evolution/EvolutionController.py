@@ -5,7 +5,7 @@ import numpy as np
 import Agents.Evolution.DNAObject as DNA
 
 class EvolutionController:
-	NumberOfDNAInGenration = 10
+	NumberOfDNAInGenration = 50
 	GenrationNum = 0
 	
 	def __init__(self, dataSetManager, loadData, winningModeON=False):
@@ -54,7 +54,7 @@ class EvolutionController:
 	def MakeDNAListFromSeed(self):
 		self.DNAList = []
 		for loop in range(self.NumberOfDNAInGenration-1):
-			self.DNAList += [DNA.DNAObject(Mutation(self.WeightsSeed, 1, 0.01))]
+			self.DNAList += [DNA.DNAObject(Mutation(self.WeightsSeed))]
 
 
 		self.DNAList += [DNA.DNAObject(self.WeightsSeed)]
@@ -66,6 +66,8 @@ class EvolutionController:
 
 		selectionChance = CalSelectionChance(self.DNAList)
 		self.DNAList = Breed(self.DNAList, selectionChance)
+
+
 
 		for dna in self.DNAList:
 			dna.NumberOfGames = 0
@@ -79,7 +81,7 @@ class EvolutionController:
 def GetFittness(dna):
 	return dna.Fittness
 
-def Mutation(weights, mutationRate, mutationAmount):
+def Mutation(weights):
 	weightType = type(weights)
 
 	if hasattr(weights, "__len__"):
@@ -93,7 +95,7 @@ def Mutation(weights, mutationRate, mutationAmount):
 		else:
 			newWeights = list()
 			for weight in weights:
-				newWeights += [Mutation(weight, mutationRate, mutationAmount)]
+				newWeights += [Mutation(weight)]
 			return newWeights
 
 		return newWeights
@@ -107,11 +109,13 @@ def Breed(dnaList, selectionChance):
 	for dna1 in dnaList:
 		dna2 = np.random.choice(dnaList, p=selectionChance)
 
-		newDnaList += [dna1]
+		newDnaList += [Mutation(newWeights)]
 
 		newWeights = CrossFadeWithWeights(dna1.Weights, dna2.Weights, [0.5, 0.5])
 
+		newWeights = Mutation(newWeights)
 		newDnaList += [DNA.DNAObject(newWeights)]
+		
 	return newDnaList
 
 
