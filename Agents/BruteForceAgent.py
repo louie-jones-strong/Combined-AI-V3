@@ -6,6 +6,7 @@ from DataManger.Serializer import BoardToKey
 
 class Agent(AgentBase.AgentBase):
 	MovesNotPlayedCache = {}
+	AgentType = "BruteForce"
 
 	def MoveCal(self, board):
 		key = BoardToKey(board)

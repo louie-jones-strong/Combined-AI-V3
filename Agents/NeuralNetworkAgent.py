@@ -7,6 +7,7 @@ import Agents.NeuralNetwork as NeuralNetwork
 
 class Agent(AgentBase.AgentBase):
 	TrainedEpochs = 0
+	AgentType = "NeuralNetwork"
 
 	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False):
 		if not trainingMode:

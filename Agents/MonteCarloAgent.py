@@ -3,11 +3,14 @@ import Agents.SimOutputPredictor as BoardPredictor
 import sys
 
 class Agent(AgentBase.AgentBase):
+	AgentType = "MonteCarlo"
 
 	def __init__(self, dataSetManager, loadData, moveAgent, winningModeON=False):
 		super().__init__(dataSetManager, loadData, winningModeON)
 
 		self.MoveAgent = moveAgent
+		self.AgentType += "("+str(moveAgent.AgentType)+")"
+
 		self.MoveAgent.RecordMoves = False
 
 		self.BoardPredictor = BoardPredictor.SimOutputPredictor(dataSetManager, loadData)

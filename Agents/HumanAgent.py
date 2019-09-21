@@ -5,6 +5,7 @@ import Agents.AgentBase as AgentBase
 
 
 class Agent(AgentBase.AgentBase):
+	AgentType = "Human"
 
 	def MoveCal(self, board):
 		numOfOutputs = self.DataSetManager.NumOfOutputs

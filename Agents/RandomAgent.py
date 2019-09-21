@@ -3,6 +3,7 @@ import Agents.AgentBase as AgentBase
 from DataManger.Serializer import BoardToKey
 
 class Agent(AgentBase.AgentBase):
+	AgentType = "Random"
 
 	def MoveCal(self, board):
 		key = BoardToKey(board)

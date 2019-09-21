@@ -5,6 +5,7 @@ import Agents.NeuralNetwork as NeuralNetwork
 class Agent(AgentBase.AgentBase):
 	EvoAgentId = -1
 	CurrentDNA = None
+	AgentType = "Evolution"
 
 	def __init__(self, evoController, dataSetManager, loadData, winningModeON=False):
 		super().__init__(dataSetManager, loadData, winningModeON)

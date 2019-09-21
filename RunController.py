@@ -259,7 +259,7 @@ class RunController:
 
 
 		return
-	def Output(self, game, numMoves, gameStartTime, board, turn, finished=False):
+	def Output(self, agents, game, numMoves, gameStartTime, board, turn, finished=False):
 		if self.RenderQuality == 0:
 			return
 		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
@@ -291,6 +291,11 @@ class RunController:
 			print("Real Time since start: " + Format.SplitTime(realTime))
 
 			print("time since last BackUp: " + Format.SplitTime(totalTime-backUpTime))
+
+			for loop in range(len(agents)):
+				print()
+				print("Agent["+str(loop)+"] ("+str(agents[loop].AgentType)+") Info: ")
+				print(agents[loop].AgentInfoOutput())
 			
 			title = "AI Playing: "+self.SimInfo["SimName"]
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
@@ -340,7 +345,7 @@ class RunController:
 		gameStartTime = time.time()
 		while gamesToPlay == -1 or numGames < gamesToPlay:
 			if isMainThread:
-				self.Output(game, numMoves, gameStartTime, board, turn)
+				self.Output(agents, game, numMoves, gameStartTime, board, turn)
 			board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
 
 			numMoves += 1
@@ -358,7 +363,7 @@ class RunController:
 					agents[loop].SaveData(fit[loop])
 
 				if isMainThread:
-					self.Output(game, numMoves, gameStartTime, board, turn, finished=True)
+					self.Output(agents, game, numMoves, gameStartTime, board, turn, finished=True)
 
 					self.TrySaveData()
 
@@ -395,7 +400,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=1, simNumber=6, loadData="Y", aiType="E")
+		controller = RunController(Logger, renderQuality=1, simNumber=6, loadData="Y", aiType=None)
 
 	except Exception as error:
 		Logger.LogError(error)

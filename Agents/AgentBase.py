@@ -3,7 +3,8 @@ from DataManger.Serializer import BoardToKey
 
 
 class AgentBase:
-
+	AgentType = "Base"
+	
 	def __init__(self, dataSetManager, loadData, winningModeON=False):
 		self.DataSetManager = dataSetManager
 		self.WinningModeON = winningModeON
@@ -190,6 +191,11 @@ class AgentBase:
 						return True
 			
 		return False		
+
+	def AgentInfoOutput(self):
+		info = ""
+		info += "test"
+		return info
 
 def GetSortKey(val):
 	return val["MoveNumber"]
