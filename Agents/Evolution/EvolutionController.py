@@ -109,7 +109,7 @@ def Breed(dnaList, selectionChance):
 	for dna1 in dnaList:
 		dna2 = np.random.choice(dnaList, p=selectionChance)
 
-		newDnaList += [Mutation(newWeights)]
+		newDnaList += [Mutation(dna1.Weights)]
 
 		newWeights = CrossFadeWithWeights(dna1.Weights, dna2.Weights, [0.5, 0.5])
 
