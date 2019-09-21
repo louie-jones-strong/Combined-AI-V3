@@ -195,6 +195,9 @@ class AgentBase:
 	def AgentInfoOutput(self):
 		info = ""
 		info += "Base Agent test"
+		#Todo add invalids per move 
+		#add invalids per game
+		#the point of these is to see if the agents are getting better or only the dataset
 		return info
 
 def GetSortKey(val):
