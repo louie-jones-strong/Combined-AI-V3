@@ -9,7 +9,7 @@ class Agent(AgentBase.AgentBase):
 	TrainedEpochs = 0
 	AgentType = "NeuralNetwork"
 
-	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False):
+	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False, trainingStopTime=None):
 		if not trainingMode:
 			super().__init__(dataSetManager, loadData, winningModeON)
 		else:
@@ -26,7 +26,8 @@ class Agent(AgentBase.AgentBase):
 				self.AnnModel.SetWeights(weights)
 
 		if trainingMode:
-			self.Train()
+			self.Train(trainingStopTime)
+			input("finished training hold as not coded this")
 		return
 
 	def MoveCal(self, boards, batch=False):
@@ -45,7 +46,7 @@ class Agent(AgentBase.AgentBase):
 			self.RecordMove(boards[0], outputs)
 		return outputs
 
-	def Train(self):
+	def Train(self, stopTime=None):
 		dataSetX = []
 		dataSetY = []
 
@@ -53,7 +54,8 @@ class Agent(AgentBase.AgentBase):
 			time.sleep(10)
 			dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 
-		while True:
+		startTime = time.time()
+		while stopTime == None or time.time()-startTime < stopTime:
 			self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY, trainingTime=60)
 			
 			weights = self.AnnModel.GetWeights()
