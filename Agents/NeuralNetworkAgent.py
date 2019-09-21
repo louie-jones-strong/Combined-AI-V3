@@ -10,7 +10,10 @@ class Agent(AgentBase.AgentBase):
 	AgentType = "NeuralNetwork"
 
 	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False, trainingStopTime=None):
-		if not trainingMode:
+		self.TrainingMode = trainingMode
+		self.TrainingStopTime = trainingStopTime
+
+		if not self.TrainingMode:
 			super().__init__(dataSetManager, loadData, winningModeON)
 		else:
 			self.DataSetManager = dataSetManager
@@ -25,8 +28,8 @@ class Agent(AgentBase.AgentBase):
 			if found:
 				self.AnnModel.SetWeights(weights)
 
-		if trainingMode:
-			self.Train(trainingStopTime)
+		if self.TrainingMode:
+			self.Train()
 			input("finished training hold as not coded this")
 		return
 
@@ -46,7 +49,7 @@ class Agent(AgentBase.AgentBase):
 			self.RecordMove(boards[0], outputs)
 		return outputs
 
-	def Train(self, stopTime=None):
+	def Train(self):
 		dataSetX = []
 		dataSetY = []
 
@@ -54,13 +57,12 @@ class Agent(AgentBase.AgentBase):
 			time.sleep(10)
 			dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 
-		startTime = time.time()
-		while stopTime == None or time.time()-startTime < stopTime:
-			self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY, trainingTime=60)
-			
-			weights = self.AnnModel.GetWeights()
-			self.DataSetManager.SaveNetworkWeights("BestMove", weights)
-			dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
+
+		self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY, trainingTime=self.TrainingStopTime)
+		
+		weights = self.AnnModel.GetWeights()
+		self.DataSetManager.SaveNetworkWeights("BestMove", weights)
+		dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 
 		return
 
@@ -70,4 +72,10 @@ class Agent(AgentBase.AgentBase):
 			found, weights = self.DataSetManager.LoadNetworkWeights()
 			if found:
 				self.AnnModel.SetWeights(weights)
+		return
+
+	def TournamentFinished(self):
+		super().TournamentFinished()
+		if self.TrainingMode:
+			self.Train()
 		return
