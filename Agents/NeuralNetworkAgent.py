@@ -10,15 +10,10 @@ class Agent(AgentBase.AgentBase):
 	AgentType = "NeuralNetwork"
 
 	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False, trainingStopTime=None):
+		super().__init__(dataSetManager, loadData, winningModeON)
+		
 		self.TrainingMode = trainingMode
 		self.TrainingStopTime = trainingStopTime
-
-		if not self.TrainingMode:
-			super().__init__(dataSetManager, loadData, winningModeON)
-		else:
-			self.DataSetManager = dataSetManager
-
-		self.LoadData = loadData
 
 		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
 		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
