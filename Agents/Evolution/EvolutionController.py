@@ -7,6 +7,8 @@ import Agents.Evolution.DNAObject as DNA
 class EvolutionController:
 	NumberOfDNAInGenration = 50
 	GenrationNum = 0
+	FittnessCache = []
+	LastGenBestFittness = None
 	
 	def __init__(self, dataSetManager, loadData, winningModeON=False):
 		self.EvoAgentList = []
@@ -40,6 +42,8 @@ class EvolutionController:
 		agentDna = None
 		for loop in range(len(self.DNAList)):
 			dna = self.DNAList[loop]
+			self.FittnessCache[loop] = round(dna.Fittness, 3)
+			
 			if dna.AgentId == None and dna.NumberOfGames == 0:
 				agentDna = dna
 				agentDna.AgentId = evoAgentId
@@ -55,13 +59,17 @@ class EvolutionController:
 		self.DNAList = []
 		for loop in range(self.NumberOfDNAInGenration-1):
 			self.DNAList += [DNA.DNAObject(Mutation(self.WeightsSeed))]
+			self.FittnessCache += [0]
 
 
 		self.DNAList += [DNA.DNAObject(self.WeightsSeed)]
+		self.FittnessCache += [0]
 		return
 
 	def CalNextGen(self):
-		self.DNAList.sort(key=GetFittness)
+		self.DNAList.sort(key=GetFittness, reverse=True)
+		self.LastGenBestFittness = self.DNAList[0].Fittness
+
 		self.DNAList = self.DNAList[:int(len(self.DNAList)/2)]
 
 		selectionChance = CalSelectionChance(self.DNAList)
@@ -73,10 +81,22 @@ class EvolutionController:
 			self.DNAList[loop].NumberOfGames = 0
 			self.DNAList[loop].AgentId = None
 			self.DNAList[loop].Fittness = 0
+			self.FittnessCache[loop] = 0
 
 		self.GenrationNum += 1
 		print("Genration: " + str(self.GenrationNum))
 		return
+
+	def ControllerInfoOutput(self):
+		info = "Genration: " + str(self.GenrationNum)
+		info += "\n"
+		
+		if self.LastGenBestFittness != None:
+			info += "Last Gen Best Fittness: "+str(self.LastGenBestFittness)
+			info += "\n"
+			
+		info += "Fittness: " + str(sorted(self.FittnessCache, reverse=True))
+		return info
 
 def GetFittness(dna):
 	return dna.Fittness
@@ -106,7 +126,9 @@ def Mutation(weights):
 def Breed(dnaList, selectionChance):
 
 	newDnaList = []
-	for dna1 in dnaList:
+	for loop in range(len(dnaList)):
+		dna1 = dnaList[loop]
+
 		dna2 = np.random.choice(dnaList, p=selectionChance)
 
 		newDnaList += [DNA.DNAObject(Mutation(dna1.Weights))]

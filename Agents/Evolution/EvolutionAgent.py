@@ -51,3 +51,10 @@ class Agent(AgentBase.AgentBase):
 		self.CurrentDNA = self.EvoController.GetNextModelWeights(self.EvoAgentId)
 		self.AnnModel.SetWeights(self.CurrentDNA.Weights)
 		return
+
+	def AgentInfoOutput(self):
+		info = ""
+		
+		info += "Evo Controller Info:\n"
+		info += self.EvoController.ControllerInfoOutput()
+		return info

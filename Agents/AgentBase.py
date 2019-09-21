@@ -194,7 +194,7 @@ class AgentBase:
 
 	def AgentInfoOutput(self):
 		info = ""
-		info += "test"
+		info += "Base Agent test"
 		return info
 
 def GetSortKey(val):
