@@ -4,6 +4,7 @@ from DataManger.Serializer import BoardToKey
 
 class AgentBase:
 	AgentType = "Base"
+	InvalidMoveList = {}
 	
 	def __init__(self, dataSetManager, loadData, winningModeON=False):
 		self.DataSetManager = dataSetManager
@@ -51,6 +52,9 @@ class AgentBase:
 		if self.RecordMoves:
 			self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID, "MoveNumber":self.MoveNumber}
 			self.MoveNumber += 1
+
+		if key not in self.InvalidMoveList:
+			self.InvalidMoveList[key] = 0
 		return
 
 	def UpdateInvalidMove(self, board, move):
@@ -69,6 +73,8 @@ class AgentBase:
 			del self.TempDataSet[str(key)+str(moveID)]
 
 		self.MoveNumber -= 1
+
+		self.InvalidMoveList[key] += 1
 		return
 
 	def UpdateMoveOutCome(self, boardKey, move, outComeBoard, gameFinished=False):
@@ -131,6 +137,7 @@ class AgentBase:
 
 
 		self.TempDataSet = {}
+		self.InvalidMoveList = {}
 		self.MoveNumber = 0
 		return
 
@@ -198,6 +205,13 @@ class AgentBase:
 		#Todo add invalids per move 
 		#add invalids per game
 		#the point of these is to see if the agents are getting better or only the dataset
+		total = sum(self.InvalidMoveList.values())
+		
+		info += "Invalids This Game: "+str(total)
+		info += "\n"
+		if len(self.InvalidMoveList) > 0:
+			info += "Avg Invalids Per move: "+str(round(total/len(self.InvalidMoveList)))
+
 		return info
 
 def GetSortKey(val):
