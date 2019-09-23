@@ -4,8 +4,10 @@ from DataManger.Serializer import BoardToKey
 
 class AgentBase:
 	AgentType = "Base"
-	InvalidMoveList = {}
-	
+	NumInvailds = 0
+	NumMoves = 0
+	NumGames = 1
+
 	def __init__(self, dataSetManager, loadData, winningModeON=False):
 		self.DataSetManager = dataSetManager
 		self.WinningModeON = winningModeON
@@ -53,8 +55,6 @@ class AgentBase:
 			self.TempDataSet[str(key)+str(moveID)] = {"BoardKey": key, "MoveID": moveID, "MoveNumber":self.MoveNumber}
 			self.MoveNumber += 1
 
-		if key not in self.InvalidMoveList:
-			self.InvalidMoveList[key] = 0
 		return
 
 	def UpdateInvalidMove(self, board, move):
@@ -74,7 +74,7 @@ class AgentBase:
 
 		self.MoveNumber -= 1
 
-		self.InvalidMoveList[key] += 1
+		self.NumInvailds += 1
 		return
 
 	def UpdateMoveOutCome(self, boardKey, move, outComeBoard, gameFinished=False):
@@ -98,7 +98,8 @@ class AgentBase:
 					move.MoveOutComes[outComeKey] += 1
 				else:
 					move.MoveOutComes[outComeKey] = 1
-				
+		
+		self.NumMoves += 1
 		return
 
 	def GameFinished(self, fitness):
@@ -137,8 +138,8 @@ class AgentBase:
 
 
 		self.TempDataSet = {}
-		self.InvalidMoveList = {}
 		self.MoveNumber = 0
+		self.NumGames += 1
 		return
 
 	def TournamentFinished(self):
@@ -205,12 +206,20 @@ class AgentBase:
 		#Todo add invalids per move 
 		#add invalids per game
 		#the point of these is to see if the agents are getting better or only the dataset
-		total = sum(self.InvalidMoveList.values())
 		
-		info += "Invalids This Game: "+str(total)
+			
+		perGame = self.NumInvailds
+		if self.NumGames > 0:
+			perGame = self.NumInvailds/self.NumGames
+
+		perMove = self.NumInvailds
+		if self.NumMoves > 0:
+			perMove = self.NumInvailds/self.NumMoves
+
+
+		info += "Avg Invalids per Game: "+str(round(perGame))
 		info += "\n"
-		if len(self.InvalidMoveList) > 0:
-			info += "Avg Invalids Per move: "+str(round(total/len(self.InvalidMoveList)))
+		info += "Avg Invalids Per move: "+str(round(perMove))
 
 		return info
 
