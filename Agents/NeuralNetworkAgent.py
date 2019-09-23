@@ -61,8 +61,8 @@ class Agent(AgentBase.AgentBase):
 
 		return
 
-	def SaveData(self, fitness):
-		super().SaveData(fitness)
+	def GameFinished(self, fitness):
+		super().GameFinished(fitness)
 		if self.LoadData:
 			found, weights = self.DataSetManager.LoadNetworkWeights()
 			if found:

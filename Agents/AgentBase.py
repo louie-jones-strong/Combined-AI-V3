@@ -101,7 +101,7 @@ class AgentBase:
 				
 		return
 
-	def SaveData(self, fitness):
+	def GameFinished(self, fitness):
 		if not self.RecordMoves:
 			return
 		

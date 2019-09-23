@@ -82,9 +82,9 @@ class Agent(AgentBase.AgentBase):
 		self.RecordMove(board, move)
 		return move
 
-	def SaveData(self, fitness):
+	def GameFinished(self, fitness):
 		if len(self.MovesNotPlayedCache) >= 1000:
 			self.MovesNotPlayedCache = {}
 
-		super().SaveData(fitness)
+		super().GameFinished(fitness)
 		return

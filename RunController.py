@@ -361,7 +361,7 @@ class RunController:
 				self.AiDataManager.MetaDataAdd("NumberOfGames", 1)
 
 				for loop in range(len(agents)):
-					agents[loop].SaveData(fit[loop])
+					agents[loop].GameFinished(fit[loop])
 
 				if isMainThread:
 					self.Output(agents, game, numMoves, gameStartTime, board, turn, finished=True)

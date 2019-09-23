@@ -35,8 +35,8 @@ class Agent(AgentBase.AgentBase):
 			self.RecordMove(boards[0], outputs)
 		return outputs
 
-	def SaveData(self, fittness):
-		super().SaveData(fittness)
+	def GameFinished(self, fittness):
+		super().GameFinished(fittness)
 
 		tempFittness = self.CurrentDNA.Fittness*self.CurrentDNA.NumberOfGames
 		tempFittness += fittness
