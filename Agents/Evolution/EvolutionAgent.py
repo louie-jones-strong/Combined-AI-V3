@@ -53,7 +53,7 @@ class Agent(AgentBase.AgentBase):
 		return
 
 	def AgentInfoOutput(self):
-		info = ""
+		info = super().AgentInfoOutput()
 		
 		info += "Evo Controller Info:\n"
 		info += self.EvoController.ControllerInfoOutput()
