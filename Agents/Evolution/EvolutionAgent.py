@@ -54,6 +54,9 @@ class Agent(AgentBase.AgentBase):
 
 	def AgentInfoOutput(self):
 		info = super().AgentInfoOutput()
+		info += "\n"
+		info += self.AnnModel.GetInfoOutput()
+		info += "\n"
 		
 		info += "Evo Controller Info:\n"
 		info += self.EvoController.ControllerInfoOutput()
