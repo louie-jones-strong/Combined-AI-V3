@@ -62,6 +62,11 @@ class NeuralNetwork:
 		self.PredictionCache = {}
 		return trainedEpochs
 
+	def GetInfoOutput(self):
+		
+		info = "ANN Prediction Cache Size: " + str(len(self.PredictionCache))
+		return info
+
 def MakeModel(dataSetManager):
 	inputShape, structreArray = PredictNetworkStructre(dataSetManager)
 

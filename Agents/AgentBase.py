@@ -202,11 +202,6 @@ class AgentBase:
 
 	def AgentInfoOutput(self):
 		info = ""
-		info += "Base Agent test"
-		#Todo add invalids per move 
-		#add invalids per game
-		#the point of these is to see if the agents are getting better or only the dataset
-		
 			
 		perGame = self.NumInvailds
 		if self.NumGames > 0:
@@ -220,6 +215,8 @@ class AgentBase:
 		info += "Avg Invalids per Game: "+str(round(perGame))
 		info += "\n"
 		info += "Avg Invalids Per move: "+str(round(perMove))
+		info += "\n"
+		info += "moves played: "+str(self.NumMoves)
 
 		return info
 

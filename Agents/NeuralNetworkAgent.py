@@ -74,3 +74,10 @@ class Agent(AgentBase.AgentBase):
 		if self.TrainingMode:
 			self.Train()
 		return
+
+	def AgentInfoOutput(self):
+		info = super().AgentInfoOutput()
+		info += "\n"
+		info += self.AnnModel.GetInfoOutput()
+
+		return info
