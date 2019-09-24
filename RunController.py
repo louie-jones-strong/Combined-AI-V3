@@ -316,7 +316,9 @@ class RunController:
 		gamesToPlay = 100
 		self.LastSaveTime = time.time()
 
-		while not (self.StopTime != None and self.AiDataManager.MetaDataGet("RealTime") >= self.StopTime):
+		startTime = time.time()
+
+		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
 			threads = []
 			for loop in range(targetThreadNum-1):
