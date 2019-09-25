@@ -20,7 +20,7 @@ class Tests:
 		self.Logger.InputAllowed = False
 
 		Sims = [1, 2, 3, 4, 6]
-		Agents = ["b", "n", "e"]
+		Agents = ["b"]
 
 		hadError = False
 		timeMark = time.time()
