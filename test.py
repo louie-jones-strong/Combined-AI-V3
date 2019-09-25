@@ -2,7 +2,7 @@ def TensorflowTest():
     try:
         print("testing tensorflow")
 
-        import tensorflow as tf
+        import tensorflow
 
         # Simple hello world using TensorFlow
 
@@ -11,15 +11,15 @@ def TensorflowTest():
         #
         # The value returned by the constructor represents the output
         # of the Constant op.
-        hello = tf.constant('Hello, TensorFlow!')
+        hello = tensorflow.constant('Hello, TensorFlow!')
 
         # Start tf session
-        sess = tf.Session()
+        sess = tensorflow.Session()
 
         # Run the op
         print(sess.run(hello))
     except Exception as error:
-        self.Logger.LogError(error)
+        print(error)
     return
 
 
@@ -30,5 +30,5 @@ def TfLearnTest():
         import tflearn
 
     except Exception as error:
-        self.Logger.LogError(error)
+        print(error)
     return
