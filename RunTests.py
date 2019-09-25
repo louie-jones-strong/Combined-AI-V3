@@ -3,6 +3,7 @@ from Shared import Logger
 import time
 from Shared.OutputFormating import SplitTime, TimeToDateTime
 from DataManger import BasicLoadAndSave
+import test
 
 class Tests:
 	def __init__(self):
@@ -23,6 +24,9 @@ class Tests:
 		Agents = ["b", "n", "e"]
 
 		hadError = False
+		
+		test.TensorflowTest()
+		test.TfLearnTest()
 
 		timeMark = time.time()
 		for simNum in Sims:
