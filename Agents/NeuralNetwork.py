@@ -15,6 +15,8 @@ class NeuralNetwork:
 		self.RunId = runId
 		self.PredictionCache = {}
 		self.MaxCacheSize = 5000
+
+		self.NumBetterValueInvailds = 0
 		return
 	
 	def GetWeights(self):
@@ -54,7 +56,7 @@ class NeuralNetwork:
 		trainedEpochs = 0
 		trainingStartTime = time.time()
 		
-		while (time.time()-trainingStartTime) < trainingTime:
+		while trainingTime == None or (time.time()-trainingStartTime) < trainingTime:
 			epochs = 10
 			self.NetworkModel.fit(dataSetX, dataSetY, n_epoch=epochs, batch_size=self.BatchSize, run_id=self.RunId, shuffle=True)
 			trainedEpochs += epochs
@@ -62,10 +64,74 @@ class NeuralNetwork:
 		self.PredictionCache = {}
 		return trainedEpochs
 
-	def GetInfoOutput(self):
+	def GetInfoOutput(self, numGames, numMoves):
 		
 		info = "ANN Prediction Cache Size: " + str(len(self.PredictionCache))
+		
+		perGame = self.NumBetterValueInvailds
+		if numGames > 0:
+			perGame = self.NumBetterValueInvailds/numGames
+
+		perMove = self.NumBetterValueInvailds
+		if numMoves > 0:
+			perMove = self.NumBetterValueInvailds/numMoves
+
+
+		info += "\n"
+		info += "Avg NumBetterValueInvailds per Game: "+str(round(perGame))
+		info += "\n"
+		info += "Avg NumBetterValueInvailds Per move: "+str(round(perMove))
+		info += "\n"
 		return info
+
+	def PredictionToMove(self, dataSetManager, networkOutput, board):
+
+		if dataSetManager.MetaDataGet("NetworkUsingOneHotEncoding"):
+			key = BoardToKey(board)
+			found, boardInfo = dataSetManager.GetBoardInfo(key)
+
+			output = dataSetManager.MoveIDToMove(0)
+			bestValue = -sys.maxsize
+
+			for loop in range(len(networkOutput)):
+				invaild = False
+
+				if found:
+					if 2**loop & boardInfo.PlayedMovesLookUpArray:
+						if loop not in boardInfo.Moves:
+							invaild = True
+
+				if networkOutput[loop] >= bestValue and (not invaild):
+					bestValue = networkOutput[loop]
+					output = dataSetManager.MoveIDToMove(loop)
+
+			for loop in range(len(networkOutput)):
+				if networkOutput[loop] >= bestValue:
+					self.NumBetterValueInvailds += 1
+			
+			self.NumBetterValueInvailds -= 1
+
+
+		else:
+			output = []
+			for loop in range(len(networkOutput)):
+				temp = networkOutput[loop]
+				temp = temp / dataSetManager.OutputResolution
+				temp = round(temp)
+				temp = temp * dataSetManager.OutputResolution
+
+				if temp < dataSetManager.MinOutputSize:
+					temp = dataSetManager.MinOutputSize
+
+				if temp > dataSetManager.MaxOutputSize:
+					temp = dataSetManager.MaxOutputSize
+
+				if dataSetManager.OutputResolution == int(dataSetManager.OutputResolution):
+					temp= int(temp)
+
+				output += [temp]
+
+		return output
 
 def MakeModel(dataSetManager):
 	inputShape, structreArray = PredictNetworkStructre(dataSetManager)
@@ -183,44 +249,3 @@ def LayerMaker(network, structreArray, layerNumber=0):
 		network = LayerMaker(network, structreArray, layerNumber=layerNumber+1)
 
 	return network
-
-def PredictionToMove(dataSetManager, networkOutput, board):
-	if dataSetManager.MetaDataGet("NetworkUsingOneHotEncoding"):
-		key = BoardToKey(board)
-		found, boardInfo = dataSetManager.GetBoardInfo(key)
-
-		output = dataSetManager.MoveIDToMove(0)
-		bestValue = -sys.maxsize
-
-		for loop in range(len(networkOutput)):
-			invaild = False
-
-			if found:
-				if 2**loop & boardInfo.PlayedMovesLookUpArray:
-					if loop not in boardInfo.Moves:
-						invaild = True
-
-			if networkOutput[loop] >= bestValue and (not invaild):
-				bestValue = networkOutput[loop]
-				output = dataSetManager.MoveIDToMove(loop)
-
-	else:
-		output = []
-		for loop in range(len(networkOutput)):
-			temp = networkOutput[loop]
-			temp = temp / dataSetManager.OutputResolution
-			temp = round(temp)
-			temp = temp * dataSetManager.OutputResolution
-
-			if temp < dataSetManager.MinOutputSize:
-				temp = dataSetManager.MinOutputSize
-
-			if temp > dataSetManager.MaxOutputSize:
-				temp = dataSetManager.MaxOutputSize
-
-			if dataSetManager.OutputResolution == int(dataSetManager.OutputResolution):
-				temp= int(temp)
-
-			output += [temp]
-
-	return output

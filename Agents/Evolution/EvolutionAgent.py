@@ -28,7 +28,7 @@ class Agent(AgentBase.AgentBase):
 		outputs = []
 		for loop in range(len(networkOutputs)):
 			networkOutput = list(networkOutputs[loop])
-			outputs += [NeuralNetwork.PredictionToMove(self.DataSetManager, networkOutput, boards[loop])]
+			outputs += [self.AnnModel.PredictionToMove(self.DataSetManager, networkOutput, boards[loop])]
 
 		if not batch:
 			outputs = outputs[0]
@@ -55,7 +55,7 @@ class Agent(AgentBase.AgentBase):
 	def AgentInfoOutput(self):
 		info = super().AgentInfoOutput()
 		info += "\n"
-		info += self.AnnModel.GetInfoOutput()
+		info += self.AnnModel.GetInfoOutput(self.NumGames, self.NumMoves)
 		info += "\n"
 		
 		info += "Evo Controller Info:\n"

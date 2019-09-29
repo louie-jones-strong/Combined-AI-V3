@@ -9,11 +9,10 @@ class Agent(AgentBase.AgentBase):
 	TrainedEpochs = 0
 	AgentType = "NeuralNetwork"
 
-	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False, trainingStopTime=None):
+	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False):
 		super().__init__(dataSetManager, loadData, winningModeON)
 		
 		self.TrainingMode = trainingMode
-		self.TrainingStopTime = trainingStopTime
 
 		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
 		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
@@ -25,7 +24,6 @@ class Agent(AgentBase.AgentBase):
 
 		if self.TrainingMode:
 			self.Train()
-			input("finished training hold as not coded this")
 		return
 
 	def MoveCal(self, boards, batch=False):
@@ -37,7 +35,7 @@ class Agent(AgentBase.AgentBase):
 		outputs = []
 		for loop in range(len(networkOutputs)):
 			networkOutput = list(networkOutputs[loop])
-			outputs += [NeuralNetwork.PredictionToMove(self.DataSetManager, networkOutput, boards[loop])]
+			outputs += [self.AnnModel.PredictionToMove(self.DataSetManager, networkOutput, boards[loop])]
 
 		if not batch:
 			outputs = outputs[0]
@@ -53,20 +51,12 @@ class Agent(AgentBase.AgentBase):
 			dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 
 
-		self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY, trainingTime=self.TrainingStopTime)
+		self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY)
 		
 		weights = self.AnnModel.GetWeights()
 		self.DataSetManager.SaveNetworkWeights("BestMove", weights)
 		dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 
-		return
-
-	def GameFinished(self, fitness):
-		super().GameFinished(fitness)
-		if self.LoadData:
-			found, weights = self.DataSetManager.LoadNetworkWeights()
-			if found:
-				self.AnnModel.SetWeights(weights)
 		return
 
 	def TournamentFinished(self):
@@ -78,6 +68,6 @@ class Agent(AgentBase.AgentBase):
 	def AgentInfoOutput(self):
 		info = super().AgentInfoOutput()
 		info += "\n"
-		info += self.AnnModel.GetInfoOutput()
+		info += self.AnnModel.GetInfoOutput(self.NumGames, self.NumMoves)
 
 		return info

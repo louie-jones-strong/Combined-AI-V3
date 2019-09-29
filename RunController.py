@@ -145,8 +145,9 @@ class RunController:
 
 				import Agents.NeuralNetworkAgent as NeuralNetwork
 				trainingMode = userInput == "Y" or userInput == "y"
+				
 				self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, 
-					winningModeON=self.WinningMode, trainingMode=trainingMode, trainingStopTime=self.StopTime)]
+					winningModeON=self.WinningMode, trainingMode=trainingMode)]
 
 				for loop in range(self.NumberOfBots-1):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
@@ -403,7 +404,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=1, simNumber=6, loadData="Y", aiType=None, stopTime=60*5)
+		controller = RunController(Logger, renderQuality=1, simNumber=6, loadData="Y", aiType=None, stopTime=None)
 
 	except Exception as error:
 		Logger.LogError(error)
