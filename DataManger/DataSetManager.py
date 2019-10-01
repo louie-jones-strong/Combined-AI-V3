@@ -222,13 +222,13 @@ class DataSetManager:
 	def GetMoveDataSet(self):
 		dataSetX = []
 		dataSetY = []
-		loadingBar = LoadingBar.LoadingBar(self.Logger)
 		isOneHotEncoding = True
 
 		self.LoadMetaData()
-		if (self.MetaDataGet("TotalTime") > self.MetaDataGet("AnnDataMadeFromBruteForceTotalTime") or
-			(not ComplexFileExists(self.AnnDataSetAddress+"XDataSet")) or 
-			(not ComplexFileExists(self.AnnDataSetAddress+"YDataSet"))):
+		if (self.MetaDataGet("TotalTime") > self.MetaDataGet("AnnDataMadeFromTotalTime") or
+			(not ComplexFileExists(self.AnnDataSetAddress+"XMoveDataSet")) or 
+			(not ComplexFileExists(self.AnnDataSetAddress+"YMoveDataSet"))):
+			loadingBar = LoadingBar.LoadingBar(self.Logger)
 			
 			self.LoadTableInfo()
 			loop = 0
@@ -263,21 +263,68 @@ class DataSetManager:
 				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset", loop, len(self.DataSetHashTable))
 				loop += 1
 
-			ComplexSave(self.AnnDataSetAddress+"XDataSet", dataSetX)
-			ComplexSave(self.AnnDataSetAddress+"YDataSet", dataSetY)
-			self.MetaDataSet("AnnDataMadeFromBruteForceTotalTime", self.MetaDataGet("TotalTime"))
+			ComplexSave(self.AnnDataSetAddress+"XMoveDataSet", dataSetX)
+			ComplexSave(self.AnnDataSetAddress+"YMoveDataSet", dataSetY)
+			self.MetaDataSet("AnnDataMadeFromTotalTime", self.MetaDataGet("TotalTime"))
 			self.MetaDataSet("NetworkUsingOneHotEncoding", isOneHotEncoding)
 			self.Clear()
 
-		elif ComplexFileExists(self.AnnDataSetAddress+"XDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YDataSet"):
-			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XDataSet")
-			dataSetY = ComplexLoad(self.AnnDataSetAddress+"YDataSet")
+		elif ComplexFileExists(self.AnnDataSetAddress+"XMoveDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YMoveDataSet"):
+			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XMoveDataSet")
+			dataSetY = ComplexLoad(self.AnnDataSetAddress+"YMoveDataSet")
 			isOneHotEncoding = self.MetaDataGet("NetworkUsingOneHotEncoding")
 
 		return dataSetX, dataSetY
+
 	def GetSimPredictionDataSet(self):
 		dataSetX = []
 		dataSetY = []
+
+		self.LoadMetaData()
+		if (self.MetaDataGet("TotalTime") > self.MetaDataGet("AnnDataMadeFromTotalTime") or
+			(not ComplexFileExists(self.AnnDataSetAddress+"XPredictionDataSet")) or 
+			(not ComplexFileExists(self.AnnDataSetAddress+"YPredictionDataSet"))):
+			
+			loadingBar = LoadingBar.LoadingBar(self.Logger)
+			
+			self.LoadTableInfo()
+			loop = 0
+			for key, value in self.DataSetHashTable.items():
+				index = value[0]
+				board = pickle.loads(value[1])
+
+				if not self.DataSetTables[index].IsLoaded:
+					self.DataSetTables[index].Load()
+			
+				if key in self.DataSetTables[index].Content:
+					boardInfo = self.DataSetTables[index].Content[key]
+					for moveId, moveInfo in boardInfo.Moves.items():
+
+						move = self.MoveIDToMove(moveId)
+
+						dataSetX += [[board, move]]
+						
+						mostcommonAmount = 0
+						mostcommonKey = ""
+						for outComeKey, value in boardInfo.Moves.items():
+							if value >= mostcommonAmount:
+								mostcommonAmount = value
+								mostcommonKey = outComeKey
+
+						dataSetY += [[1]]
+
+
+				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset", loop, len(self.DataSetHashTable))
+				loop += 1
+
+			ComplexSave(self.AnnDataSetAddress+"XPredictionDataSet", dataSetX)
+			ComplexSave(self.AnnDataSetAddress+"YPredictionDataSet", dataSetY)
+			#self.MetaDataSet("AnnDataMadeFromTotalTime", self.MetaDataGet("TotalTime"))
+			self.Clear()
+
+		elif ComplexFileExists(self.AnnDataSetAddress+"XPredictionDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YPredictionDataSet"):
+			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XPredictionDataSet")
+			dataSetY = ComplexLoad(self.AnnDataSetAddress+"YPredictionDataSet")
 
 		return dataSetX, dataSetY
 

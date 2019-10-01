@@ -237,7 +237,7 @@ class RunController:
 			self.AiDataManager.MetaDataSet("TotalTime", 0)
 			self.AiDataManager.MetaDataSet("BruteForceTotalTime", 0)
 			self.AiDataManager.MetaDataSet("AnnTotalTime", 0)
-			self.AiDataManager.MetaDataSet("AnnDataMadeFromBruteForceTotalTime", 0)
+			self.AiDataManager.MetaDataSet("AnnDataMadeFromTotalTime", 0)
 			self.AiDataManager.MetaDataSet("LastBackUpTotalTime", 0)
 			self.AiDataManager.MetaDataSet("AnnMoveInputShape", None)
 			self.AiDataManager.MetaDataSet("AnnMoveStructreArray", None)
@@ -404,7 +404,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=1, simNumber=6, loadData="Y", aiType=None, stopTime=None)
+		controller = RunController(Logger, renderQuality=1, simNumber=None, loadData="Y", aiType=None, stopTime=None)
 
 	except Exception as error:
 		Logger.LogError(error)
