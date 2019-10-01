@@ -14,7 +14,7 @@ class NeuralNetwork:
 		self.BatchSize = batchSize
 		self.RunId = runId
 		self.PredictionCache = {}
-		self.MaxCacheSize = 5000
+		self.MaxCacheSize = 10000
 
 		self.NumBetterValueInvailds = 0
 		return
