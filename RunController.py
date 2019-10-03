@@ -1,6 +1,7 @@
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
+import Agents.SimOutputPredictor as SimOutputPredictor
 import DataManger.DataSetManager as DataSetManager
 from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
@@ -14,58 +15,18 @@ import threading
 def MakeAgentMove(turn, board, agents, game):
 	startBoardKey = BoardToKey(board)
 
-	moveCalTime = 0
-	makeMoveTime = 0
-	updateInvalidMoveTime = 0
-	checkFinishedTime = 0
-	updateMoveOutComeTime = 0
-
 	agent = agents[turn-1]
 	valid = False
-	#if turn == 1:
 	while not valid:
-		timeMark = time.time()
 		move = agent.MoveCal(board)
-		moveCalTime += time.time()-timeMark
-		timeMark = time.time()
 		valid, outComeBoard, turn = game.MakeMove(move)
-		makeMoveTime += time.time()-timeMark
 		if not valid:
-			timeMark = time.time()
 			agent.UpdateInvalidMove(board, move)
-			updateInvalidMoveTime += time.time()-timeMark
-	#else:
-	#	board = game.FlipBoard(board)
-	#	while not valid:
-	#		timeMark = time.time()
-	#		move = agent.MoveCal(board)
-	#		moveCalTime += time.time()-timeMark
-	#		flippedMove = game.FlipInput(move)
-	#		
-	#		timeMark = time.time()
-	#		valid, outComeBoard, turn = game.MakeMove(flippedMove)
-	#		makeMoveTime += time.time()-timeMark
-	#		if not valid:
-	#			timeMark = time.time()
-	#			agent.UpdateInvalidMove(board, move)
-	#			updateInvalidMoveTime += time.time()-timeMark
 
-	timeMark = time.time()
 	finished, fit = game.CheckFinished()
-	checkFinishedTime += time.time()-timeMark
 
-	timeMark = time.time()
 	agent.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
-	updateMoveOutComeTime += time.time()-timeMark
 
-	#totalTime = moveCalTime+makeMoveTime+updateInvalidMoveTime+checkFinishedTime+updateMoveOutComeTime
-
-	#print("AI  MoveCal Time:           "+str(moveCalTime))
-	#print("Sim MakeMove Time:          "+str(makeMoveTime))
-	#print("AI  UpdateInvalidMove Time: "+str(updateInvalidMoveTime))
-	#print("Sim CheckFinished Time:     "+str(checkFinishedTime))
-	#print("AI  UpdateMoveOutCome Time: "+str(updateMoveOutComeTime))
-	#print("total Time: "+str(totalTime))
 	return outComeBoard, turn, finished, fit
 
 class RunController:
@@ -122,6 +83,8 @@ class RunController:
 
 		else:
 			loadData = self.SetUpMetaData(loadData)
+
+			self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
 
 			if userInput == "H":
 				self.WinningMode = True
