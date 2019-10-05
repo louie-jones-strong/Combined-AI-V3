@@ -4,6 +4,7 @@ import time
 
 class SimOutputPredictor:
 	TrainedEpochs = 0
+	NumWrongPredictions = 0
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
 		self.DataSetManager = dataSetManager
@@ -46,6 +47,10 @@ class SimOutputPredictor:
 
 		return newBoard
 
+	def UpdateMoveOutCome(self, boardKey, move, outComeBoard, gameFinished=False):
+
+		return
+
 	def Train(self):
 		dataSetX = []
 		dataSetY = []
@@ -62,3 +67,9 @@ class SimOutputPredictor:
 			dataSetX, dataSetY = self.DataSetManager.GetSimPredictionDataSet()
 
 		return
+
+	def PredictorInfoOutput(self):
+		info = ""
+		info += "Number of Wrong predictions: "+str(self.NumWrongPredictions)
+
+		return info
