@@ -14,7 +14,7 @@ class Logger:
 
 	def Clear(self):
 		if self.ClearAllowed:
-			os.system("cls")
+			os.system('cls' if os.name == 'nt' else 'clear')
 		return
 
 	def SetTitle(self, titleText):
