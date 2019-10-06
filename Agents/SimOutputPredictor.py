@@ -1,6 +1,7 @@
 #import Agents.NeuralNetwork as NeuralNetwork
 from DataManger.Serializer import BoardToKey
 import time
+from Shared import OutputFormating as Format
 
 class SimOutputPredictor:
 	TrainedEpochs = 0
@@ -90,11 +91,11 @@ class SimOutputPredictor:
 
 	def PredictorInfoOutput(self):
 		info = ""
-		info += "Number of Wrong predictions: "+str(self.NumWrongPredictions)
+		info += "Number of Wrong predictions: "+Format.SplitNumber(self.NumWrongPredictions)
 		info += "\n"
-		info += "Number of predictions: "+str(self.NumPredictions)
+		info += "Number of predictions: "+Format.SplitNumber(self.NumPredictions)
 		if self.NumPredictions != 0:
 			info += "\n"
-			info += "predictions ratio: "+str((self.NumWrongPredictions/self.NumPredictions)*100)+"%"
+			info += "predictions ratio: "+str(round(self.NumWrongPredictions/self.NumPredictions)*100)+"%"
 
 		return info

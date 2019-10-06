@@ -1,6 +1,6 @@
 import DataManger.BoardInfo as BoardInfo
 from DataManger.Serializer import BoardToKey
-
+from Shared import OutputFormating as Format
 
 class AgentBase:
 	AgentType = "Base"
@@ -216,7 +216,7 @@ class AgentBase:
 		info += "\n"
 		info += "Avg Invalids Per move: "+str(round(perMove))
 		info += "\n"
-		info += "moves played: "+str(self.NumMoves)
+		info += "moves played: "+Format.SplitNumber(self.NumMoves)
 
 		return info
 
