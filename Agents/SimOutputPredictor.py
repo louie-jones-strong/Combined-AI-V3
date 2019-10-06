@@ -96,6 +96,7 @@ class SimOutputPredictor:
 		info += "Number of predictions: "+Format.SplitNumber(self.NumPredictions)
 		if self.NumPredictions != 0:
 			info += "\n"
-			info += "predictions ratio: "+str(round(self.NumWrongPredictions/self.NumPredictions)*100)+"%"
+			ratio = (self.NumWrongPredictions/self.NumPredictions)*100
+			info += "predictions ratio: "+str(round(ratio,ndigits=2))+"%"
 
 		return info

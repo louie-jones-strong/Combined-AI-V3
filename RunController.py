@@ -28,7 +28,7 @@ def MakeAgentMove(turn, board, agents, outcomePredictor, game):
 			agent.UpdateInvalidMove(board, move)
 
 			if outcomePredictor != None:
-				outcomePredictor.UpdateMoveOutCome(startBoardKey, move, outComeBoard)
+				outcomePredictor.UpdateInvalidMove(startBoardKey, move)
 
 
 	finished, fit = game.CheckFinished()

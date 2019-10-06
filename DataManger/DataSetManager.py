@@ -344,18 +344,7 @@ class DataSetManager:
 			if (self.DataSetTables[loop].IsLoaded):
 				loadedTables += 1
 
-		ramUsed = 0
-		ramUsed += RamInfo.GetFullSizeOf(self.DataSetHashTable)
-		ramUsed += RamInfo.GetFullSizeOf(self.NewDataSetHashTable)
-
-		ramUsed += RamInfo.GetFullSizeOf(self.DataSetTables)
-		ramUsed += RamInfo.GetFullSizeOf(self.LoadedDataSetTables)
-		ramUsed += RamInfo.GetFullSizeOf(self.MetaData)
-		ramUsed += RamInfo.GetFullSizeOf(self.MoveIDLookUp)
-		ramUsed = Format.BytesOutputFormat(ramUsed)
-
-
-		return Format.SplitNumber(loadedTables)+"/"+Format.SplitNumber(len(self.DataSetTables)) + " RamUsed: "+ramUsed
+		return Format.SplitNumber(loadedTables)+"/"+Format.SplitNumber(len(self.DataSetTables))
 	def GetNumberOfBoards(self):
 		return len(self.DataSetHashTable)
 
