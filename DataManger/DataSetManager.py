@@ -7,7 +7,7 @@ from DataManger.BasicLoadAndSave import *
 import shutil
 import threading
 
-from multiprocessing import Pool as ThreadPool
+from multiprocessing.dummy import Pool as ThreadPool
 
 class DataSetManager:
 	MetaData = LockAbleObject()
