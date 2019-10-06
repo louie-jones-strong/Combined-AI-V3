@@ -55,10 +55,10 @@ class SimOutputPredictor:
 		return newBoard
 
 	def UpdateMoveOutCome(self, boardKey, move, outComeBoard):
-		#if (str(key)+str(moveID) in self.Predictions):
-
-		#todo check if the prediction was right 
-		self.NumWrongPredictions += 1
+		if str(boardKey)+str(move) in self.Predictions:
+			prediction = self.Predictions[str(boardKey)+str(move)]["Prediction"]
+			if prediction != outComeBoard:
+				self.NumWrongPredictions += 1
 		return
 
 	def Train(self):
