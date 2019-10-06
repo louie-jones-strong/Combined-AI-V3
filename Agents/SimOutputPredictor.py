@@ -54,10 +54,20 @@ class SimOutputPredictor:
 		self.NumPredictions += 1
 		return newBoard
 
-	def UpdateMoveOutCome(self, boardKey, move, outComeBoard):
+	def UpdateInvalidMove(self, boardKey, move):
+
+		return
+
+	def UpdateMoveOutCome(self, boardKey, move, outComeBoard, finished):
+
 		if str(boardKey)+str(move) in self.Predictions:
 			prediction = self.Predictions[str(boardKey)+str(move)]["Prediction"]
-			if prediction != outComeBoard:
+
+			outComeBoardKey = BoardToKey(outComeBoard)
+			if finished:
+				outComeBoardKey = "GameFinished"
+
+			if prediction != outComeBoardKey:
 				self.NumWrongPredictions += 1
 		return
 
@@ -83,5 +93,8 @@ class SimOutputPredictor:
 		info += "Number of Wrong predictions: "+str(self.NumWrongPredictions)
 		info += "\n"
 		info += "Number of predictions: "+str(self.NumPredictions)
+		if self.NumPredictions != 0:
+			info += "\n"
+			info += "predictions ratio: "+str((self.NumWrongPredictions/self.NumPredictions)*100)+"%"
 
 		return info

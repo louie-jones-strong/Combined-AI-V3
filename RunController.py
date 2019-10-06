@@ -24,12 +24,17 @@ def MakeAgentMove(turn, board, agents, outcomePredictor, game):
 
 		valid, outComeBoard, turn = game.MakeMove(move)
 
-		outcomePredictor.UpdateMoveOutCome(startBoardKey, move, outComeBoard)
-
 		if not valid:
 			agent.UpdateInvalidMove(board, move)
 
+			if outcomePredictor != None:
+				outcomePredictor.UpdateMoveOutCome(startBoardKey, move, outComeBoard)
+
+
 	finished, fit = game.CheckFinished()
+
+	if outcomePredictor != None:
+		outcomePredictor.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
 
 	agent.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
 
@@ -43,6 +48,7 @@ class RunController:
 		self.Logger = logger
 		self.PickSimulation(simNumber)
 		self.StopTime = stopTime
+		self.outcomePredictor = None
 
 		#setting
 		self.NumberOfBots = self.SimInfo["MaxPlayers"]
