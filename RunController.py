@@ -96,9 +96,6 @@ class RunController:
 		else:
 			loadData = self.SetUpMetaData(loadData)
 
-			import Agents.SimOutputPredictor as SimOutputPredictor
-			self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
-
 			if userInput == "H":
 				self.WinningMode = True
 				self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
@@ -141,7 +138,9 @@ class RunController:
 			else:
 				for loop in range(self.NumberOfBots):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
-
+			
+			import Agents.SimOutputPredictor as SimOutputPredictor
+			self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
 		return
 
 	def PickSimulation(self, simNumber=None):
