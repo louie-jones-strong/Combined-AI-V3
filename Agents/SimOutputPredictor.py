@@ -9,6 +9,7 @@ class SimOutputPredictor:
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
 		self.DataSetManager = dataSetManager
+		self.Predictions = {}
 
 		if loadData:
 			self.DataSetManager.LoadTableInfo()
@@ -48,10 +49,14 @@ class SimOutputPredictor:
 			#todo
 			print("need to code ann for PredictOutput")
 
+		
+		self.Predictions[str(key)+str(move)] = {"BoardKey": key, "Move": move, "Prediction": newBoard}
 		self.NumPredictions += 1
 		return newBoard
 
 	def UpdateMoveOutCome(self, boardKey, move, outComeBoard):
+		#if (str(key)+str(moveID) in self.Predictions):
+
 		#todo check if the prediction was right 
 		self.NumWrongPredictions += 1
 		return
