@@ -7,8 +7,6 @@ from DataManger.BasicLoadAndSave import *
 import shutil
 import threading
 
-from multiprocessing.dummy import Pool as ThreadPool
-
 class DataSetManager:
 	MetaData = LockAbleObject()
 	MoveIDLookUp = []
@@ -66,15 +64,6 @@ class DataSetManager:
 		self.MoveIDLookUpAdress = self.DatasetAddress+"LookUp//"+"MoveIdLookUp"
 		return
 
-	def SaveTableThread(self, tableKey):
-		if self.LoadedDataSetTables[tableKey] > 0:
-			self.DataSetTables[tableKey].Save()
-			self.LoadedDataSetTables[tableKey] = 0
-		else:
-			self.DataSetTables[tableKey].Unload()
-			del self.LoadedDataSetTables[tableKey]
-		return
-
 	def Save(self):
 		with self.Lock:
 			if (not self.CanAppendData) and os.path.exists(self.DatasetAddress):
@@ -94,19 +83,14 @@ class DataSetManager:
 				ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
 
 			listOfKeys = list(self.LoadedDataSetTables.keys())
+			for tableKey in listOfKeys:
 
-			pool = ThreadPool(6) 
-			pool.map(self.SaveTableThread, listOfKeys)
-
-			#todo remove if not needed
-			# for tableKey in listOfKeys:
-
-			# 	if self.LoadedDataSetTables[tableKey] > 0:
-			# 		self.DataSetTables[tableKey].Save()
-			# 		self.LoadedDataSetTables[tableKey] = 0
-			# 	else:
-			# 		self.DataSetTables[tableKey].Unload()
-			# 		del self.LoadedDataSetTables[tableKey]
+				if self.LoadedDataSetTables[tableKey] > 0:
+					self.DataSetTables[tableKey].Save()
+					self.LoadedDataSetTables[tableKey] = 0
+				else:
+					self.DataSetTables[tableKey].Unload()
+					del self.LoadedDataSetTables[tableKey]
 
 
 
