@@ -1,9 +1,10 @@
-import Agents.NeuralNetwork as NeuralNetwork
+#import Agents.NeuralNetwork as NeuralNetwork
 from DataManger.Serializer import BoardToKey
 import time
 
 class SimOutputPredictor:
 	TrainedEpochs = 0
+	NumPredictions = 0
 	NumWrongPredictions = 0
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
@@ -12,16 +13,17 @@ class SimOutputPredictor:
 		if loadData:
 			self.DataSetManager.LoadTableInfo()
 
-		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
-		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
+		#todo
+		# networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
+		# self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
 
-		if loadData:
-			found, weights = self.DataSetManager.LoadNetworkWeights()
-			if found:
-				self.AnnModel.SetWeights(weights)
+		# if loadData:
+		# 	found, weights = self.DataSetManager.LoadNetworkWeights()
+		# 	if found:
+		# 		self.AnnModel.SetWeights(weights)
 
-		if trainingMode:
-			self.Train()
+		# if trainingMode:
+		# 	self.Train()
 		return
 
 	def PredictOutput(self, board, move):
@@ -33,7 +35,7 @@ class SimOutputPredictor:
 		if found:
 			moveID = self.DataSetManager.MoveIDLookUp.index(move)
 			with boardInfo.Lock:
-				moveOutComes = boardInfo[moveID].MoveOutComes
+				moveOutComes = boardInfo.Moves[moveID].MoveOutComes
 
 				highestTimes = 0
 				for outCome, times in moveOutComes.items():
@@ -43,12 +45,15 @@ class SimOutputPredictor:
 						highestTimes = times
 
 		else:
+			#todo
 			print("need to code ann for PredictOutput")
 
+		self.NumPredictions += 1
 		return newBoard
 
-	def UpdateMoveOutCome(self, boardKey, move, outComeBoard, gameFinished=False):
-
+	def UpdateMoveOutCome(self, boardKey, move, outComeBoard):
+		#todo check if the prediction was right 
+		self.NumWrongPredictions += 1
 		return
 
 	def Train(self):
@@ -71,5 +76,7 @@ class SimOutputPredictor:
 	def PredictorInfoOutput(self):
 		info = ""
 		info += "Number of Wrong predictions: "+str(self.NumWrongPredictions)
+		info += "\n"
+		info += "Number of predictions: "+str(self.NumPredictions)
 
 		return info

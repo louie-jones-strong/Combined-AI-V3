@@ -1,7 +1,6 @@
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
-import Agents.SimOutputPredictor as SimOutputPredictor
 import DataManger.DataSetManager as DataSetManager
 from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
@@ -12,14 +11,21 @@ import os
 import sys
 import threading
 
-def MakeAgentMove(turn, board, agents, game):
+
+def MakeAgentMove(turn, board, agents, outcomePredictor, game):
 	startBoardKey = BoardToKey(board)
 
 	agent = agents[turn-1]
 	valid = False
 	while not valid:
 		move = agent.MoveCal(board)
+		
+		outcomePredictor.PredictOutput(startBoardKey, move)
+
 		valid, outComeBoard, turn = game.MakeMove(move)
+
+		outcomePredictor.UpdateMoveOutCome(startBoardKey, move, outComeBoard)
+
 		if not valid:
 			agent.UpdateInvalidMove(board, move)
 
@@ -84,6 +90,7 @@ class RunController:
 		else:
 			loadData = self.SetUpMetaData(loadData)
 
+			import Agents.SimOutputPredictor as SimOutputPredictor
 			self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
 
 			if userInput == "H":
@@ -224,7 +231,8 @@ class RunController:
 
 
 		return
-	def Output(self, agents, game, numMoves, gameStartTime, board, turn, finished=False):
+
+	def Output(self, agents, outcomePredictor, game, numMoves, gameStartTime, board, turn, finished=False):
 		if self.RenderQuality == 0:
 			return
 		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
@@ -261,6 +269,10 @@ class RunController:
 				print()
 				print("Agent["+str(loop)+"] ("+str(agents[loop].AgentType)+") Info: ")
 				print(agents[loop].AgentInfoOutput())
+
+			print()
+			print("Predictor")
+			print(outcomePredictor.PredictorInfoOutput())
 			
 			title = "AI Playing: "+self.SimInfo["SimName"]
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
@@ -288,21 +300,22 @@ class RunController:
 			for loop in range(targetThreadNum-1):
 				game = self.Sim.CreateNew()
 				agents = []
+				#todo make agent list again from user input from before
 				for loop in range(self.NumberOfBots):
 					agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
-				thread = threading.Thread(target=self.RunSimTournament, args=(gamesToPlay, game, agents, False,))
+				thread = threading.Thread(target=self.RunSimTournament, args=(gamesToPlay, game, agents, self.OutcomePredictor, False,))
 				threads += [thread]
 				thread.start()
 
 
-			self.RunSimTournament(gamesToPlay, self.Sim, self.Agents, True)
+			self.RunSimTournament(gamesToPlay, self.Sim, self.Agents, self.OutcomePredictor, True)
 			for thread in threads:
 				thread.join()
 
 		self.TrySaveData(True)
 		return
 
-	def RunSimTournament(self, gamesToPlay, game, agents, isMainThread):
+	def RunSimTournament(self, gamesToPlay, game, agents, outcomePredictor, isMainThread):
 		board, turn = game.Start()
 		self.AiDataManager.UpdateStartingBoards(board)
 
@@ -312,8 +325,8 @@ class RunController:
 		gameStartTime = time.time()
 		while gamesToPlay == -1 or numGames < gamesToPlay:
 			if isMainThread:
-				self.Output(agents, game, numMoves, gameStartTime, board, turn)
-			board, turn, finished, fit = MakeAgentMove(turn, board, agents, game)
+				self.Output(agents, outcomePredictor, game, numMoves, gameStartTime, board, turn)
+			board, turn, finished, fit = MakeAgentMove(turn, board, agents, outcomePredictor, game)
 
 			numMoves += 1
 			temp = time.time()-totalStartTime
@@ -330,7 +343,7 @@ class RunController:
 					agents[loop].GameFinished(fit[loop])
 
 				if isMainThread:
-					self.Output(agents, game, numMoves, gameStartTime, board, turn, finished=True)
+					self.Output(agents, outcomePredictor, game, numMoves, gameStartTime, board, turn, finished=True)
 
 					self.TrySaveData()
 
