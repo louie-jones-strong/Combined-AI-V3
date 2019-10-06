@@ -1,8 +1,10 @@
 
 def BoardToKey(board):
-		key = str(board)
-		#key = hash(key)
-		return key
+	key = str(board)
+
+	#key = serializer(board)
+	#key = hash(key)
+	return key
 
 def serializer(inputObject):
 	outputObject = ""
@@ -27,7 +29,7 @@ def serializer(inputObject):
 		for loop in range(len(inputObject)):
 			outputObject += [serializer(inputObject[loop])]
 
-		outputObject = ", ".join(outputObject)
+		outputObject = ",".join(outputObject)
 		return "["+outputObject+"]"
 	else:
 		return str(inputObject)
@@ -44,12 +46,12 @@ def deserializer(inputString):
 
 		stringList = []
 		if inputString.count("[") == 0:
-			stringList = inputString.split(", ")
+			stringList = inputString.split(",")
 
 		else:
 			index = 0
 			while index < len(inputString):
-				if inputString.startswith(", "):
+				if inputString.startswith(","):
 					inputString = inputString[2:]
 				index = inputString.find("]")+1
 				stringList += [inputString[0:index]]
@@ -68,7 +70,7 @@ def deserializer(inputString):
 		outputObject = False
 
 	elif inputString.startswith("'"):
-		outputObject = inputString.replace("'", "")
+		outputObject = inputString.replace("'","")
 
 	elif "." in inputString:
 		outputObject = float(inputString)

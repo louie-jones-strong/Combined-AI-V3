@@ -28,10 +28,9 @@ class SimOutputPredictor:
 		# 	self.Train()
 		return
 
-	def PredictOutput(self, board, move):
-		newBoard = board[:]
+	def PredictOutput(self, key, move):
+		newBoard = []
 
-		key = BoardToKey(board)
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 
 		if found:
