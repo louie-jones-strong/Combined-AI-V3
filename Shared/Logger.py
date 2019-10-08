@@ -14,12 +14,16 @@ class Logger:
 
 	def Clear(self):
 		if self.ClearAllowed:
-			os.system('cls' if os.name == 'nt' else 'clear')
+			if os.name == "nt":
+				os.system('cls')
+			else:
+				os.system('clear')
 		return
 
 	def SetTitle(self, titleText):
 		if self.SetTitleAllowed:
-			os.system("title "+str(titleText))
+			if os.name == "nt":
+				os.system("title "+str(titleText))
 		return
 	
 	def LogError(self, error):
