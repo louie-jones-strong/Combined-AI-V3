@@ -21,6 +21,14 @@ class AgentBase:
 			self.DataSetManager.LoadTableInfo()
 		return
 	
+	def MoveCal(self, board):
+
+		return
+
+	def MoveListCal(self, board):
+		
+		return [self.MoveCal(board)]
+
 	def RecordMove(self, board, move):
 		if not self.RecordMoves:
 			return

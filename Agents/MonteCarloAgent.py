@@ -15,7 +15,7 @@ class Agent(AgentBase.AgentBase):
 
 		self.BoardPredictor = BoardPredictor.SimOutputPredictor(dataSetManager, loadData)
 
-		self.MaxMoveCalDepth = 3
+		self.MaxMoveCalDepth = 10
 		self.MaxMoveCalTime = 1
 		return
 
@@ -24,20 +24,21 @@ class Agent(AgentBase.AgentBase):
 		self.RecordMove(board, move)
 		return move
 
-	def AlphaBeta(self, board, alpha=-sys.maxsize, beta=sys.maxsize, isMax=True):
+	def AlphaBeta(self, board, alpha=-sys.maxsize, beta=sys.maxsize, isMax=True, depth=0):
 		minv = sys.maxsize
 		maxv = -sys.maxsize
 		bestMove = None
 
-		moveList = self.MoveAgent.MoveCal(board)
+		moveList = self.MoveAgent.MoveListCal(board)
 
 		for tempMove in moveList:
 			
 			predictedBoard = self.BoardPredictor.PredictOutput(board, tempMove)
 
-			if predictedBoard != "Finished":
-				m, tempMove = self.AlphaBeta(predictedBoard, alpha=alpha, beta=beta, isMax=not isMax)
-
+			if predictedBoard != "GameFinished" and depth < self.MaxMoveCalDepth:
+				m, tempMove = self.AlphaBeta(predictedBoard, alpha=alpha, beta=beta, isMax=not isMax, depth=depth+1)
+				if tempMove == None:
+					print("error")
 
 				if isMax:
 					if m > maxv:

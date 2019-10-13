@@ -26,9 +26,8 @@ class Agent(AgentBase.AgentBase):
 			self.Train()
 		return
 
-	def MoveCal(self, boards, batch=False):
-		if not batch:
-			boards = [boards]
+	def MoveCal(self, boards):
+		boards = [boards]
 
 		networkOutputs = self.AnnModel.Predict(boards)
 
@@ -37,9 +36,8 @@ class Agent(AgentBase.AgentBase):
 			networkOutput = list(networkOutputs[loop])
 			outputs += [self.AnnModel.PredictionToMove(self.DataSetManager, networkOutput, boards[loop])]
 
-		if not batch:
-			outputs = outputs[0]
-			self.RecordMove(boards[0], outputs)
+		outputs = outputs[0]
+		self.RecordMove(boards[0], outputs)
 		return outputs
 
 	def Train(self):
