@@ -20,8 +20,7 @@ class Agent(AgentBase.AgentBase):
 		return
 
 	def MoveCal(self, board):
-		move = self.MoveAgent.MoveCal(board)
-		
+		_ , move = self.AlphaBeta(board)
 		self.RecordMove(board, move)
 		return move
 

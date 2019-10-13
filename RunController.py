@@ -20,7 +20,7 @@ def MakeAgentMove(turn, board, agents, outcomePredictor, game):
 	while not valid:
 		move = agent.MoveCal(board)
 		
-		outcomePredictor.PredictOutput(startBoardKey, move)
+		outcomePredictor.PredictOutput(board, move)
 
 		valid, outComeBoard, turn = game.MakeMove(move)
 
@@ -28,7 +28,7 @@ def MakeAgentMove(turn, board, agents, outcomePredictor, game):
 			agent.UpdateInvalidMove(board, move)
 
 			if outcomePredictor != None:
-				outcomePredictor.UpdateInvalidMove(startBoardKey, move)
+				outcomePredictor.UpdateInvalidMove(board, move)
 
 
 	finished, fit = game.CheckFinished()
@@ -76,7 +76,7 @@ class RunController:
 
 	def SetupAgent(self, loadData=None, aiType=None, trainNetwork=None):
 		if aiType == None:
-			userInput = input("Brute B) Network N) Evolution E) Random R) See Tree T) Human H):")
+			userInput = input("Brute B) Network N) Evolution E) Random R) See Tree T) Human H) MonteCarloAgent M):")
 		else:
 			userInput = aiType
 
@@ -95,6 +95,8 @@ class RunController:
 
 		else:
 			loadData = self.SetUpMetaData(loadData)
+			import Agents.SimOutputPredictor as SimOutputPredictor
+			self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
 
 			if userInput == "H":
 				self.WinningMode = True
@@ -135,12 +137,20 @@ class RunController:
 				for loop in range(self.NumberOfBots-1):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
 
+			elif userInput.upper() == "M":
+				import Agents.MonteCarloAgent as MonteCarloAgent
+				moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)
+
+				self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent, winningModeON=self.WinningMode)]
+
+				for loop in range(self.NumberOfBots-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+
+
 			else:
 				for loop in range(self.NumberOfBots):
 					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
-			
-			import Agents.SimOutputPredictor as SimOutputPredictor
-			self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
+
 		return
 
 	def PickSimulation(self, simNumber=None):
