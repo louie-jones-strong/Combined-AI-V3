@@ -31,19 +31,17 @@ class Agent(AgentBase.AgentBase):
 
 		moveList = self.MoveAgent.MoveListCal(board)
 
-		for tempMove in moveList:
+		for move in moveList:
 			
-			predictedBoard = self.BoardPredictor.PredictOutput(board, tempMove)
+			predictedBoard = self.BoardPredictor.PredictOutput(board, move)
 
 			if predictedBoard != "GameFinished" and depth < self.MaxMoveCalDepth:
-				m, tempMove = self.AlphaBeta(predictedBoard, alpha=alpha, beta=beta, isMax=not isMax, depth=depth+1)
-				if tempMove == None:
-					print("error")
+				m, _ = self.AlphaBeta(predictedBoard, alpha=alpha, beta=beta, isMax=not isMax, depth=depth+1)
 
 				if isMax:
 					if m > maxv:
 						maxv = m
-						bestMove = tempMove
+						bestMove = move
 
 						if maxv >= beta:
 							return maxv, bestMove
