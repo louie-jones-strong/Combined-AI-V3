@@ -1,6 +1,7 @@
 import Agents.AgentBase as AgentBase
 import Agents.SimOutputPredictor as BoardPredictor
 import Agents.BoardValuePredictor as BoardValuePredictor
+from Shared import OutputFormating as Format
 import sys
 
 class Agent(AgentBase.AgentBase):
@@ -13,6 +14,7 @@ class Agent(AgentBase.AgentBase):
 		self.AgentType += "("+str(moveAgent.AgentType)+")"
 
 		self.MoveAgent.RecordMoves = False
+		self.NumDiffrentMoves = 0
 
 		self.BoardPredictor = BoardPredictor.SimOutputPredictor(dataSetManager, loadData)
 		self.ValuePredictor = BoardValuePredictor.BoardValuePredictor(dataSetManager, loadData)
@@ -22,9 +24,15 @@ class Agent(AgentBase.AgentBase):
 		return
 
 	def MoveCal(self, board):
-		_ , move = self.AlphaBeta(board)
-		self.RecordMove(board, move)
-		return move
+		normalMove = self.MoveAgent.MoveCal(board)
+
+		_, alphaBetaMove = self.AlphaBeta(board)
+		
+		if normalMove != alphaBetaMove:
+			self.NumDiffrentMoves += 1
+		
+		self.RecordMove(board, alphaBetaMove)
+		return alphaBetaMove
 
 	def AlphaBeta(self, board, alpha=-sys.maxsize, beta=sys.maxsize, isMax=True, depth=0):
 		minv = sys.maxsize
@@ -66,5 +74,5 @@ class Agent(AgentBase.AgentBase):
 	def AgentInfoOutput(self):
 		info = super().AgentInfoOutput()
 		info += "\n"
-		info += "Monte Carlo info"
+		info += "NumDiffrentMoves: "+Format.SplitNumber(self.NumDiffrentMoves)
 		return info
