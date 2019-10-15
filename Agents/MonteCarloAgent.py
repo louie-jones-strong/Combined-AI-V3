@@ -1,5 +1,6 @@
 import Agents.AgentBase as AgentBase
 import Agents.SimOutputPredictor as BoardPredictor
+import Agents.BoardValuePredictor as BoardValuePredictor
 import sys
 
 class Agent(AgentBase.AgentBase):
@@ -14,6 +15,7 @@ class Agent(AgentBase.AgentBase):
 		self.MoveAgent.RecordMoves = False
 
 		self.BoardPredictor = BoardPredictor.SimOutputPredictor(dataSetManager, loadData)
+		self.ValuePredictor = BoardValuePredictor.BoardValuePredictor(dataSetManager, loadData)
 
 		self.MaxMoveCalDepth = 10
 		self.MaxMoveCalTime = 1
@@ -37,25 +39,27 @@ class Agent(AgentBase.AgentBase):
 
 			if predictedBoard != "GameFinished" and depth < self.MaxMoveCalDepth:
 				m, _ = self.AlphaBeta(predictedBoard, alpha=alpha, beta=beta, isMax=not isMax, depth=depth+1)
+			else:
+				m = self.ValuePredictor.PredictValue(board)
 
-				if isMax:
-					if m > maxv:
-						maxv = m
-						bestMove = move
+			if isMax:
+				if m > maxv:
+					maxv = m
+					bestMove = move
 
-						if maxv >= beta:
-							return maxv, bestMove
-						elif maxv > alpha:
-							alpha = maxv
-				else:
-					if m < minv:
-						minv = m
+					if maxv >= beta:
+						return maxv, bestMove
+					elif maxv > alpha:
+						alpha = maxv
+			else:
+				if m < minv:
+					minv = m
 
-						if minv <= alpha:
-							return minv, bestMove
+					if minv <= alpha:
+						return minv, bestMove
 
-						elif minv < beta:
-							beta = minv
+					elif minv < beta:
+						beta = minv
 
 		return minv, bestMove
 
