@@ -129,6 +129,8 @@ class AgentBase:
 			found, boardInfo = self.DataSetManager.GetBoardInfo(key)
 			if found:
 				with boardInfo.Lock:
+
+					# add fittness to total move fittness
 					if moveID in boardInfo.Moves:
 						newFitness = boardInfo.Moves[moveID].AvgFitness*boardInfo.Moves[moveID].TimesPlayed
 						newFitness += fitness
@@ -144,6 +146,14 @@ class AgentBase:
 							boardInfo.Finished = self.IsBoardFinished(boardInfo)
 							if boardInfo.Finished:
 								self.DataSetManager.MetaDataAdd("NumberOfFinishedBoards", 1)
+
+					
+					# add fittness to total board fittness
+					newFitness = boardInfo.TotalAvgFitness*boardInfo.TotalTimesPlayed
+					newFitness += fitness
+					boardInfo.TotalTimesPlayed += 1
+					newFitness /= boardInfo.TotalTimesPlayed
+					boardInfo.TotalAvgFitness = newFitness
 
 
 		self.TempDataSet = {}

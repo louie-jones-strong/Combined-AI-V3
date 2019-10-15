@@ -42,7 +42,7 @@ def MakeAgentMove(turn, board, agents, outcomePredictor, game):
 
 class RunController:
 
-	Version = 1.4
+	Version = 1.5
 
 	def __init__(self, logger, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None, stopTime=None):
 		self.Logger = logger
