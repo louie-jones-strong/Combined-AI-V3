@@ -58,3 +58,9 @@ class Agent(AgentBase.AgentBase):
 							beta = minv
 
 		return minv, bestMove
+
+	def AgentInfoOutput(self):
+		info = super().AgentInfoOutput()
+		info += "\n"
+		info += "Monte Carlo info"
+		return info
