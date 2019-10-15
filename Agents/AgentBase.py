@@ -1,4 +1,5 @@
 import DataManger.BoardInfo as BoardInfo
+import DataManger.MoveInfo as MoveInfo
 from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
 
@@ -47,7 +48,7 @@ class AgentBase:
 			boardInfo.BeingUsed = True
 			# never played this move before
 			if moveID not in boardInfo.Moves:
-				boardInfo.Moves[moveID] = BoardInfo.MoveInfo()
+				boardInfo.Moves[moveID] = MoveInfo.MoveInfo()
 
 			# mark move as played if never played before
 			if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
