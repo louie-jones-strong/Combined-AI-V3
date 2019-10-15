@@ -70,7 +70,6 @@ def ComplexLoad(address):
 	file.close()
 	return objectInfo
 def ComplexFileExists(address):
-	method = 0
 	value = False
 	value = os.path.exists(address+".p")
 	return value
