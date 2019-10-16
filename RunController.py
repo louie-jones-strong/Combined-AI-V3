@@ -56,22 +56,28 @@ class RunController:
 		self.LastSaveTook = 0
 		self.WinningMode = False
 
-		if self.SimInfo["RenderSetup"]:
-			self.RenderQuality = 1
-		else:
-			self.RenderQuality = 0
-
 		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                                      self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
 
+		if self.SimInfo["RenderSetup"]:
+			if renderQuality != None:
+				self.RenderQuality = renderQuality
+			else:
+				self.RenderQuality = int(input("no Output 0): Simple 1): Complex 2):"))
+		else:
+			self.RenderQuality = 0
+
+
 		self.SetupAgent(loadData, aiType, trainNetwork)
-		
-		if renderQuality != None:
-			self.RenderQuality = renderQuality
+
 
 		if self.RenderQuality == 2:
 			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
+
+		elif self.RenderQuality == 0:
+			self.Logger.Clear()
+
 		return
 
 	def SetupAgent(self, loadData=None, aiType=None, trainNetwork=None):
