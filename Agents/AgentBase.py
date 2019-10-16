@@ -15,6 +15,7 @@ class AgentBase:
 		self.TempDataSet = {}
 		self.MoveNumber = 0
 		self.RecordMoves = True
+		self.TotalFittness = 0
 		
 		self.AllMovesPlayedValue = (2**self.DataSetManager.MaxMoveIDs)-1
 
@@ -112,6 +113,8 @@ class AgentBase:
 		return
 
 	def GameFinished(self, fitness):
+		self.TotalFittness += fitness
+		
 		if not self.RecordMoves:
 			return
 		
@@ -221,16 +224,19 @@ class AgentBase:
 
 	def AgentInfoOutput(self):
 		info = ""
-			
+		
+		fitPerGame = self.TotalFittness
 		perGame = self.NumInvailds
 		if self.NumGames > 0:
 			perGame = self.NumInvailds/self.NumGames
+			fitPerGame = self.TotalFittness/self.NumGames
 
 		perMove = self.NumInvailds
 		if self.NumMoves > 0:
 			perMove = self.NumInvailds/self.NumMoves
 
-
+		info += "Avg Fittness per Game: "+str(round(fitPerGame))
+		info += "\n"
 		info += "Avg Invalids per Game: "+str(round(perGame))
 		info += "\n"
 		info += "Avg Invalids Per move: "+str(round(perMove))
