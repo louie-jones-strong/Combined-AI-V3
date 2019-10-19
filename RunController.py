@@ -240,9 +240,12 @@ class RunController:
 		return True
 
 	def RenderBoard(self, game, board):
+		if self.RenderQuality == 0:
+			return
 
-		if self.RenderQuality == 1:
+		elif self.RenderQuality == 1:
 			game.SimpleBoardOutput(board)
+		
 		elif self.RenderQuality == 2:
 			timeMark = time.time()
 			self.RenderEngine.PieceList = game.ComplexBoardOutput(board)
@@ -254,8 +257,14 @@ class RunController:
 		return
 
 	def Output(self, agents, outcomePredictor, game, numMoves, gameStartTime, board, turn, finished=False):
+		outputTime = time.time()
+
 		if self.RenderQuality == 0:
 			return
+
+		if self.RenderQuality == 2:
+			self.RenderBoard(game, board)
+
 		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
 			numGames = self.AiDataManager.MetaDataGet("NumberOfGames")+1
 
@@ -270,7 +279,9 @@ class RunController:
 				avgMoveTime = round(avgMoveTime, 6)
 
 			self.Logger.Clear()
-			self.RenderBoard(game, board)
+			if self.RenderQuality == 1:
+				self.RenderBoard(game, board)
+
 			print("")
 			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
 			print("Number Of Complete Boards: " + str(Format.SplitNumber(numberOfCompleteBoards)))
@@ -300,10 +311,10 @@ class RunController:
 			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
 			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
 			self.Logger.SetTitle(title)
-			self.LastOutputTime = time.time()
 
-		elif self.RenderQuality == 2:
-			self.RenderBoard(game, board)
+			outputTime = time.time()-outputTime
+			print("Output Took: "+ Format.SplitTime(outputTime))
+			self.LastOutputTime = time.time()
 
 
 		return
@@ -401,7 +412,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=1, simNumber=None, loadData="Y", aiType=None, stopTime=None)
+		controller = RunController(Logger, renderQuality=None, simNumber=None, loadData="Y", aiType=None, stopTime=None)
 
 	except Exception as error:
 		Logger.LogError(error)
