@@ -82,6 +82,29 @@ class Agent(AgentBase.AgentBase):
 		self.RecordMove(board, move)
 		return move
 
+	def MoveListCal(self, board):
+		key = BoardToKey(board)
+		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
+
+		moves = []
+
+		if found:
+			with boardInfo.Lock:
+				if boardInfo.PlayedMovesLookUpArray < self.AllMovesPlayedValue:
+					for moveId in range(self.DataSetManager.MaxMoveIDs):
+						if not (2**moveId & boardInfo.PlayedMovesLookUpArray):
+							moves += [self.DataSetManager.MoveIDLookUp[moveId]]
+				else:
+					for movekey, moveValue in boardInfo.Moves.items():
+						moves += [self.DataSetManager.MoveIDLookUp[movekey]]
+
+
+		else:#never played board before
+			for moveId in range(self.DataSetManager.MaxMoveIDs):
+				moves += [self.DataSetManager.MoveIDLookUp[moveId]]
+
+		return moves
+
 	def GameFinished(self, fitness):
 		if len(self.MovesNotPlayedCache) >= 1000:
 			self.MovesNotPlayedCache = {}
