@@ -51,13 +51,12 @@ class RunController:
 		self.outcomePredictor = None
 
 		#setting
-		self.NumberOfBots = self.SimInfo["MaxPlayers"]
+		self.NumberOfAgents = self.SimInfo["MaxPlayers"]
 		self.LastOutputTime = time.time()
 		self.LastSaveTook = 0
-		self.WinningMode = False
 
 		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
-		
+
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
 		else:
@@ -104,18 +103,17 @@ class RunController:
 			self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
 
 			if userInput == "H":
-				self.WinningMode = True
-				self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
 
-				for loop in range(self.NumberOfBots-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				for loop in range(self.NumberOfAgents-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
 
 
 			elif userInput == "R":
-				self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData)]
 
-				for loop in range(self.NumberOfBots-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				for loop in range(self.NumberOfAgents-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
 
 			elif userInput == "N":
 				if trainNetwork == None:
@@ -126,35 +124,34 @@ class RunController:
 				import Agents.NeuralNetworkAgent as NeuralNetwork
 				trainingMode = userInput == "Y" or userInput == "y"
 				
-				self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, 
-					winningModeON=self.WinningMode, trainingMode=trainingMode)]
+				self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, trainingMode=trainingMode)]
 
-				for loop in range(self.NumberOfBots-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				for loop in range(self.NumberOfAgents-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
 
 			elif userInput.upper() == "E":
 				import Agents.Evolution.EvolutionAgent as EvolutionAgent
 				import Agents.Evolution.EvolutionController as EvolutionController
-				evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData, winningModeON=self.WinningMode)
+				evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData)
 
-				self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData)]
 
-				for loop in range(self.NumberOfBots-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				for loop in range(self.NumberOfAgents-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
 
 			elif userInput.upper() == "M":
 				import Agents.MonteCarloAgent as MonteCarloAgent
-				moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)
+				moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData)
 
-				self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent, winningModeON=self.WinningMode)]
+				self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent)]
 
-				for loop in range(self.NumberOfBots-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				for loop in range(self.NumberOfAgents-1):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
 
 
 			else:
-				for loop in range(self.NumberOfBots):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=self.WinningMode)]
+				for loop in range(self.NumberOfAgents):
+					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
 
 		return
 
@@ -189,7 +186,7 @@ class RunController:
 		self.Sim = self.Sim.Simulation()
 		self.SimInfo = self.Sim.Info
 
-		self.Logger.SetTitle("AI Playing:"+self.SimInfo["SimName"])
+		self.Logger.SetTitle(self.SimInfo["SimName"])
 
 		return
 	def SetUpMetaData(self, loadData=None):
@@ -264,7 +261,7 @@ class RunController:
 		if self.RenderQuality == 3:
 			self.RenderBoard(game, board)
 
-		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
+		if (time.time() - self.LastOutputTime) >= 0.5:
 			numGames = self.AiDataManager.MetaDataGet("NumberOfGames")+1
 
 			backUpTime = self.AiDataManager.MetaDataGet("LastBackUpTotalTime")
@@ -305,7 +302,7 @@ class RunController:
 			print("Predictor")
 			print(outcomePredictor.PredictorInfoOutput())
 			
-			title = "AI Playing: "+self.SimInfo["SimName"]
+			title = self.SimInfo["SimName"]
 			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
 			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
 			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
@@ -320,7 +317,7 @@ class RunController:
 		return
 	
 	def RunTraning(self):
-		targetThreadNum = 1
+		# targetThreadNum = 1
 		gamesToPlay = 100
 		self.LastSaveTime = time.time()
 
@@ -328,21 +325,21 @@ class RunController:
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
-			threads = []
-			for loop in range(targetThreadNum-1):
-				game = self.Sim.CreateNew()
-				agents = []
-				#todo make agent list again from user input from before
-				for loop in range(self.NumberOfBots):
-					agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
-				thread = threading.Thread(target=self.RunSimTournament, args=(gamesToPlay, game, agents, self.OutcomePredictor, False,))
-				threads += [thread]
-				thread.start()
+			# threads = []
+			# for loop in range(targetThreadNum-1):
+			# 	game = self.Sim.CreateNew()
+			# 	agents = []
+			# 	#todo make agent list again from user input from before
+			# 	for loop in range(self.NumberOfAgents):
+			# 		agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
+			# 	thread = threading.Thread(target=self.RunSimTournament, args=(gamesToPlay, game, agents, self.OutcomePredictor, False,))
+			# 	threads += [thread]
+			# 	thread.start()
 
 
 			self.RunSimTournament(gamesToPlay, self.Sim, self.Agents, self.OutcomePredictor, True)
-			for thread in threads:
-				thread.join()
+			# for thread in threads:
+			# 	thread.join()
 
 		self.TrySaveData(True)
 		return
