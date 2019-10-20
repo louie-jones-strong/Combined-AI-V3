@@ -328,6 +328,46 @@ class DataSetManager:
 
 		return dataSetX, dataSetY
 
+	def GetBoardValueDataset(self):
+		dataSetX = []
+		dataSetY = []
+
+		self.LoadMetaData()
+		if (self.MetaDataGet("TotalTime") > self.MetaDataGet("AnnDataMadeFromTotalTime") or
+			(not ComplexFileExists(self.AnnDataSetAddress+"XValueDataSet")) or 
+			(not ComplexFileExists(self.AnnDataSetAddress+"YValueDataSet"))):
+			
+			loadingBar = LoadingBar.LoadingBar(self.Logger)
+			
+			self.LoadTableInfo()
+			loop = 0
+			for key, value in self.DataSetHashTable.items():
+				index = value[0]
+				board = pickle.loads(value[1])
+
+				if not self.DataSetTables[index].IsLoaded:
+					self.DataSetTables[index].Load()
+			
+				if key in self.DataSetTables[index].Content:
+					boardInfo = self.DataSetTables[index].Content[key]
+					dataSetX += [[board]]
+					dataSetY += [[boardInfo.TotalAvgFitness]]
+
+
+				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset", loop, len(self.DataSetHashTable))
+				loop += 1
+
+			ComplexSave(self.AnnDataSetAddress+"XValueDataSet", dataSetX)
+			ComplexSave(self.AnnDataSetAddress+"YValueDataSet", dataSetY)
+			#self.MetaDataSet("AnnDataMadeFromTotalTime", self.MetaDataGet("TotalTime"))
+			self.Clear()
+
+		elif ComplexFileExists(self.AnnDataSetAddress+"XValueDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YValueDataSet"):
+			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XValueDataSet")
+			dataSetY = ComplexLoad(self.AnnDataSetAddress+"YValueDataSet")
+
+		return dataSetX, dataSetY
+
 	def SaveNetworkWeights(self, networkType, weights):
 		ComplexSave(self.AnnDataSetAddress+str(networkType)+"weights", weights)
 		return
