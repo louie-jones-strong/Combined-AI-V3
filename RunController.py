@@ -97,61 +97,60 @@ class RunController:
 			input("hold here error!!!!!")
 
 
-		else:
-			loadData = self.SetUpMetaData(loadData)
-			import Agents.SimOutputPredictor as SimOutputPredictor
-			self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
 
-			if userInput == "H":
-				self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
+		loadData = self.SetUpMetaData(loadData)
+		import Agents.SimOutputPredictor as SimOutputPredictor
+		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
 
-				for loop in range(self.NumberOfAgents-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
+		if userInput == "H":
+			self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
 
-
-			elif userInput == "R":
-				self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData)]
-
-				for loop in range(self.NumberOfAgents-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
-
-			elif userInput == "N":
-				if trainNetwork == None:
-					userInput = input("Train Network[Y/N]: ")
-				else:
-					userInput = trainNetwork
-
-				import Agents.NeuralNetworkAgent as NeuralNetwork
-				trainingMode = userInput == "Y" or userInput == "y"
-				
-				self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, trainingMode=trainingMode)]
-
-				for loop in range(self.NumberOfAgents-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
-
-			elif userInput.upper() == "E":
-				import Agents.Evolution.EvolutionAgent as EvolutionAgent
-				import Agents.Evolution.EvolutionController as EvolutionController
-				evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData)
-
-				self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData)]
-
-				for loop in range(self.NumberOfAgents-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
-
-			elif userInput.upper() == "M":
-				import Agents.MonteCarloAgent as MonteCarloAgent
-				moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData)
-
-				self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent)]
-
-				for loop in range(self.NumberOfAgents-1):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+			for loop in range(self.NumberOfAgents-1):
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
 
 
+		elif userInput == "R":
+			self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData)]
+
+			for loop in range(self.NumberOfAgents-1):
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+
+		elif userInput == "N":
+			if trainNetwork == None:
+				userInput = input("Train Network[Y/N]: ")
 			else:
-				for loop in range(self.NumberOfAgents):
-					self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				userInput = trainNetwork
+
+			import Agents.NeuralNetworkAgent as NeuralNetwork
+			trainingMode = userInput == "Y" or userInput == "y"
+			
+			self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, trainingMode=trainingMode)]
+
+			for loop in range(self.NumberOfAgents-1):
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+
+		elif userInput == "E":
+			import Agents.Evolution.EvolutionAgent as EvolutionAgent
+			import Agents.Evolution.EvolutionController as EvolutionController
+			evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData)
+
+			self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData)]
+
+			for loop in range(self.NumberOfAgents-1):
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+
+		elif userInput == "M":
+			import Agents.MonteCarloAgent as MonteCarloAgent
+			moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData)
+
+			self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent)]
+
+			for loop in range(self.NumberOfAgents-1):
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+
+		else:
+			for loop in range(self.NumberOfAgents):
+				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
 
 		return
 
