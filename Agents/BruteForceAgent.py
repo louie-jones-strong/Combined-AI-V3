@@ -48,8 +48,8 @@ class Agent(AgentBase.AgentBase):
 							self.MovesNotPlayedCache[key] = notPlayedList
 	
 					else:#played every move once already
-						#nonFinishedLeastPlayed = sys.maxsize
-						#nonFinishedMoveID = -1
+						nonFinishedLeastPlayed = sys.maxsize
+						nonFinishedMoveID = -1
 	
 						finishedLeastPlayed = sys.maxsize
 						finishedMoveID = 0
@@ -57,11 +57,11 @@ class Agent(AgentBase.AgentBase):
 	
 						for movekey, moveValue in boardInfo.Moves.items():
 							
-							#if (not boardInfo.Finished) and moveValue.TimesPlayed < nonFinishedLeastPlayed:# and not self.IsMoveFinished(boardInfo, movekey):
-							#	nonFinishedLeastPlayed = moveValue.TimesPlayed
-							#	nonFinishedMoveID = movekey
+							if (not boardInfo.Finished) and not self.IsMoveFinished(boardInfo, movekey) and moveValue.TimesPlayed < nonFinishedLeastPlayed:
+								nonFinishedLeastPlayed = moveValue.TimesPlayed
+								nonFinishedMoveID = movekey
 	
-							if moveValue.TimesPlayed < finishedLeastPlayed:
+							elif moveValue.TimesPlayed < finishedLeastPlayed:
 								if not (foundNoneLockedBoard and self.IsMoveLocked(boardInfo, movekey)):
 									foundNoneLockedBoard = True
 									finishedLeastPlayed = moveValue.TimesPlayed
@@ -70,10 +70,10 @@ class Agent(AgentBase.AgentBase):
 									if finishedLeastPlayed == 1:
 										break
 	
-						#if nonFinishedMoveID != -1:
-						#	moveID = nonFinishedMoveID
-						#else:
-						moveID = finishedMoveID
+						if nonFinishedMoveID != -1:
+							moveID = nonFinishedMoveID
+						else:
+							moveID = finishedMoveID
 
 			else:#never played board before
 				moveID = 0
