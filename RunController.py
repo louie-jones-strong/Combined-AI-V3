@@ -63,15 +63,15 @@ class RunController:
 			if renderQuality != None:
 				self.RenderQuality = renderQuality
 			else:
-				self.RenderQuality = int(input("no Output 0): Simple 1): Complex 2):"))
+				self.RenderQuality = int(input("no Output 0) Just Info 1) Simple 2) Complex 3): "))
 		else:
-			self.RenderQuality = 0
+			self.RenderQuality = int(input("no Output 0) Just Info 1): "))
 
 
 		self.SetupAgent(loadData, aiType, trainNetwork)
 
 
-		if self.RenderQuality == 2:
+		if self.RenderQuality == 3:
 			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 
@@ -243,10 +243,10 @@ class RunController:
 		if self.RenderQuality == 0:
 			return
 
-		elif self.RenderQuality == 1:
+		elif self.RenderQuality == 2:
 			game.SimpleBoardOutput(board)
 		
-		elif self.RenderQuality == 2:
+		elif self.RenderQuality == 3:
 			timeMark = time.time()
 			self.RenderEngine.PieceList = game.ComplexBoardOutput(board)
 			timeMark = time.time()-timeMark
@@ -262,7 +262,7 @@ class RunController:
 		if self.RenderQuality == 0:
 			return
 
-		if self.RenderQuality == 2:
+		if self.RenderQuality == 3:
 			self.RenderBoard(game, board)
 
 		if (time.time() - self.LastOutputTime) >= 0.5 or self.WinningMode:
@@ -279,7 +279,7 @@ class RunController:
 				avgMoveTime = round(avgMoveTime, 6)
 
 			self.Logger.Clear()
-			if self.RenderQuality == 1:
+			if self.RenderQuality == 2:
 				self.RenderBoard(game, board)
 
 			print("")
@@ -313,6 +313,7 @@ class RunController:
 			self.Logger.SetTitle(title)
 
 			outputTime = time.time()-outputTime
+			print()
 			print("Output Took: "+ Format.SplitTime(outputTime))
 			self.LastOutputTime = time.time()
 
