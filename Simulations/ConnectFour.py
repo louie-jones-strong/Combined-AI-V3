@@ -8,23 +8,40 @@ class Simulation(SimBase.SimBase):
 			"MinInputSize":0,"MaxInputSize":6,
 			"Resolution":1,"RenderSetup":True}
 
-	def __init__(self):
-		self.BackGroundpieceList = []
-		gridSize = 40
+	def __init__(self, index=None):
+		self.Index = 0
 
-		grid = [7, 6]
-		self.BackGroundpieceList += [Shape.Piece([350, 350], [grid[0]*gridSize, grid[1]*gridSize], Shape.Square(), [0, 0, 255])]
+		gridSizeList = [(7,6), (4,4)]
+		if index == None:
+			for loop in range(len(gridSizeList)):
+				print(str(loop)+") X="+str(gridSizeList[loop][0])+" Y="+str(gridSizeList[loop][1]))
+
+			index = int(input("pick grid shape: "))
+
+		self.Index = index
+		self.Grid = gridSizeList[index]
+		self.Info["MaxInputSize"] = self.Grid[0]-1
+		self.Info["SimName"] = "ConnectFour"+str(self.Grid)
+
+
+		gridSize = 40
+		self.BackGroundpieceList = []
+		self.BackGroundpieceList += [Shape.Piece([350, 350], [self.Grid[0]*gridSize, self.Grid[1]*gridSize], Shape.Square(), [0, 0, 255])]
 		return
 
 	def CreateNew(self):
-		sim = Simulation()
+		sim = Simulation(self.Index)
 		return sim
 
 	def Start(self):
-		self.Board = [[0,0,0,0,0,0],[0,0,0,0,0,0],
-					[0,0,0,0,0,0],[0,0,0,0,0,0],
-					[0,0,0,0,0,0],[0,0,0,0,0,0],
-					[0,0,0,0,0,0]]
+		self.Board = []
+		for loop in range(self.Grid[0]):
+			temp = []
+			for loop2 in range(self.Grid[1]):
+				temp += [0]
+
+			self.Board += [temp]
+
 		self.Turn = 1
 		self.MoveNum = 0
 		return self.Board, self.Turn
@@ -120,17 +137,16 @@ class Simulation(SimBase.SimBase):
 
 		pieceList = []
 		pieceList += self.BackGroundpieceList
-		grid = [7, 6]
-		for x in range(grid[0]):
-			for y in range(grid[1]):
+		for x in range(self.Grid[0]):
+			for y in range(self.Grid[1]):
 				if board[x][y] == 0:
-					pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+					pieceList += [Shape.Piece([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
                                                * gridSize*2+350], [35, 35], Shape.Circle(), [0, 0, 0])]
 				elif board[x][y] == 1:
-					pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+					pieceList += [Shape.Piece([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
                                                 * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 0, 0])]
 				else:
-					pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+					pieceList += [Shape.Piece([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
                                                * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 255, 0])]
 		return pieceList
 
