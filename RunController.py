@@ -56,8 +56,8 @@ class RunController:
 		self.LastSaveTook = 0
 		self.WinningMode = False
 
-		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
-                                                     self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
+		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
+		
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
 		else:
@@ -413,14 +413,7 @@ if __name__ == "__main__":
 
 	try:
 		controller = RunController(Logger, renderQuality=1, simNumber=None, loadData="Y", aiType=None, stopTime=None)
+		controller.RunTraning()
 
 	except Exception as error:
 		Logger.LogError(error)
-		hadError= True
-
-	if not hadError:
-		try:
-			controller.RunTraning()
-
-		except Exception as error:
-			Logger.LogError(error)

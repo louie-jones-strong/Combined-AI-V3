@@ -12,27 +12,22 @@ class DataSetManager:
 	MoveIDLookUp = []
 	MaxMoveIDs = 0
 
-	SimName = ""
-	NumOfOutputs = 0
-	MinOutputSize = 0
-	MaxOutputSize = 0
-	OutputResolution = 0
 	Lock = threading.Lock()
 	
-	def __init__(self, logger, numOfOutputs, minOutputSize, maxOutputSize, outputResolution, simName):
+	def __init__(self, logger, simInfo):
 		self.Logger = logger
-		self.NumOfOutputs = numOfOutputs
-		self.MinOutputSize = minOutputSize
-		self.MaxOutputSize = maxOutputSize
-		self.OutputResolution = outputResolution
-		self.SimName = simName
+		self.NumOfOutputs = simInfo["NumInputs"]
+		self.MinOutputSize = simInfo["MinInputSize"]
+		self.MaxOutputSize = simInfo["MaxInputSize"]
+		self.OutputResolution = simInfo["Resolution"]
+		self.SimName = simInfo["SimName"]
 		self.Lock = threading.Lock()
 		self.MetaData = LockAbleObject()
 
 		self.SetupPaths()
 
 		#cal the max move ids from sim info
-		self.MaxMoveIDs = int(((maxOutputSize-(minOutputSize-1))*(1/outputResolution) )**numOfOutputs)
+		self.MaxMoveIDs = int(((self.MaxOutputSize-(self.MinOutputSize-1))*(1/self.OutputResolution) )**self.NumOfOutputs)
 
 		#cal all the moves and given them move ids
 		self.MoveIDLookUp = []
