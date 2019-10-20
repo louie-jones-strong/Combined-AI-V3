@@ -58,14 +58,13 @@ class RunController:
 
 		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo["NumInputs"], self.SimInfo["MinInputSize"],
                                                      self.SimInfo["MaxInputSize"], self.SimInfo["Resolution"], self.SimInfo["SimName"])
-
-		if self.SimInfo["RenderSetup"]:
-			if renderQuality != None:
-				self.RenderQuality = renderQuality
-			else:
-				self.RenderQuality = int(input("no Output 0) Just Info 1) Simple 2) Complex 3): "))
+		if renderQuality != None:
+			self.RenderQuality = renderQuality
 		else:
-			self.RenderQuality = int(input("no Output 0) Just Info 1): "))
+			if self.SimInfo["RenderSetup"]:
+				self.RenderQuality = int(input("no Output 0) Just Info 1) Simple 2) Complex 3): "))
+			else:
+				self.RenderQuality = int(input("no Output 0) Just Info 1): "))
 
 
 		self.SetupAgent(loadData, aiType, trainNetwork)
