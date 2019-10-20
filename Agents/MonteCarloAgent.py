@@ -11,6 +11,7 @@ class Agent(AgentBase.AgentBase):
 		super().__init__(dataSetManager, loadData, winningModeON)
 
 		self.MoveAgent = moveAgent
+		self.MoveAgent.winningModeON = winningModeON
 		self.AgentType += "("+str(moveAgent.AgentType)+")"
 
 		self.MoveAgent.RecordMoves = False
