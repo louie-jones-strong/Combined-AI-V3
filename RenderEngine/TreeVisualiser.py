@@ -6,6 +6,7 @@ class TreeVisualiser:
 
 	def __init__(self, dataSetManager):
 		self.DataSetManager = dataSetManager
+		self.MaxDepthFound = 0
 
 		self.ClearTree()
 		self.MaxDepth = 100
@@ -39,6 +40,7 @@ class TreeVisualiser:
 		self.Labels = {}
 		self.FinishedNodes = []
 		self.NonFinishedNodes = []
+		self.MaxDepthFound = 0
 		return
 	
 	def BuildTree(self, key, depth=0):
@@ -47,6 +49,8 @@ class TreeVisualiser:
 
 		if depth not in self.DepthNumNodes:
 			self.DepthNumNodes[depth] = 0
+			if depth > self.MaxDepthFound:
+				self.MaxDepthFound = depth
 
 		x = self.DepthNumNodes[depth]
 		if x % 2 == 0:
@@ -94,6 +98,11 @@ class TreeVisualiser:
 		nx.draw_networkx_edges(self.Tree, self.Pos, alpha=0.5)
 
 		#nx.draw_networkx_labels(self.Tree, self.Pos, self.Labels)
+
+		for layerIndex in range(self.MaxDepthFound+1):
+			x = 0
+			y = -layerIndex*100
+			plt.text(x, y, "move:"+str(layerIndex+1), fontsize=10, horizontalalignment='center', verticalalignment='center')
 
 		print("Nodes: "+str(self.Tree.number_of_nodes()))
 		print("edges: "+str(self.Tree.number_of_edges()))
