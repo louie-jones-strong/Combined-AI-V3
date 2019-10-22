@@ -105,8 +105,11 @@ class RunController:
 		if userInput == "H":
 			self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
 
+			import Agents.MonteCarloAgent as MonteCarloAgent
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
+				moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData)
+
+				self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent, winningModeON=True)]
 
 
 		elif userInput == "R":
