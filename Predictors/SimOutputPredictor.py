@@ -2,18 +2,18 @@
 from DataManger.Serializer import BoardToKey
 import time
 from Shared import OutputFormating as Format
+import Predictors.PredictorBase as PredictorBase
 
-class SimOutputPredictor:
+
+class SimOutputPredictor(PredictorBase.PredictorBase):
 	TrainedEpochs = 0
 	NumPredictions = 0
 	NumWrongPredictions = 0
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
-		self.DataSetManager = dataSetManager
-		self.Predictions = {}
+		super.__init__(dataSetManager, loadData)
 
-		if loadData:
-			self.DataSetManager.LoadTableInfo()
+		self.Predictions = {}
 
 		#todo
 		# networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)

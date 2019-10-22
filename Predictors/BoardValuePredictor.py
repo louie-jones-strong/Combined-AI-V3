@@ -2,17 +2,15 @@
 from DataManger.Serializer import BoardToKey
 import time
 from Shared import OutputFormating as Format
+import Predictors.PredictorBase as PredictorBase
 
-class BoardValuePredictor:
+
+class BoardValuePredictor(PredictorBase.PredictorBase):
 	TrainedEpochs = 0
 	NumPredictions = 0
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
-		self.DataSetManager = dataSetManager
-		self.Predictions = {}
-
-		if loadData:
-			self.DataSetManager.LoadTableInfo()
+		super.__init__(dataSetManager, loadData)
 		return
 
 	def PredictValue(self, board):
