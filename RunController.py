@@ -99,7 +99,7 @@ class RunController:
 
 
 		loadData = self.SetUpMetaData(loadData)
-		import Agents.SimOutputPredictor as SimOutputPredictor
+		import Predictors.SimOutputPredictor as SimOutputPredictor
 		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
 
 		if userInput == "H":

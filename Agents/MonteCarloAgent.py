@@ -1,6 +1,6 @@
 import Agents.AgentBase as AgentBase
-import Agents.SimOutputPredictor as BoardPredictor
-import Agents.BoardValuePredictor as BoardValuePredictor
+import Predictors.SimOutputPredictor as BoardPredictor
+import Predictors.BoardValuePredictor as BoardValuePredictor
 from Shared import OutputFormating as Format
 import sys
 
