@@ -7,7 +7,6 @@ import Predictors.PredictorBase as PredictorBase
 
 class SimOutputPredictor(PredictorBase.PredictorBase):
 	TrainedEpochs = 0
-	NumPredictions = 0
 	NumWrongPredictions = 0
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
@@ -90,10 +89,9 @@ class SimOutputPredictor(PredictorBase.PredictorBase):
 		return
 
 	def PredictorInfoOutput(self):
+		info = super().PredictorInfoOutput()
 		info = ""
 		info += "Number of Wrong predictions: "+Format.SplitNumber(self.NumWrongPredictions)
-		info += "\n"
-		info += "Number of predictions: "+Format.SplitNumber(self.NumPredictions)
 		if self.NumPredictions != 0:
 			info += "\n"
 			ratio = (1-(self.NumWrongPredictions/self.NumPredictions))*100

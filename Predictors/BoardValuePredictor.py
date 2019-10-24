@@ -7,7 +7,6 @@ import Predictors.PredictorBase as PredictorBase
 
 class BoardValuePredictor(PredictorBase.PredictorBase):
 	TrainedEpochs = 0
-	NumPredictions = 0
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
 		super.__init__(dataSetManager, loadData)
@@ -29,9 +28,3 @@ class BoardValuePredictor(PredictorBase.PredictorBase):
 		
 		self.NumPredictions += 1
 		return value
-
-	def PredictorInfoOutput(self):
-		info = ""
-		info += "Number of predictions: "+Format.SplitNumber(self.NumPredictions)
-
-		return info
