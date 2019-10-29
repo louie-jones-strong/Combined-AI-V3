@@ -8,6 +8,29 @@ class Simulation(SimBase.SimBase):
 			"MinInputSize":0,"MaxInputSize":7,
 			"Resolution":1,"RenderSetup":True}
 	
+	def __init__(self):
+		self.BackGroundpieceList = []
+		pieceSize = 30
+		boardColor = True
+		for x in range(8):
+			for y in range(8):
+
+				if boardColor:
+					color = [255, 255, 255]
+					boardColor = False
+				else:
+					color = [0, 0, 0]
+					boardColor = True
+
+				self.BackGroundpieceList += [Shape.Piece([((x+0.5)-4)*pieceSize*2+350, ((y+0.5)-4)
+    	                          * pieceSize*2+350], [pieceSize, pieceSize], Shape.Square(), color)]
+
+			if boardColor:
+				boardColor = False
+			else:
+				boardColor = True
+		return
+
 	def CreateNew(self):
 		sim = Simulation()
 		return sim
@@ -93,6 +116,20 @@ class Simulation(SimBase.SimBase):
 
 		print("   0  1  2  3  4  5  6  7   ")
 		return
+
+	def ComplexBoardOutput(self, board):
+		pieceSize = 20
+		gridSize = 30
+
+		pieceList = []
+		pieceList += self.BackGroundpieceList
+		grid = [8, 8]
+		# for x in range(grid[0]):
+		# 	for y in range(grid[1]):
+		# 		if board[x][y] != 0:
+		# 			if board[x][y] == 1:
+					
+		return pieceList
 
 def NewBoard():
 	board = [[4,2,3,5,6,3,2,4],
