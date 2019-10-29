@@ -1,4 +1,5 @@
 import RenderEngine.Shape as Shape
+import RenderEngine.Piece as Piece
 import Simulations.SimulationBase as SimBase
 
 
@@ -22,7 +23,7 @@ class Simulation(SimBase.SimBase):
 					color = [0, 0, 0]
 					boardColor = True
 
-				self.BackGroundpieceList += [Shape.Piece([((x+0.5)-4)*pieceSize*2+350, ((y+0.5)-4)
+				self.BackGroundpieceList += [Piece.Piece([((x+0.5)-4)*pieceSize*2+350, ((y+0.5)-4)
     	                          * pieceSize*2+350], [pieceSize, pieceSize], Shape.Square(), color)]
 
 			if boardColor:
@@ -187,22 +188,22 @@ class Simulation(SimBase.SimBase):
 			for y in range(grid[1]):
 				if board[x][y] != 0:
 					if board[x][y] == 1:
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+						pieceList += [Piece.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
     	                                        * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 255, 255])]
 					elif board[x][y] == 2:
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+						pieceList += [Piece.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 255, 255])]
 
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+						pieceList += [Piece.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize*0.6, pieceSize*0.6], Shape.Crown(), [0, 0, 0])]
 					elif board[x][y] == -1:
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+						pieceList += [Piece.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
 					else:
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+						pieceList += [Piece.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
     	                                        * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
 						
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+						pieceList += [Piece.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
                                                     * gridSize*2+350], [pieceSize*0.6, pieceSize*0.6], Shape.Crown(), [255, 255, 255])]
 		return pieceList
 

@@ -71,30 +71,7 @@ class RenderEngine:
 		return
 	def DrawPieces(self):
 		for loop in range(len(self.PieceList)):
-			piece = self.PieceList[loop]
-
-			if (piece.Movable):
-				fillColor = [0, 255, 0]
-			else:
-				fillColor = piece.Color
-
-			if (piece.Selected):
-				borderColor = [255, 0, 0]
-			else:
-				borderColor = [0, 0, 0]
-
-			points = piece.GetRotatedPoints()
-
-			#pygame.draw.polygon(self.Window, fillColor, points, 0)
-			#pygame.draw.polygon(self.Window, borderColor, points, 2)
-
-			if piece.Fill and len(points) >= 3:
-				pygame.gfxdraw.filled_polygon(self.Window, points, fillColor)
-				
-			if len(points) >= 3:
-				pygame.gfxdraw.aapolygon(self.Window, points, borderColor)
-			elif len(points) == 2:
-				pygame.gfxdraw.line(self.Window, int(points[0][0]), int(points[0][1]), int(points[1][0]), int(points[1][1]), borderColor)
+			self.PieceList[loop].Draw(self.Window)
 		return
 
 	def UpdateWindow(self, lastBuildTimeTook=0):

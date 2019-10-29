@@ -1,9 +1,9 @@
-import math
+import RenderEngine.Piece as Piece
 
 def BuildCardShapes(pos, scale, suit, value, rotate=0, showFace=True):
 	shapes = []
 	
-	shapes += [Piece(pos, scale, CardBackBase(), [255, 255, 255], rotate=rotate)]
+	shapes += [Piece.Piece(pos, scale, CardBackBase(), [255, 255, 255], rotate=rotate)]
 	if showFace:
 
 		if suit >= 0 and suit <= 3:
@@ -22,100 +22,100 @@ def BuildCardShapes(pos, scale, suit, value, rotate=0, showFace=True):
 			
 			suitScale = [scale[0]*0.1, scale[1]*0.1]
 
-			tempPos = RotatePoint([pos[0]+scale[0]*0.55, pos[1]+scale[1]*0.75], rotate, pos)
-			shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+			tempPos = Piece.RotatePoint([pos[0]+scale[0]*0.55, pos[1]+scale[1]*0.75], rotate, pos)
+			shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-			tempPos = RotatePoint([pos[0]-scale[0]*0.55, pos[1]-scale[1]*0.75], rotate, pos)
-			shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+			tempPos = Piece.RotatePoint([pos[0]-scale[0]*0.55, pos[1]-scale[1]*0.75], rotate, pos)
+			shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 			if value == 0:
 				suitScale = [scale[0]*0.5, scale[1]*0.5]
-				tempPos = RotatePoint(pos, rotate, pos)
-				shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+				tempPos = Piece.RotatePoint(pos, rotate, pos)
+				shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 			elif value == 10:
 				suitScale = [scale[0]*0.5, scale[1]*0.5]
-				tempPos = RotatePoint(pos, rotate, pos)
-				shapes += [Piece(tempPos, suitScale, Jack(), suitColour, rotate=rotate)]
+				tempPos = Piece.RotatePoint(pos, rotate, pos)
+				shapes += [Piece.Piece(tempPos, suitScale, Jack(), suitColour, rotate=rotate)]
 
 			elif value == 11:
 				suitScale = [scale[0]*0.5, scale[1]*0.5]
-				tempPos = RotatePoint(pos, rotate, pos)
-				shapes += [Piece(tempPos, suitScale, Queen(), suitColour, rotate=rotate)]
+				tempPos = Piece.RotatePoint(pos, rotate, pos)
+				shapes += [Piece.Piece(tempPos, suitScale, Queen(), suitColour, rotate=rotate)]
 
 			elif value == 12:
 				suitScale = [scale[0]*0.5, scale[1]*0.5]
-				tempPos = RotatePoint(pos, rotate, pos)
-				shapes += [Piece(tempPos, suitScale, Crown(), suitColour, rotate=rotate)]
+				tempPos = Piece.RotatePoint(pos, rotate, pos)
+				shapes += [Piece.Piece(tempPos, suitScale, Crown(), suitColour, rotate=rotate)]
 
 			else:
 			
 				suitScale = [scale[0]*0.1, scale[1]*0.1]
 				if value == 1 or value == 2:
-					tempPos = RotatePoint([pos[0], pos[1]+scale[0]*0.45], rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint([pos[0], pos[1]+scale[0]*0.45], rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-					tempPos = RotatePoint([pos[0], pos[1]-scale[0]*0.45], rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint([pos[0], pos[1]-scale[0]*0.45], rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 				if value == 2 or value == 4 or value == 8:
-					tempPos = RotatePoint(pos, rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint(pos, rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 				if value >= 5 and 7 >= value:
-					tempPos = RotatePoint([pos[0]+scale[0]*0.3, pos[1]], rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint([pos[0]+scale[0]*0.3, pos[1]], rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-					tempPos = RotatePoint([pos[0]-scale[0]*0.3, pos[1]], rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint([pos[0]-scale[0]*0.3, pos[1]], rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 				if value >= 3 and 9 >= value:
-					tempPos = RotatePoint([pos[0]+scale[0]*0.3, pos[1]+scale[0]*0.45], rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint([pos[0]+scale[0]*0.3, pos[1]+scale[0]*0.45], rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-					tempPos = RotatePoint([pos[0]+scale[0]*0.3, pos[1]-scale[0]*0.45], rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint([pos[0]+scale[0]*0.3, pos[1]-scale[0]*0.45], rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-					tempPos = RotatePoint([pos[0]-scale[0]*0.3, pos[1]+scale[0]*0.45], rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint([pos[0]-scale[0]*0.3, pos[1]+scale[0]*0.45], rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-					tempPos = RotatePoint([pos[0]-scale[0]*0.3, pos[1]-scale[0]*0.45], rotate, pos)
-					shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+					tempPos = Piece.RotatePoint([pos[0]-scale[0]*0.3, pos[1]-scale[0]*0.45], rotate, pos)
+					shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 					if value >= 5 and 7 >= value:
-						tempPos = RotatePoint([pos[0]+scale[0]*0.3, pos[1]], rotate, pos)
-						shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+						tempPos = Piece.RotatePoint([pos[0]+scale[0]*0.3, pos[1]], rotate, pos)
+						shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-						tempPos = RotatePoint([pos[0]-scale[0]*0.3, pos[1]], rotate, pos)
-						shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+						tempPos = Piece.RotatePoint([pos[0]-scale[0]*0.3, pos[1]], rotate, pos)
+						shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 						if value == 6 or value == 7:
-							tempPos = RotatePoint([pos[0], pos[1]-scale[0]*0.3], rotate, pos)
-							shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+							tempPos = Piece.RotatePoint([pos[0], pos[1]-scale[0]*0.3], rotate, pos)
+							shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 		
 							if value == 7:
-								tempPos = RotatePoint([pos[0], pos[1]+scale[0]*0.3], rotate, pos)
-								shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+								tempPos = Piece.RotatePoint([pos[0], pos[1]+scale[0]*0.3], rotate, pos)
+								shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 					elif value == 8 or value == 9:
-						tempPos = RotatePoint([pos[0]+scale[0]*0.15, pos[1]+scale[0]*0.25], rotate, pos)
-						shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+						tempPos = Piece.RotatePoint([pos[0]+scale[0]*0.15, pos[1]+scale[0]*0.25], rotate, pos)
+						shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-						tempPos = RotatePoint([pos[0]+scale[0]*0.15, pos[1]-scale[0]*0.25], rotate, pos)
-						shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+						tempPos = Piece.RotatePoint([pos[0]+scale[0]*0.15, pos[1]-scale[0]*0.25], rotate, pos)
+						shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-						tempPos = RotatePoint([pos[0]-scale[0]*0.15, pos[1]+scale[0]*0.25], rotate, pos)
-						shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+						tempPos = Piece.RotatePoint([pos[0]-scale[0]*0.15, pos[1]+scale[0]*0.25], rotate, pos)
+						shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-						tempPos = RotatePoint([pos[0]-scale[0]*0.15, pos[1]-scale[0]*0.25], rotate, pos)
-						shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+						tempPos = Piece.RotatePoint([pos[0]-scale[0]*0.15, pos[1]-scale[0]*0.25], rotate, pos)
+						shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
 						if value == 9:
-							tempPos = RotatePoint([pos[0], pos[1]-scale[0]*0.4], rotate, pos)
-							shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+							tempPos = Piece.RotatePoint([pos[0], pos[1]-scale[0]*0.4], rotate, pos)
+							shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 
-							tempPos = RotatePoint([pos[0], pos[1]+scale[0]*0.4], rotate, pos)
-							shapes += [Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
+							tempPos = Piece.RotatePoint([pos[0], pos[1]+scale[0]*0.4], rotate, pos)
+							shapes += [Piece.Piece(tempPos, suitScale, suitPiece, suitColour, rotate=rotate)]
 			
 
 	return shapes
@@ -232,80 +232,3 @@ def VerticalLine():
 	points += [[-0.01, -1]]
 	points += [[-0.01, 1]]
 	return points
-
-
-def RotatePoint(point, degrees, center=[0,0]):
-	rotate = degrees*(math.pi/180)  # Convert to radians
-
-	cosValue = math.cos(rotate)
-	sinValue = math.sin(rotate)
-
-	rotatedX = cosValue*(point[0]-center[0]) - sinValue*(point[1]-center[1])+center[0]
-	rotatedY = sinValue*(point[0]-center[0]) + cosValue*(point[1]-center[1])+center[1]
-	return [rotatedX, rotatedY]
-
-class Piece():
-	Points = []
-	Color = [255, 255, 255]
-	Selected = False
-	Movable = False
-	Fill = True
-	InfoObject = None
-	Rotate = 0
-	Pos = [1,1]
-	Scale = [1,1]
-
-	def __init__(self, pos, scale, points, color, fill=True, rotate=0, infoObject=None):
-		self.Pos = pos
-		self.Scale = scale
-		self.Points = points
-		self.Color = color
-		self.Fill = fill
-		self.Rotate = rotate
-		self.InfoObject = infoObject
-		return
-
-	def GetRotatedPoints(self):
-		rotatedPoints = []
-
-		for loop in range(len(self.Points)):
-			point = self.Points[loop]
-			point = RotatePoint(point, self.Rotate)
-
-			point[0] *= self.Scale[0]
-			point[1] *= self.Scale[1]
-
-			point[0] += self.Pos[0]
-			point[1] += self.Pos[1]
-
-			rotatedPoints += [point]
-
-
-		return rotatedPoints
-
-
-if __name__ == "__main__":
-	import RenderEngine2D
-	engine = RenderEngine2D.RenderEngine()
-	suitLoop = 0
-	valueLoop = 0
-
-	loop = 0
-	while True:
-		
-		engine.PieceList = BuildCardShapes([350, 350], [100, 100], suitLoop, valueLoop)
-
-		loop += 1
-		if loop >= 1000:
-			loop = 0
-
-			valueLoop += 1
-			if valueLoop >= 13:
-				valueLoop = 0
-				
-				suitLoop += 1
-				if suitLoop >= 4:
-					suitLoop = 0
-
-		if not engine.UpdateWindow():
-			break

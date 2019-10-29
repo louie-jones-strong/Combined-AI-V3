@@ -1,3 +1,4 @@
+import RenderEngine.Piece as Piece
 import RenderEngine.Shape as Shape
 import Simulations.SimulationBase as SimBase
 
@@ -10,11 +11,11 @@ class Simulation(SimBase.SimBase):
 
 	def __init__(self):
 		self.BackGroundpieceList = []
-		self.BackGroundpieceList += [Shape.Piece([350,300],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
-		self.BackGroundpieceList += [Shape.Piece([350,400],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
+		self.BackGroundpieceList += [Piece.Piece([350,300],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
+		self.BackGroundpieceList += [Piece.Piece([350,400],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
 		
-		self.BackGroundpieceList += [Shape.Piece([300, 350], [1, 150], Shape.VerticalLine(), [0, 0, 0])]
-		self.BackGroundpieceList += [Shape.Piece([400, 350], [1, 150], Shape.VerticalLine(), [0, 0, 0])]
+		self.BackGroundpieceList += [Piece.Piece([300, 350], [1, 150], Shape.VerticalLine(), [0, 0, 0])]
+		self.BackGroundpieceList += [Piece.Piece([400, 350], [1, 150], Shape.VerticalLine(), [0, 0, 0])]
 		return
 
 	def Start(self):
@@ -113,9 +114,9 @@ class Simulation(SimBase.SimBase):
 
 				if board[loop] != 0:
 					if board[loop] == 1:#X
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)* gridSize*2+350], [pieceSize, pieceSize], Shape.Cross(), [0, 0, 0])]
+						pieceList += [Piece.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)* gridSize*2+350], [pieceSize, pieceSize], Shape.Cross(), [0, 0, 0])]
 					else:#O
-						pieceList += [Shape.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)* gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
+						pieceList += [Piece.Piece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)* gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 0, 0])]
 				loop += 1
 		return pieceList
 
