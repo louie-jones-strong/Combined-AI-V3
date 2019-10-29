@@ -10,7 +10,7 @@ class SimOutputPredictor(PredictorBase.PredictorBase):
 	NumWrongPredictions = 0
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
-		super.__init__(dataSetManager, loadData)
+		super().__init__(dataSetManager, loadData)
 
 		self.Predictions = {}
 
