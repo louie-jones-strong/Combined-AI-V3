@@ -1,5 +1,5 @@
 import RenderEngine.Shape as Shape
-import RenderEngine.PieceBase as Piece
+import RenderEngine.PolygonPiece as Piece
 import Simulations.SimulationBase as SimBase
 
 
@@ -23,7 +23,7 @@ class Simulation(SimBase.SimBase):
 					color = [0, 0, 0]
 					boardColor = True
 
-				self.BackGroundpieceList += [Piece.PieceBase([((x+0.5)-4)*pieceSize*2+350, ((y+0.5)-4)
+				self.BackGroundpieceList += [Piece.PolygonPiece([((x+0.5)-4)*pieceSize*2+350, ((y+0.5)-4)
     	                          * pieceSize*2+350], [pieceSize, pieceSize], Shape.Square(), color)]
 
 			if boardColor:
