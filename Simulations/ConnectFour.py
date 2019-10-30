@@ -1,5 +1,5 @@
 import RenderEngine.Shape as Shape
-import RenderEngine.Piece as Piece
+import RenderEngine.PieceBase as Piece
 import Simulations.SimulationBase as SimBase
 
 
@@ -27,7 +27,7 @@ class Simulation(SimBase.SimBase):
 
 		gridSize = 40
 		self.BackGroundpieceList = []
-		self.BackGroundpieceList += [Piece.Piece([350, 350], [self.Grid[0]*gridSize, self.Grid[1]*gridSize], Shape.Square(), [0, 0, 255])]
+		self.BackGroundpieceList += [Piece.PieceBase([350, 350], [self.Grid[0]*gridSize, self.Grid[1]*gridSize], Shape.Square(), [0, 0, 255])]
 		return
 
 	def CreateNew(self):
@@ -141,13 +141,13 @@ class Simulation(SimBase.SimBase):
 		for x in range(self.Grid[0]):
 			for y in range(self.Grid[1]):
 				if board[x][y] == 0:
-					pieceList += [Piece.Piece([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
+					pieceList += [Piece.PieceBase([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
                                                * gridSize*2+350], [35, 35], Shape.Circle(), [0, 0, 0])]
 				elif board[x][y] == 1:
-					pieceList += [Piece.Piece([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
+					pieceList += [Piece.PieceBase([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
                                                 * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [255, 0, 0])]
 				else:
-					pieceList += [Piece.Piece([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
+					pieceList += [Piece.PieceBase([((x+0.5)-self.Grid[0]/2)*gridSize*2+350, ((y+0.5)-self.Grid[1]/2)
                                                * gridSize*2+350], [pieceSize, pieceSize], Shape.Circle(), [0, 255, 0])]
 		return pieceList
 

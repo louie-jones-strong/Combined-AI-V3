@@ -14,7 +14,7 @@ def RotatePoint(point, degrees, center=[0, 0]):
 	return [rotatedX, rotatedY]
 
 
-class Piece():
+class PieceBase():
 	Points = []
 	Color = [255, 255, 255]
 	Fill = True
