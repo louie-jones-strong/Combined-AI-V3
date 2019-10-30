@@ -1,5 +1,6 @@
 import RenderEngine.Shape as Shape
 import RenderEngine.PolygonPiece as Piece
+import RenderEngine.ImagePiece as ImagePiece
 import Simulations.SimulationBase as SimBase
 
 
@@ -10,6 +11,21 @@ class Simulation(SimBase.SimBase):
 			"Resolution":1,"RenderSetup":True}
 	
 	def __init__(self):
+		self.PieceImageDict = {}
+		self.PieceImageDict[1] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type1.png")
+		self.PieceImageDict[2] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type2.png")
+		self.PieceImageDict[3] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type3.png")
+		self.PieceImageDict[4] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type4.png")
+		self.PieceImageDict[5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type5.png")
+		self.PieceImageDict[6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type6.png")
+
+		self.PieceImageDict[-1] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-1.png")
+		self.PieceImageDict[-2] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-2.png")
+		self.PieceImageDict[-3] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-3.png")
+		self.PieceImageDict[-4] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-4.png")
+		self.PieceImageDict[-5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-5.png")
+		self.PieceImageDict[-6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-6.png")
+
 		self.BackGroundpieceList = []
 		pieceSize = 30
 		boardColor = True
@@ -125,10 +141,14 @@ class Simulation(SimBase.SimBase):
 		pieceList = []
 		pieceList += self.BackGroundpieceList
 		grid = [8, 8]
-		# for x in range(grid[0]):
-		# 	for y in range(grid[1]):
-		# 		if board[x][y] != 0:
-		# 			if board[x][y] == 1:
+		for x in range(grid[0]):
+			for y in range(grid[1]):
+				pieceType = board[y][x]
+
+				if pieceType in self.PieceImageDict:
+					img = self.PieceImageDict[pieceType]
+					pieceList += [ImagePiece.ImagePiece([((x+0.5)-grid[0]/2)*gridSize*2+350, ((y+0.5)-grid[1]/2)
+												* gridSize*2+350], [pieceSize, pieceSize], img)]
 					
 		return pieceList
 
