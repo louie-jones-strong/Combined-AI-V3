@@ -9,7 +9,7 @@ class BoardValuePredictor(PredictorBase.PredictorBase):
 	TrainedEpochs = 0
 
 	def __init__(self, dataSetManager, loadData, trainingMode=False):
-		super.__init__(dataSetManager, loadData)
+		super().__init__(dataSetManager, loadData)
 		return
 
 	def PredictValue(self, board):
