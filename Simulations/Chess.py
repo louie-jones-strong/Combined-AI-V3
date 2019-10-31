@@ -26,26 +26,13 @@ class Simulation(SimBase.SimBase):
 		self.PieceImageDict[-5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-5.png")
 		self.PieceImageDict[-6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-6.png")
 
+		boardImg = ImagePiece.LoadImage("RenderEngine\\Images\\Board.png")
 		self.BackGroundpieceList = []
 		pieceSize = 30
-		boardColor = True
-		for x in range(8):
-			for y in range(8):
-
-				if boardColor:
-					color = [255, 255, 255]
-					boardColor = False
-				else:
-					color = [0, 0, 0]
-					boardColor = True
-
-				self.BackGroundpieceList += [Piece.PolygonPiece([((x+0.5)-4)*pieceSize*2+350, ((y+0.5)-4)
-    	                          * pieceSize*2+350], [pieceSize, pieceSize], Shape.Square(), color)]
-
-			if boardColor:
-				boardColor = False
-			else:
-				boardColor = True
+		grid = [8,8]
+		scale = [grid[0]*pieceSize, grid[1]*pieceSize]
+		pos = [scale[0], scale[1]]
+		self.BackGroundpieceList += [ImagePiece.ImagePiece(pos, scale, boardImg)]
 		return
 
 	def CreateNew(self):
@@ -153,7 +140,7 @@ class Simulation(SimBase.SimBase):
 		return pieceList
 
 def NewBoard():
-	board = [[4,2,3,5,6,3,2,4],
+	board = [[4,2,3,6,5,3,2,4],
 			 [1,1,1,1,1,1,1,1],
 			 [0,0,0,0,0,0,0,0],
 			 [0,0,0,0,0,0,0,0],

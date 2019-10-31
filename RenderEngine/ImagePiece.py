@@ -15,7 +15,7 @@ class ImagePiece(Piece.PieceBase):
 		return
 
 	def Draw(self, window):
-		img = pygame.transform.scale(self.Image, self.Scale)
+		img = pygame.transform.scale(self.Image, [self.Scale[0]*2, self.Scale[1]*2])
 
 		pos = [self.Pos[0]-self.Scale[0]/2, self.Pos[1]-self.Scale[1]/2]
 		window.blit(img, pos)
