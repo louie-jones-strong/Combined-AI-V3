@@ -39,7 +39,7 @@ class Simulation(SimBase.SimBase):
 		return sim
 		
 	def Start(self):
-		self.Board = NewBoard()
+		self.Board, self.KingPos = NewBoard()
 		self.Turn = 1
 		self.NumMoves=0
 		return self.Board, self.Turn
@@ -73,9 +73,21 @@ class Simulation(SimBase.SimBase):
 		if not (PiceMoveRulesCheck(inputs, self.Board, self.Turn)):
 			return False, self.Board, self.Turn
 
+		if abs(self.Board[ inputs[1] ][ inputs[0] ]) == 6:
+			self.KingPos[self.Turn] = [inputs[3], inputs[2]]
+
+		if abs(self.Board[ inputs[1] ][ inputs[0] ]) == 1 and (inputs[3] == 0 or inputs[3] == 7):
+			self.Board[ inputs[1] ][ inputs[0]] = 5*self.Board[ inputs[1] ][ inputs[0] ]
+
 		self.Board[ inputs[3] ][ inputs[2] ] = self.Board[ inputs[1] ][ inputs[0] ]
 		self.Board[ inputs[1] ][ inputs[0] ] = 0
 		self.NumMoves += 1
+
+		if self.Turn == 1:
+			self.Turn = 2
+		else:
+			self.Turn = 1
+
 		return True, self.Board, self.Turn
 
 	def CheckFinished(self):
@@ -138,6 +150,10 @@ class Simulation(SimBase.SimBase):
 					
 		return pieceList
 
+	def CheckIfCheck(self):
+
+		return 
+
 def NewBoard():
 	board = [[4,2,3,6,5,3,2,4],
 			 [1,1,1,1,1,1,1,1],
@@ -148,7 +164,10 @@ def NewBoard():
 			 [-1,-1,-1,-1,-1,-1,-1,-1],
 			 [-4,-2,-3,-6,-5,-3,-2,-4]]
 
-	return board
+	KingPos = {}
+	KingPos[1] = [0, 3]
+	KingPos[2] = [7, 3]
+	return board, KingPos
 
 def PiceMoveRulesCheck(move, board, turn ):
 	pice = board[ move[1] ][ move[0] ]
@@ -213,6 +232,19 @@ def KnightsCheck(move, board, turn):
 def PawnCheck(move, board, turn):
 	change_x = abs(move[0] - move[2])
 	change_y = move[1] - move[3]
+	
+	if change_x > 1:
+		return False
+	if change_x == 1:
+		if board[3][2] == 0:
+			return False
+		if board[3][2] < 0 and turn == 1:
+			return False
+		if board[3][2] > 0 and turn == 2:
+			return False
+	elif board[3][2] == 0:
+		return False
+
 	if turn == 1 and (change_y <= 0 or change_y > 2):
 		return False
 	if turn == 2 and (change_y >=0 or change_y < -2):
@@ -221,19 +253,32 @@ def PawnCheck(move, board, turn):
 		return False
 	if turn == 2 and change_y == -2 and not(move[1] == 6):
 		return False
-	return CheckLineOfSight( board , move)
+
+	return CheckLineOfSight(board, move)
 
 def CheckLineOfSight(board, move):
 	change_x = move[2] - move[0]
 	change_y = move[3] - move[1]
-	if abs(change_y) == 0:
-		for loop in range( move[1] , move[3] ):
-			if not (board[ move[0] ][ loop ] == 0):
-				return False
-	elif abs(change_x) == 0:
-		for loop in range( move[0] , move[2] ):
-			if not (board[ loop ][ move[1] ] == 0):
-				return False
+	if change_y == 0:
+		if move[0] < move[2]:
+			for loop in range( move[0] , move[2] ):
+				if board[ move[1] ][ loop ] != 0:
+					return False
+		else:
+			for loop in range( move[2] , move[0] ):
+				if board[ move[1] ][ loop ] != 0:
+					return False
+
+	elif change_x == 0:
+		if move[1] < move[3]:
+			for loop in range( move[1] , move[3] ):
+				if board[ loop ][ move[0] ] != 0:
+					return False
+		else:
+			for loop in range( move[3] , move[1] ):
+				if board[ loop ][ move[0] ] != 0:
+					return False
+
 	elif abs(change_x) == abs(change_y):
 		for loop in range(1,abs(change_x)):
 			x = loop
@@ -242,6 +287,7 @@ def CheckLineOfSight(board, move):
 				x = x * -1
 			if change_y < 0:
 				y = y * -1
-			if not (board[ move[1] + y ][ move[0] + x] == 0):
+			if board[ move[1] + y ][ move[0] + x] != 0:
 				return False
+
 	return True
