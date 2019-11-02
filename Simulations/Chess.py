@@ -1,5 +1,4 @@
 import RenderEngine.Shape as Shape
-import RenderEngine.PolygonPiece as Piece
 import RenderEngine.ImagePiece as ImagePiece
 import Simulations.SimulationBase as SimBase
 
@@ -180,28 +179,28 @@ def kingCheck(move, board, turn):
 	if change_y > 1 or change_x > 1:
 		return False
 	else:
-		return CheckLineOfSight( board , move)
+		return CheckLineOfSight(board, move)
 
 def QueenCheck(move, board, turn):
 	change_x = abs(move[0] - move[2])
 	change_y = abs(move[1] - move[3])
 	if not( change_x == change_y) and not(change_x == 0) and not(change_y == 0):
 		return False
-	return CheckLineOfSight( board , move)
+	return CheckLineOfSight(board, move)
 
 def RooksCheck(move, board, turn):
 	change_x = abs(move[0] - move[2])
 	change_y = abs(move[1] - move[3])
 	if not ( change_x == 0 or change_y == 0 ):
 		return False
-	return CheckLineOfSight( board , move)
+	return CheckLineOfSight(board, move)
 
 def BishopsCheck(move, board, turn):
 	change_x = abs(move[0] - move[2])
 	change_y = abs(move[1] - move[3])
 	if not( change_x == change_y):
 		return False
-	return CheckLineOfSight( board , move)
+	return CheckLineOfSight(board, move)
 
 def KnightsCheck(move, board, turn):
 	change_x = abs(move[0] - move[2])
