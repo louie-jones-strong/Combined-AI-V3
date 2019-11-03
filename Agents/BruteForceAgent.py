@@ -52,7 +52,7 @@ class Agent(AgentBase.AgentBase):
 						nonFinishedMoveID = -1
 	
 						finishedLeastPlayed = sys.maxsize
-						finishedMoveID = 0
+						finishedMoveID = -1
 						foundNoneLockedBoard = False
 	
 						for movekey, moveValue in boardInfo.Moves.items():
@@ -74,6 +74,9 @@ class Agent(AgentBase.AgentBase):
 							moveID = nonFinishedMoveID
 						else:
 							moveID = finishedMoveID
+
+						if moveID == -1:
+							raise Exception("Cannot find move on board "+ str(board))
 
 			else:#never played board before
 				moveID = 0

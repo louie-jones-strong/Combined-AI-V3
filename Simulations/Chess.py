@@ -11,19 +11,19 @@ class Simulation(SimBase.SimBase):
 	
 	def __init__(self):
 		self.PieceImageDict = {}
-		self.PieceImageDict[1] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type1.png")
-		self.PieceImageDict[2] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type2.png")
-		self.PieceImageDict[3] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type3.png")
-		self.PieceImageDict[4] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type4.png")
-		self.PieceImageDict[5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type5.png")
-		self.PieceImageDict[6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type6.png")
+		self.PieceImageDict[-1] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type1.png")
+		self.PieceImageDict[-2] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type2.png")
+		self.PieceImageDict[-3] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type3.png")
+		self.PieceImageDict[-4] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type4.png")
+		self.PieceImageDict[-5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type5.png")
+		self.PieceImageDict[-6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type6.png")
 
-		self.PieceImageDict[-1] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-1.png")
-		self.PieceImageDict[-2] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-2.png")
-		self.PieceImageDict[-3] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-3.png")
-		self.PieceImageDict[-4] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-4.png")
-		self.PieceImageDict[-5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-5.png")
-		self.PieceImageDict[-6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-6.png")
+		self.PieceImageDict[1] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-1.png")
+		self.PieceImageDict[2] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-2.png")
+		self.PieceImageDict[3] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-3.png")
+		self.PieceImageDict[4] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-4.png")
+		self.PieceImageDict[5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-5.png")
+		self.PieceImageDict[6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-6.png")
 
 		boardImg = ImagePiece.LoadImage("RenderEngine\\Images\\Board.png")
 		self.BackGroundpieceList = []
@@ -70,7 +70,7 @@ class Simulation(SimBase.SimBase):
 		if self.Turn == 2 and self.Board[ inputs[3] ][ inputs[2] ] > 0:
 			return False, self.Board, self.Turn
 
-		if not (PiceMoveRulesCheck(inputs, self.Board, self.Turn)):
+		if not (PieceMoveRulesCheck(inputs, self.Board, self.Turn)):
 			return False, self.Board, self.Turn
 
 		if abs(self.Board[ inputs[1] ][ inputs[0] ]) == 6:
@@ -93,8 +93,18 @@ class Simulation(SimBase.SimBase):
 	def CheckFinished(self):
 		player1Fitness, player2Fitness = 0,0
 		finished = False
+
+		if self.Board[ self.KingPos[1][0] ][ self.KingPos[1][1]] == 0:
+			finished = True
+			player1Fitness = -5
+			player2Fitness = 5
 		
-		if self.NumMoves >= 250:
+		elif self.Board[ self.KingPos[2][0] ][ self.KingPos[2][1]] == 0:
+			finished = True
+			player1Fitness = 5
+			player2Fitness = -5
+
+		elif self.NumMoves >= 250:
 			finished = True
 			player1Fitness = 3
 			player2Fitness = 3
@@ -164,29 +174,39 @@ def NewBoard():
 			 [-1,-1,-1,-1,-1,-1,-1,-1],
 			 [-4,-2,-3,-6,-5,-3,-2,-4]]
 
+	# board = [[0, 0, 0, 0, 0, 0, 0, 0], 
+	# 		[-4, 0, 0, 0, 0, 0, 0, 1], 
+	# 		[0, 0, 0, 0, 0, 0, 0, -1], 
+	# 		[0, 0, 0, 0, 0, 0, 0, 0], 
+	# 		[0, 0, 0, 0, 0, 0, 0, 0], 
+	# 		[0, 0, 0, 0, 0, 0, 0, 0], 
+	# 		[0, 0, 0, 0, 0, 0, 0, 0], 
+	# 		[0, 0, 0, 0, 0, 0, 0, 0]]
+
+
 	KingPos = {}
 	KingPos[1] = [0, 3]
 	KingPos[2] = [7, 3]
 	return board, KingPos
 
-def PiceMoveRulesCheck(move, board, turn ):
-	pice = board[ move[1] ][ move[0] ]
-	if abs(pice) == 6:
+def PieceMoveRulesCheck(move, board, turn ):
+	piece = abs(board[ move[1] ][ move[0] ])
+	if piece == 6:
 		return kingCheck(move, board, turn)
 
-	elif abs(pice) == 5:
+	elif piece == 5:
 		return QueenCheck(move, board, turn)
 
-	elif abs(pice) == 4:
+	elif piece == 4:
 		return RooksCheck(move, board, turn)
 
-	elif abs(pice) == 3:
+	elif piece == 3:
 		return BishopsCheck(move, board, turn)
 
-	elif abs(pice) == 2:
+	elif piece == 2:
 		return KnightsCheck(move, board, turn)
 
-	elif abs(pice) == 1:
+	elif piece == 1:
 		return PawnCheck(move, board, turn)
 
 	else:
@@ -210,7 +230,7 @@ def QueenCheck(move, board, turn):
 def RooksCheck(move, board, turn):
 	change_x = abs(move[0] - move[2])
 	change_y = abs(move[1] - move[3])
-	if not ( change_x == 0 or change_y == 0 ):
+	if change_x != 0 and change_y != 0:
 		return False
 	return CheckLineOfSight(board, move)
 
@@ -235,24 +255,29 @@ def PawnCheck(move, board, turn):
 	
 	if change_x > 1:
 		return False
-	if change_x == 1:
-		if board[3][2] == 0:
-			return False
-		if board[3][2] < 0 and turn == 1:
-			return False
-		if board[3][2] > 0 and turn == 2:
-			return False
-	elif board[3][2] == 0:
+	if abs(change_y) > 2 or change_y == 0:
 		return False
 
-	if turn == 1 and (change_y <= 0 or change_y > 2):
+	if change_x == 1:
+		if board[move[3]][move[2]] == 0:
+			return False
+		if board[move[3]][move[2]] < 0 and turn == 1:
+			return False
+		if board[move[3]][move[2]] > 0 and turn == 2:
+			return False
+	elif board[move[3]][move[2]] != 0:
 		return False
-	if turn == 2 and (change_y >=0 or change_y < -2):
-		return 
-	if turn == 1 and change_y == 2 and not(move[1] == 1):
+
+	if turn == 1 and change_y <= 0:
 		return False
-	if turn == 2 and change_y == -2 and not(move[1] == 6):
+	if turn == 2 and change_y >= 0:
 		return False
+	
+	if abs(change_y) == 2:
+		if turn == 1 and not(move[1] == 1):
+			return False
+		if turn == 2 and not(move[1] == 6):
+			return False
 
 	return CheckLineOfSight(board, move)
 
@@ -262,21 +287,21 @@ def CheckLineOfSight(board, move):
 	if change_y == 0:
 		if move[0] < move[2]:
 			for loop in range( move[0] , move[2] ):
-				if board[ move[1] ][ loop ] != 0:
+				if loop != move[2] and loop != move[0] and board[ move[1] ][ loop ] != 0:
 					return False
 		else:
 			for loop in range( move[2] , move[0] ):
-				if board[ move[1] ][ loop ] != 0:
+				if loop != move[2] and loop != move[0] and board[ move[1] ][ loop ] != 0:
 					return False
 
 	elif change_x == 0:
 		if move[1] < move[3]:
 			for loop in range( move[1] , move[3] ):
-				if board[ loop ][ move[0] ] != 0:
+				if loop != move[3] and loop != move[1] and board[ loop ][ move[0] ] != 0:
 					return False
 		else:
 			for loop in range( move[3] , move[1] ):
-				if board[ loop ][ move[0] ] != 0:
+				if loop != move[3] and loop != move[1] and board[ loop ][ move[0] ] != 0:
 					return False
 
 	elif abs(change_x) == abs(change_y):

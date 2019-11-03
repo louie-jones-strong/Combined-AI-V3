@@ -359,6 +359,8 @@ class RunController:
 				self.Output(agents, outcomePredictor, game, numMoves, gameStartTime, board, turn)
 			board, turn, finished, fit = MakeAgentMove(turn, board, agents, outcomePredictor, game)
 
+			#input("any button to step:")
+
 			numMoves += 1
 			temp = time.time()-totalStartTime
 			self.AiDataManager.MetaDataAdd("TotalTime", temp)
@@ -411,7 +413,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=None, simNumber=None, loadData="Y", aiType=None, stopTime=None)
+		controller = RunController(Logger, renderQuality=3, simNumber=None, loadData="Y", aiType=None, stopTime=None)
 		controller.RunTraning()
 
 	except Exception as error:
