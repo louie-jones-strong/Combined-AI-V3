@@ -3,8 +3,7 @@ from DataManger.Serializer import BoardToKey
 import time
 import sys
 
-print("Importing Tflearn...")
-import tflearn
+import keras
 
 class NeuralNetwork:
 
@@ -21,21 +20,11 @@ class NeuralNetwork:
 	
 	def GetWeights(self):
 		weightsValue = []
-		for loop in range(self.NumberOfLayers):
-			temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
-			with self.NetworkModel.session.as_default():
-				temp[0] = tflearn.variables.get_value(temp[0])
-				temp[1] = tflearn.variables.get_value(temp[1])
-				weightsValue += [temp]
+		weightsValue = self.NetworkModel.get_weights()
 		return weightsValue
 
 	def SetWeights(self, newWeights):
-		for loop in range(self.NumberOfLayers):
-			temp = tflearn.variables.get_layer_variables_by_name("layer"+str(loop))
-			with self.NetworkModel.session.as_default():
-				tflearn.variables.set_value(temp[0],newWeights[loop][0])
-				tflearn.variables.set_value(temp[1],newWeights[loop][1])
-
+		self.NetworkModel.set_weights(newWeights)
 		self.PredictionCache = {}
 		return
 
@@ -197,53 +186,20 @@ def PredictNetworkStructre(dataSetManager):
 	return inputShape, structreArray
 
 def ModelMaker(inputShape, structreArray, tensorBoardAdress, lr=0.01, optimizer="adam"):
-	
-	tflearn.config.init_graph(gpu_memory_fraction=0.95, soft_placement=True)
+	network = keras.models.Sequential()
 
-	if len(inputShape) == 1:
-		network = tflearn.input_data(shape=[None, inputShape[0] ], name='input')
-	elif len(inputShape) == 2:
-		network = tflearn.input_data(shape=[None, inputShape[0] , inputShape[1] ], name='input')
-	elif len(inputShape) == 3:
-		network = tflearn.input_data(shape=[None, inputShape[0] , inputShape[1] , inputShape[2] ], name='input')
-	else:
-		network = tflearn.input_data(shape=[None, inputShape[0] , inputShape[1] , inputShape[2] , inputShape[3] ], name='input')
+	network.add(keras.layers.Dense(structreArray[0][1],input_shape=inputShape))
 
 	network = LayerMaker(network, structreArray)
-	
-	loss = 'mean_square'
-	if optimizer != "adam":
-		optimizer = tflearn.SGD(learning_rate=lr)
-	
-	network = tflearn.regression(network, optimizer=optimizer, learning_rate=lr, loss=loss, name="target")
-	
-	model = tflearn.DNN(network, tensorboard_dir=tensorBoardAdress)
-	return model
-def LayerMaker(network, structreArray, layerNumber=0):
-	layerName = "layer" + str(layerNumber)
 
+	network.compile(loss=keras.losses.categorical_crossentropy,
+              optimizer=keras.optimizers.SGD(lr=0.01, momentum=0.9, nesterov=True))
+	return network
+
+def LayerMaker(network, structreArray, layerNumber=0):
 	layerInfo = structreArray[layerNumber]
 
-	if layerInfo[0] == "conv":
-		network = tflearn.conv_2d(network, layerInfo[1], 3, activation=layerInfo[2], regularizer="L2", name=layerName)
-
-	elif layerInfo[0] == "ann":
-		network = tflearn.fully_connected(network, layerInfo[1], activation=layerInfo[2], name=layerName)
-		#network = tflearn.dropout(network, 0.8)
-
-	elif layerInfo[0] == "maxpool":
-		network = tflearn.max_pool_2d(network, layerInfo[1], name=layerName)
-
-	elif layerInfo[0] == "rnn":
-		network = tflearn.simple_rnn(network, layerInfo[1], activation=layerInfo[2], bias=True, name=layerName)
-
-	elif  layerInfo[0] == "lstm":
-		if len(layerInfo) > 2 and layerInfo[3] == "True":
-			network = tflearn.lstm(network, layerInfo[1], activation=layerInfo[2], dropout=0.8, return_seq=True, name=layerName)
-		else:
-			network = tflearn.lstm(network, layerInfo[1], activation=layerInfo[2], return_seq=False, name=layerName)
-
-
+	network.add(keras.layers.Dense(layerInfo[1], activation=layerInfo[2]))
 
 	if len(structreArray) > layerNumber+1:
 		network = LayerMaker(network, structreArray, layerNumber=layerNumber+1)
