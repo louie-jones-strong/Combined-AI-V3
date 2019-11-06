@@ -2,6 +2,7 @@ import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
+from Shared import OutputFormating as Format
 from Shared import Logger
 import importlib
 import time
