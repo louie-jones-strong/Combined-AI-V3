@@ -9,7 +9,7 @@ import importlib
 import time
 import os
 import sys
-import threading
+from TournamentController import TournamentController
 
 
 def MakeAgentMove(turn, board, agents, outcomePredictor, game):
@@ -319,29 +319,18 @@ class RunController:
 		return
 	
 	def RunTraning(self):
-		# targetThreadNum = 1
 		gamesToPlay = 100
 		self.LastSaveTime = time.time()
 
 		startTime = time.time()
+		
+		tournamentController = TournamentController(self.Logger, self.Sim, self.Agents, self.AiDataManager, self.OutcomePredictor, self.RenderQuality)
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
-			# threads = []
-			# for loop in range(targetThreadNum-1):
-			# 	game = self.Sim.CreateNew()
-			# 	agents = []
-			# 	#todo make agent list again from user input from before
-			# 	for loop in range(self.NumberOfAgents):
-			# 		agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
-			# 	thread = threading.Thread(target=self.RunSimTournament, args=(gamesToPlay, game, agents, self.OutcomePredictor, False,))
-			# 	threads += [thread]
-			# 	thread.start()
+			#self.RunSimTournament(gamesToPlay, self.Sim, self.Agents, self.OutcomePredictor, True)
 
-
-			self.RunSimTournament(gamesToPlay, self.Sim, self.Agents, self.OutcomePredictor, True)
-			# for thread in threads:
-			# 	thread.join()
+			tournamentController.RunTournament(gamesToPlay)
 
 		self.TrySaveData(True)
 		return

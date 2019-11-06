@@ -18,16 +18,21 @@ class TournamentController:
 		self.LastSaveTime = time.time()
 		self.LastOutputTime = time.time()
 		self.MoveNumber = 0
+		self.LastSaveTook = 0
 
 		if self.RenderQuality == 3:
 			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 		return
 
-	def RunTournament(self, numGames):
+	def RunTournament(self, targetGameCount, stopTime=None):
 		
-		for loop in range(numGames):
+		gameCount = 0
+		while ((targetGameCount == -1 or gameCount < targetGameCount) and
+			(stopTime == None or self.DataManager.MetaDataGet("RealTime") >= stopTime)):
+
 			self.RunGame()
+			gameCount += 1
 
 		for agent in self.Agents:
 			agent.TournamentFinished()
@@ -49,6 +54,7 @@ class TournamentController:
 
 			temp = time.time()-totalTime
 			self.DataManager.MetaDataAdd("TotalTime", temp)
+			self.DataManager.MetaDataAdd("RealTime", temp)
 			totalTime = time.time()
 
 
@@ -151,7 +157,7 @@ class TournamentController:
 		print("OutcomePredictor")
 		print(self.OutcomePredictor.PredictorInfoOutput())
 		
-		title = self.Game.SimInfo["SimName"]
+		title = self.Game.Info["SimName"]
 		title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
 		title += " CachingInfo: " + self.DataManager.GetLoadedDataInfo()
 		title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
