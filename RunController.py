@@ -53,7 +53,7 @@ class RunController:
 		#setting
 		self.NumberOfAgents = self.SimInfo["MaxPlayers"]
 
-		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
+		self.DataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
 
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
@@ -83,7 +83,7 @@ class RunController:
 			loadData = self.SetUpMetaData("Y")
 			if loadData:
 				import RenderEngine.TreeVisualiser as TreeVisualiser
-				TreeVisualiser.TreeVisualiser(self.AiDataManager)
+				TreeVisualiser.TreeVisualiser(self.DataManager)
 
 			input("hold here error!!!!!")
 
@@ -91,23 +91,23 @@ class RunController:
 
 		loadData = self.SetUpMetaData(loadData)
 		import Predictors.SimOutputPredictor as SimOutputPredictor
-		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
+		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.DataManager, loadData)
 
 		if userInput == "H":
-			self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
+			self.Agents += [HumanAgent.Agent(self.DataManager, loadData, winningModeON=True)]
 
 			import Agents.MonteCarloAgent as MonteCarloAgent
 			for loop in range(self.NumberOfAgents-1):
-				moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData)
+				moveAgent = BruteForceAgent.Agent(self.DataManager, loadData)
 
-				self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent, winningModeON=True)]
+				self.Agents += [MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent, winningModeON=True)]
 
 
 		elif userInput == "R":
-			self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData)]
+			self.Agents += [RandomAgent.Agent(self.DataManager, loadData)]
 
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		elif userInput == "N":
 			if trainNetwork == None:
@@ -118,33 +118,33 @@ class RunController:
 			import Agents.NeuralNetworkAgent as NeuralNetwork
 			trainingMode = userInput == "Y" or userInput == "y"
 			
-			self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, trainingMode=trainingMode)]
+			self.Agents += [NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=trainingMode)]
 
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		elif userInput == "E":
 			import Agents.Evolution.EvolutionAgent as EvolutionAgent
 			import Agents.Evolution.EvolutionController as EvolutionController
-			evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData)
+			evoController = EvolutionController.EvolutionController(self.DataManager, loadData)
 
-			self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData)]
+			self.Agents += [EvolutionAgent.Agent(evoController, self.DataManager, loadData)]
 
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		elif userInput == "M":
 			import Agents.MonteCarloAgent as MonteCarloAgent
-			moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData)
+			moveAgent = BruteForceAgent.Agent(self.DataManager, loadData)
 
-			self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent)]
+			self.Agents += [MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent)]
 
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		else:
 			for loop in range(self.NumberOfAgents):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		return
 
@@ -185,45 +185,45 @@ class RunController:
 	def SetUpMetaData(self, loadData=None):
 		userInput = "N"
 
-		if self.AiDataManager.LoadMetaData():
-			if self.AiDataManager.MetaDataGet("Version") == self.Version:
+		if self.DataManager.LoadMetaData():
+			if self.DataManager.MetaDataGet("Version") == self.Version:
 				if loadData == None:
 					self.Logger.Clear()
 					print("")
-					print("SizeOfDataSet: "+str(self.AiDataManager.MetaDataGet("SizeOfDataSet")))
-					print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaDataGet("NumberOfCompleteBoards")))
-					print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaDataGet("NumberOfFinishedBoards")))
-					print("NumberOfGames: "+str(self.AiDataManager.MetaDataGet("NumberOfGames")))
-					print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaDataGet("TotalTime"), roundTo=2))
-					print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaDataGet("LastBackUpTotalTime"), roundTo=2))
+					print("SizeOfDataSet: "+str(self.DataManager.MetaDataGet("SizeOfDataSet")))
+					print("NumberOfCompleteBoards: "+str(self.DataManager.MetaDataGet("NumberOfCompleteBoards")))
+					print("NumberOfFinishedBoards: "+str(self.DataManager.MetaDataGet("NumberOfFinishedBoards")))
+					print("NumberOfGames: "+str(self.DataManager.MetaDataGet("NumberOfGames")))
+					print("TotalTime: "+Format.SplitTime(self.DataManager.MetaDataGet("TotalTime"), roundTo=2))
+					print("LastBackUpTotalTime: "+Format.SplitTime(self.DataManager.MetaDataGet("LastBackUpTotalTime"), roundTo=2))
 					print("")
 					userInput = input("load Dataset[Y/N]:")
 				else:
 					userInput = loadData
 			else:
-				print("MetaData Version "+str(self.AiDataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
+				print("MetaData Version "+str(self.DataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
 				input()
 
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager.MetaDataSet("Version", self.Version)
-			self.AiDataManager.MetaDataSet("SizeOfDataSet", 0)
-			self.AiDataManager.MetaDataSet("NumberOfTables", 0)
-			self.AiDataManager.MetaDataSet("FillingTable", 0)
-			self.AiDataManager.MetaDataSet("NumberOfCompleteBoards", 0)
-			self.AiDataManager.MetaDataSet("NumberOfFinishedBoards", 0)
-			self.AiDataManager.MetaDataSet("NumberOfGames", 0)
-			self.AiDataManager.MetaDataSet("NetworkUsingOneHotEncoding", False)
-			self.AiDataManager.MetaDataSet("RealTime", 0)
-			self.AiDataManager.MetaDataSet("TotalTime", 0)
-			self.AiDataManager.MetaDataSet("BruteForceTotalTime", 0)
-			self.AiDataManager.MetaDataSet("AnnTotalTime", 0)
-			self.AiDataManager.MetaDataSet("AnnDataMadeFromTotalTime", 0)
-			self.AiDataManager.MetaDataSet("LastBackUpTotalTime", 0)
-			self.AiDataManager.MetaDataSet("AnnMoveInputShape", None)
-			self.AiDataManager.MetaDataSet("AnnMoveStructreArray", None)
-			self.AiDataManager.MetaDataSet("AnnRunId", None)
-			self.AiDataManager.MetaDataSet("TriedMovesPlayed", 0)
-			self.AiDataManager.MetaDataSet("VaildMovesPlayed", 0)
+			self.DataManager.MetaDataSet("Version", self.Version)
+			self.DataManager.MetaDataSet("SizeOfDataSet", 0)
+			self.DataManager.MetaDataSet("NumberOfTables", 0)
+			self.DataManager.MetaDataSet("FillingTable", 0)
+			self.DataManager.MetaDataSet("NumberOfCompleteBoards", 0)
+			self.DataManager.MetaDataSet("NumberOfFinishedBoards", 0)
+			self.DataManager.MetaDataSet("NumberOfGames", 0)
+			self.DataManager.MetaDataSet("NetworkUsingOneHotEncoding", False)
+			self.DataManager.MetaDataSet("RealTime", 0)
+			self.DataManager.MetaDataSet("TotalTime", 0)
+			self.DataManager.MetaDataSet("BruteForceTotalTime", 0)
+			self.DataManager.MetaDataSet("AnnTotalTime", 0)
+			self.DataManager.MetaDataSet("AnnDataMadeFromTotalTime", 0)
+			self.DataManager.MetaDataSet("LastBackUpTotalTime", 0)
+			self.DataManager.MetaDataSet("AnnMoveInputShape", None)
+			self.DataManager.MetaDataSet("AnnMoveStructreArray", None)
+			self.DataManager.MetaDataSet("AnnRunId", None)
+			self.DataManager.MetaDataSet("TriedMovesPlayed", 0)
+			self.DataManager.MetaDataSet("VaildMovesPlayed", 0)
 			return False
 		
 		return True
@@ -234,7 +234,7 @@ class RunController:
 
 		startTime = time.time()
 		
-		tournamentController = TournamentController(self.Logger, self.Sim, self.Agents, self.AiDataManager, self.OutcomePredictor, self.RenderQuality)
+		tournamentController = TournamentController(self.Logger, self.Sim, self.Agents, self.DataManager, self.OutcomePredictor, self.RenderQuality)
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
