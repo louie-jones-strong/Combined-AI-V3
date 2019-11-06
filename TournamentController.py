@@ -2,7 +2,6 @@ import time
 from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
 
-
 class TournamentController:
 
 	def __init__(self, logger, game, agents, dataManager, outcomePredictor, renderQuality):

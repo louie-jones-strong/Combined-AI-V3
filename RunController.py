@@ -2,43 +2,11 @@ import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
-from DataManger.Serializer import BoardToKey
-from Shared import OutputFormating as Format
 from Shared import Logger
 import importlib
 import time
 import os
-import sys
 from TournamentController import TournamentController
-
-
-def MakeAgentMove(turn, board, agents, outcomePredictor, game):
-	startBoardKey = BoardToKey(board)
-
-	agent = agents[turn-1]
-	valid = False
-	while not valid:
-		move = agent.MoveCal(board)
-		
-		outcomePredictor.PredictOutput(board, move)
-
-		valid, outComeBoard, turn = game.MakeMove(move)
-
-		if not valid:
-			agent.UpdateInvalidMove(board, move)
-
-			if outcomePredictor != None:
-				outcomePredictor.UpdateInvalidMove(board, move)
-
-
-	finished, fit = game.CheckFinished()
-
-	if outcomePredictor != None:
-		outcomePredictor.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
-
-	agent.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
-
-	return outComeBoard, turn, finished, fit
 
 class RunController:
 
