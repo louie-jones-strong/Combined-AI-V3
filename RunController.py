@@ -52,8 +52,6 @@ class RunController:
 
 		#setting
 		self.NumberOfAgents = self.SimInfo["MaxPlayers"]
-		self.LastOutputTime = time.time()
-		self.LastSaveTook = 0
 
 		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
 
@@ -67,14 +65,7 @@ class RunController:
 
 
 		self.SetupAgent(loadData, aiType, trainNetwork)
-
-
-		if self.RenderQuality == 3:
-			import RenderEngine.RenderEngine2D as RenderEngine
-			self.RenderEngine = RenderEngine.RenderEngine()
-
-		elif self.RenderQuality == 0:
-			self.Logger.Clear()
+		self.Logger.Clear()
 
 		return
 
@@ -237,87 +228,6 @@ class RunController:
 		
 		return True
 
-	def RenderBoard(self, game, board):
-		if self.RenderQuality == 0:
-			return
-
-		elif self.RenderQuality == 2:
-			game.SimpleBoardOutput(board)
-		
-		elif self.RenderQuality == 3:
-			timeMark = time.time()
-			self.RenderEngine.PieceList = game.ComplexBoardOutput(board)
-			timeMark = time.time()-timeMark
-			if not self.RenderEngine.UpdateWindow(timeMark):
-				self.RenderQuality = 0
-
-
-		return
-
-	def Output(self, agents, outcomePredictor, game, numMoves, gameStartTime, board, turn, finished=False):
-		outputTime = time.time()
-
-		if self.RenderQuality == 0:
-			return
-
-		if self.RenderQuality == 3:
-			self.RenderBoard(game, board)
-
-		if (time.time() - self.LastOutputTime) >= 0.5:
-			numGames = self.AiDataManager.MetaDataGet("NumberOfGames")+1
-
-			backUpTime = self.AiDataManager.MetaDataGet("LastBackUpTotalTime")
-			totalTime = self.AiDataManager.MetaDataGet("TotalTime")
-			realTime = self.AiDataManager.MetaDataGet("RealTime")
-			numberOfCompleteBoards = self.AiDataManager.MetaDataGet("NumberOfCompleteBoards")
-			numberOfFinishedBoards = self.AiDataManager.MetaDataGet("NumberOfFinishedBoards")
-			avgMoveTime = 0
-			if numMoves != 0:
-				avgMoveTime = (time.time() - gameStartTime)/numMoves
-				avgMoveTime = round(avgMoveTime, 6)
-
-			self.Logger.Clear()
-			if self.RenderQuality == 2:
-				self.RenderBoard(game, board)
-
-			print("")
-			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
-			print("Number Of Complete Boards: " + str(Format.SplitNumber(numberOfCompleteBoards)))
-			print("Number Of Finished Boards: " + str(Format.SplitNumber(numberOfFinishedBoards)))
-			if finished:
-				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)) + " finished game")
-			else:
-				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)))
-			print("moves avg took: " + str(avgMoveTime) + " seconds")
-			print("Games avg took: " + Format.SplitTime(totalTime/numGames, roundTo=6))
-			print("time since start: " + Format.SplitTime(totalTime))
-			print("Real Time since start: " + Format.SplitTime(realTime))
-
-			print("time since last BackUp: " + Format.SplitTime(totalTime-backUpTime))
-
-			for loop in range(len(agents)):
-				print()
-				print("Agent["+str(loop)+"] ("+str(agents[loop].AgentType)+") Info: ")
-				print(agents[loop].AgentInfoOutput())
-
-			print()
-			print("Predictor")
-			print(outcomePredictor.PredictorInfoOutput())
-			
-			title = self.SimInfo["SimName"]
-			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
-			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
-			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
-			self.Logger.SetTitle(title)
-
-			outputTime = time.time()-outputTime
-			print()
-			print("Output Took: "+ Format.SplitTime(outputTime))
-			self.LastOutputTime = time.time()
-
-
-		return
-	
 	def RunTraning(self):
 		gamesToPlay = 100
 		self.LastSaveTime = time.time()
@@ -328,73 +238,10 @@ class RunController:
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
-			#self.RunSimTournament(gamesToPlay, self.Sim, self.Agents, self.OutcomePredictor, True)
-
 			tournamentController.RunTournament(gamesToPlay)
 
-		self.TrySaveData(True)
+		tournamentController.TrySaveData(True)
 		return
-
-	def RunSimTournament(self, gamesToPlay, game, agents, outcomePredictor, isMainThread):
-		board, turn = game.Start()
-		self.AiDataManager.UpdateStartingBoards(board)
-
-		numMoves = 0
-		numGames = 0
-		totalStartTime = time.time()
-		gameStartTime = time.time()
-		while gamesToPlay == -1 or numGames < gamesToPlay:
-			if isMainThread:
-				self.Output(agents, outcomePredictor, game, numMoves, gameStartTime, board, turn)
-			board, turn, finished, fit = MakeAgentMove(turn, board, agents, outcomePredictor, game)
-
-			#input("any button to step:")
-
-			numMoves += 1
-			temp = time.time()-totalStartTime
-			self.AiDataManager.MetaDataAdd("TotalTime", temp)
-			if isMainThread:
-				self.AiDataManager.MetaDataAdd("RealTime", temp)
-			totalStartTime = time.time()
-
-			if finished:
-				numGames += 1
-				self.AiDataManager.MetaDataAdd("NumberOfGames", 1)
-
-				for loop in range(len(agents)):
-					agents[loop].GameFinished(fit[loop])
-
-				if isMainThread:
-					self.Output(agents, outcomePredictor, game, numMoves, gameStartTime, board, turn, finished=True)
-
-					self.TrySaveData()
-
-				if self.StopTime != None and self.AiDataManager.MetaDataGet("RealTime") >= self.StopTime:
-					break
-
-				board, turn = game.Start()
-				self.AiDataManager.UpdateStartingBoards(board)
-				numMoves = 0
-				gameStartTime = time.time()
-		
-		for loop in range(len(agents)):
-			agents[loop].TournamentFinished()
-		return
-
-	def TrySaveData(self, forceSave=False):
-		if time.time()-self.LastSaveTime > 60 or forceSave:
-			self.LastSaveTook = time.time()
-
-
-			# save back up every hour
-			if self.AiDataManager.MetaDataGet("TotalTime")-self.AiDataManager.MetaDataGet("LastBackUpTotalTime") > 60*60:
-				self.AiDataManager.BackUp()
-
-			self.AiDataManager.Save()
-			self.LastSaveTime = time.time()
-			self.LastSaveTook = time.time() - self.LastSaveTook
-		return
-
 
 if __name__ == "__main__":
 	Logger = Logger.Logger()
