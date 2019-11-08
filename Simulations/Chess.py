@@ -11,21 +11,21 @@ class Simulation(SimBase.SimBase):
 	
 	def __init__(self):
 		self.PieceImageDict = {}
-		self.PieceImageDict[-1] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type1.png")
-		self.PieceImageDict[-2] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type2.png")
-		self.PieceImageDict[-3] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type3.png")
-		self.PieceImageDict[-4] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type4.png")
-		self.PieceImageDict[-5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type5.png")
-		self.PieceImageDict[-6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type6.png")
+		self.PieceImageDict[-1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type1.png")
+		self.PieceImageDict[-2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type2.png")
+		self.PieceImageDict[-3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type3.png")
+		self.PieceImageDict[-4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type4.png")
+		self.PieceImageDict[-5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type5.png")
+		self.PieceImageDict[-6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type6.png")
 
-		self.PieceImageDict[1] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-1.png")
-		self.PieceImageDict[2] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-2.png")
-		self.PieceImageDict[3] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-3.png")
-		self.PieceImageDict[4] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-4.png")
-		self.PieceImageDict[5] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-5.png")
-		self.PieceImageDict[6] = ImagePiece.LoadImage("RenderEngine\\Images\\Chess\\Type-6.png")
+		self.PieceImageDict[1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-1.png")
+		self.PieceImageDict[2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-2.png")
+		self.PieceImageDict[3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-3.png")
+		self.PieceImageDict[4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-4.png")
+		self.PieceImageDict[5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-5.png")
+		self.PieceImageDict[6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-6.png")
 
-		boardImg = ImagePiece.LoadImage("RenderEngine\\Images\\Board.png")
+		boardImg = ImagePiece.LoadImage("Assets\\Images\\Board.png")
 		self.BackGroundpieceList = []
 		pieceSize = 30
 		grid = [8,8]

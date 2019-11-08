@@ -2,43 +2,12 @@ import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
-from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
 from Shared import Logger
 import importlib
 import time
 import os
-import sys
-import threading
-
-
-def MakeAgentMove(turn, board, agents, outcomePredictor, game):
-	startBoardKey = BoardToKey(board)
-
-	agent = agents[turn-1]
-	valid = False
-	while not valid:
-		move = agent.MoveCal(board)
-		
-		outcomePredictor.PredictOutput(board, move)
-
-		valid, outComeBoard, turn = game.MakeMove(move)
-
-		if not valid:
-			agent.UpdateInvalidMove(board, move)
-
-			if outcomePredictor != None:
-				outcomePredictor.UpdateInvalidMove(board, move)
-
-
-	finished, fit = game.CheckFinished()
-
-	if outcomePredictor != None:
-		outcomePredictor.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
-
-	agent.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
-
-	return outComeBoard, turn, finished, fit
+from TournamentController import TournamentController
 
 class RunController:
 
@@ -52,10 +21,8 @@ class RunController:
 
 		#setting
 		self.NumberOfAgents = self.SimInfo["MaxPlayers"]
-		self.LastOutputTime = time.time()
-		self.LastSaveTook = 0
 
-		self.AiDataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
+		self.DataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
 
 		if renderQuality != None:
 			self.RenderQuality = renderQuality
@@ -67,14 +34,7 @@ class RunController:
 
 
 		self.SetupAgent(loadData, aiType, trainNetwork)
-
-
-		if self.RenderQuality == 3:
-			import RenderEngine.RenderEngine2D as RenderEngine
-			self.RenderEngine = RenderEngine.RenderEngine()
-
-		elif self.RenderQuality == 0:
-			self.Logger.Clear()
+		self.Logger.Clear()
 
 		return
 
@@ -92,7 +52,7 @@ class RunController:
 			loadData = self.SetUpMetaData("Y")
 			if loadData:
 				import RenderEngine.TreeVisualiser as TreeVisualiser
-				TreeVisualiser.TreeVisualiser(self.AiDataManager)
+				TreeVisualiser.TreeVisualiser(self.DataManager)
 
 			input("hold here error!!!!!")
 
@@ -100,23 +60,23 @@ class RunController:
 
 		loadData = self.SetUpMetaData(loadData)
 		import Predictors.SimOutputPredictor as SimOutputPredictor
-		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.AiDataManager, loadData)
+		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.DataManager, loadData)
 
 		if userInput == "H":
-			self.Agents += [HumanAgent.Agent(self.AiDataManager, loadData, winningModeON=True)]
+			self.Agents += [HumanAgent.Agent(self.DataManager, loadData, winningModeON=True)]
 
 			import Agents.MonteCarloAgent as MonteCarloAgent
 			for loop in range(self.NumberOfAgents-1):
-				moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData)
+				moveAgent = BruteForceAgent.Agent(self.DataManager, loadData)
 
-				self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent, winningModeON=True)]
+				self.Agents += [MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent, winningModeON=True)]
 
 
 		elif userInput == "R":
-			self.Agents += [RandomAgent.Agent(self.AiDataManager, loadData)]
+			self.Agents += [RandomAgent.Agent(self.DataManager, loadData)]
 
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		elif userInput == "N":
 			if trainNetwork == None:
@@ -127,33 +87,33 @@ class RunController:
 			import Agents.NeuralNetworkAgent as NeuralNetwork
 			trainingMode = userInput == "Y" or userInput == "y"
 			
-			self.Agents += [NeuralNetwork.Agent(self.AiDataManager, loadData, trainingMode=trainingMode)]
+			self.Agents += [NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=trainingMode)]
 
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		elif userInput == "E":
 			import Agents.Evolution.EvolutionAgent as EvolutionAgent
 			import Agents.Evolution.EvolutionController as EvolutionController
-			evoController = EvolutionController.EvolutionController(self.AiDataManager, loadData)
+			evoController = EvolutionController.EvolutionController(self.DataManager, loadData)
 
-			self.Agents += [EvolutionAgent.Agent(evoController, self.AiDataManager, loadData)]
+			self.Agents += [EvolutionAgent.Agent(evoController, self.DataManager, loadData)]
 
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		elif userInput == "M":
 			import Agents.MonteCarloAgent as MonteCarloAgent
-			moveAgent = BruteForceAgent.Agent(self.AiDataManager, loadData)
+			moveAgent = BruteForceAgent.Agent(self.DataManager, loadData)
 
-			self.Agents += [MonteCarloAgent.Agent(self.AiDataManager, loadData, moveAgent)]
+			self.Agents += [MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent)]
 
 			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		else:
 			for loop in range(self.NumberOfAgents):
-				self.Agents += [BruteForceAgent.Agent(self.AiDataManager, loadData)]
+				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
 		return
 
@@ -194,222 +154,69 @@ class RunController:
 	def SetUpMetaData(self, loadData=None):
 		userInput = "N"
 
-		if self.AiDataManager.LoadMetaData():
-			if self.AiDataManager.MetaDataGet("Version") == self.Version:
+		if self.DataManager.LoadMetaData():
+			if self.DataManager.MetaDataGet("Version") == self.Version:
 				if loadData == None:
 					self.Logger.Clear()
 					print("")
-					print("SizeOfDataSet: "+str(self.AiDataManager.MetaDataGet("SizeOfDataSet")))
-					print("NumberOfCompleteBoards: "+str(self.AiDataManager.MetaDataGet("NumberOfCompleteBoards")))
-					print("NumberOfFinishedBoards: "+str(self.AiDataManager.MetaDataGet("NumberOfFinishedBoards")))
-					print("NumberOfGames: "+str(self.AiDataManager.MetaDataGet("NumberOfGames")))
-					print("TotalTime: "+Format.SplitTime(self.AiDataManager.MetaDataGet("TotalTime"), roundTo=2))
-					print("LastBackUpTotalTime: "+Format.SplitTime(self.AiDataManager.MetaDataGet("LastBackUpTotalTime"), roundTo=2))
+					print("SizeOfDataSet: "+str(self.DataManager.MetaDataGet("SizeOfDataSet")))
+					print("NumberOfCompleteBoards: "+str(self.DataManager.MetaDataGet("NumberOfCompleteBoards")))
+					print("NumberOfFinishedBoards: "+str(self.DataManager.MetaDataGet("NumberOfFinishedBoards")))
+					print("NumberOfGames: "+str(self.DataManager.MetaDataGet("NumberOfGames")))
+					print("TotalTime: "+Format.SplitTime(self.DataManager.MetaDataGet("TotalTime"), roundTo=2))
+					print("LastBackUpTotalTime: "+Format.SplitTime(self.DataManager.MetaDataGet("LastBackUpTotalTime"), roundTo=2))
 					print("")
 					userInput = input("load Dataset[Y/N]:")
 				else:
 					userInput = loadData
 			else:
-				print("MetaData Version "+str(self.AiDataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
+				print("MetaData Version "+str(self.DataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
 				input()
 
 		if userInput == "n" or userInput == "N":
-			self.AiDataManager.MetaDataSet("Version", self.Version)
-			self.AiDataManager.MetaDataSet("SizeOfDataSet", 0)
-			self.AiDataManager.MetaDataSet("NumberOfTables", 0)
-			self.AiDataManager.MetaDataSet("FillingTable", 0)
-			self.AiDataManager.MetaDataSet("NumberOfCompleteBoards", 0)
-			self.AiDataManager.MetaDataSet("NumberOfFinishedBoards", 0)
-			self.AiDataManager.MetaDataSet("NumberOfGames", 0)
-			self.AiDataManager.MetaDataSet("NetworkUsingOneHotEncoding", False)
-			self.AiDataManager.MetaDataSet("RealTime", 0)
-			self.AiDataManager.MetaDataSet("TotalTime", 0)
-			self.AiDataManager.MetaDataSet("BruteForceTotalTime", 0)
-			self.AiDataManager.MetaDataSet("AnnTotalTime", 0)
-			self.AiDataManager.MetaDataSet("AnnDataMadeFromTotalTime", 0)
-			self.AiDataManager.MetaDataSet("LastBackUpTotalTime", 0)
-			self.AiDataManager.MetaDataSet("AnnMoveInputShape", None)
-			self.AiDataManager.MetaDataSet("AnnMoveStructreArray", None)
-			self.AiDataManager.MetaDataSet("AnnRunId", None)
-			self.AiDataManager.MetaDataSet("TriedMovesPlayed", 0)
-			self.AiDataManager.MetaDataSet("VaildMovesPlayed", 0)
+			self.DataManager.MetaDataSet("Version", self.Version)
+			self.DataManager.MetaDataSet("SizeOfDataSet", 0)
+			self.DataManager.MetaDataSet("NumberOfTables", 0)
+			self.DataManager.MetaDataSet("FillingTable", 0)
+			self.DataManager.MetaDataSet("NumberOfCompleteBoards", 0)
+			self.DataManager.MetaDataSet("NumberOfFinishedBoards", 0)
+			self.DataManager.MetaDataSet("NumberOfGames", 0)
+			self.DataManager.MetaDataSet("NetworkUsingOneHotEncoding", False)
+			self.DataManager.MetaDataSet("RealTime", 0)
+			self.DataManager.MetaDataSet("TotalTime", 0)
+			self.DataManager.MetaDataSet("BruteForceTotalTime", 0)
+			self.DataManager.MetaDataSet("AnnTotalTime", 0)
+			self.DataManager.MetaDataSet("AnnDataMadeFromTotalTime", 0)
+			self.DataManager.MetaDataSet("LastBackUpTotalTime", 0)
+			self.DataManager.MetaDataSet("AnnMoveInputShape", None)
+			self.DataManager.MetaDataSet("AnnMoveStructreArray", None)
+			self.DataManager.MetaDataSet("AnnRunId", None)
+			self.DataManager.MetaDataSet("TriedMovesPlayed", 0)
+			self.DataManager.MetaDataSet("VaildMovesPlayed", 0)
 			return False
 		
 		return True
 
-	def RenderBoard(self, game, board):
-		if self.RenderQuality == 0:
-			return
-
-		elif self.RenderQuality == 2:
-			game.SimpleBoardOutput(board)
-		
-		elif self.RenderQuality == 3:
-			timeMark = time.time()
-			self.RenderEngine.PieceList = game.ComplexBoardOutput(board)
-			timeMark = time.time()-timeMark
-			if not self.RenderEngine.UpdateWindow(timeMark):
-				self.RenderQuality = 0
-
-
-		return
-
-	def Output(self, agents, outcomePredictor, game, numMoves, gameStartTime, board, turn, finished=False):
-		outputTime = time.time()
-
-		if self.RenderQuality == 0:
-			return
-
-		if self.RenderQuality == 3:
-			self.RenderBoard(game, board)
-
-		if (time.time() - self.LastOutputTime) >= 0.5:
-			numGames = self.AiDataManager.MetaDataGet("NumberOfGames")+1
-
-			backUpTime = self.AiDataManager.MetaDataGet("LastBackUpTotalTime")
-			totalTime = self.AiDataManager.MetaDataGet("TotalTime")
-			realTime = self.AiDataManager.MetaDataGet("RealTime")
-			numberOfCompleteBoards = self.AiDataManager.MetaDataGet("NumberOfCompleteBoards")
-			numberOfFinishedBoards = self.AiDataManager.MetaDataGet("NumberOfFinishedBoards")
-			avgMoveTime = 0
-			if numMoves != 0:
-				avgMoveTime = (time.time() - gameStartTime)/numMoves
-				avgMoveTime = round(avgMoveTime, 6)
-
-			self.Logger.Clear()
-			if self.RenderQuality == 2:
-				self.RenderBoard(game, board)
-
-			print("")
-			print("Dataset size: " + str(Format.SplitNumber(self.AiDataManager.GetNumberOfBoards())))
-			print("Number Of Complete Boards: " + str(Format.SplitNumber(numberOfCompleteBoards)))
-			print("Number Of Finished Boards: " + str(Format.SplitNumber(numberOfFinishedBoards)))
-			if finished:
-				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)) + " finished game")
-			else:
-				print("game: " + str(Format.SplitNumber(numGames)) + " move: " + str(Format.SplitNumber(numMoves)))
-			print("moves avg took: " + str(avgMoveTime) + " seconds")
-			print("Games avg took: " + Format.SplitTime(totalTime/numGames, roundTo=6))
-			print("time since start: " + Format.SplitTime(totalTime))
-			print("Real Time since start: " + Format.SplitTime(realTime))
-
-			print("time since last BackUp: " + Format.SplitTime(totalTime-backUpTime))
-
-			for loop in range(len(agents)):
-				print()
-				print("Agent["+str(loop)+"] ("+str(agents[loop].AgentType)+") Info: ")
-				print(agents[loop].AgentInfoOutput())
-
-			print()
-			print("Predictor")
-			print(outcomePredictor.PredictorInfoOutput())
-			
-			title = self.SimInfo["SimName"]
-			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
-			title += " CachingInfo: " + self.AiDataManager.GetLoadedDataInfo()
-			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
-			self.Logger.SetTitle(title)
-
-			outputTime = time.time()-outputTime
-			print()
-			print("Output Took: "+ Format.SplitTime(outputTime))
-			self.LastOutputTime = time.time()
-
-
-		return
-	
 	def RunTraning(self):
-		# targetThreadNum = 1
 		gamesToPlay = 100
 		self.LastSaveTime = time.time()
 
 		startTime = time.time()
+		
+		tournamentController = TournamentController(self.Logger, self.Sim, self.Agents, self.DataManager, self.OutcomePredictor, self.RenderQuality)
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
-			# threads = []
-			# for loop in range(targetThreadNum-1):
-			# 	game = self.Sim.CreateNew()
-			# 	agents = []
-			# 	#todo make agent list again from user input from before
-			# 	for loop in range(self.NumberOfAgents):
-			# 		agents += [BruteForceAgent.Agent(self.AiDataManager, False, winningModeON=self.WinningMode)]
-			# 	thread = threading.Thread(target=self.RunSimTournament, args=(gamesToPlay, game, agents, self.OutcomePredictor, False,))
-			# 	threads += [thread]
-			# 	thread.start()
+			tournamentController.RunTournament(gamesToPlay)
 
-
-			self.RunSimTournament(gamesToPlay, self.Sim, self.Agents, self.OutcomePredictor, True)
-			# for thread in threads:
-			# 	thread.join()
-
-		self.TrySaveData(True)
+		tournamentController.TrySaveData(True)
 		return
-
-	def RunSimTournament(self, gamesToPlay, game, agents, outcomePredictor, isMainThread):
-		board, turn = game.Start()
-		self.AiDataManager.UpdateStartingBoards(board)
-
-		numMoves = 0
-		numGames = 0
-		totalStartTime = time.time()
-		gameStartTime = time.time()
-		while gamesToPlay == -1 or numGames < gamesToPlay:
-			if isMainThread:
-				self.Output(agents, outcomePredictor, game, numMoves, gameStartTime, board, turn)
-			board, turn, finished, fit = MakeAgentMove(turn, board, agents, outcomePredictor, game)
-
-			#input("any button to step:")
-
-			numMoves += 1
-			temp = time.time()-totalStartTime
-			self.AiDataManager.MetaDataAdd("TotalTime", temp)
-			if isMainThread:
-				self.AiDataManager.MetaDataAdd("RealTime", temp)
-			totalStartTime = time.time()
-
-			if finished:
-				numGames += 1
-				self.AiDataManager.MetaDataAdd("NumberOfGames", 1)
-
-				for loop in range(len(agents)):
-					agents[loop].GameFinished(fit[loop])
-
-				if isMainThread:
-					self.Output(agents, outcomePredictor, game, numMoves, gameStartTime, board, turn, finished=True)
-
-					self.TrySaveData()
-
-				if self.StopTime != None and self.AiDataManager.MetaDataGet("RealTime") >= self.StopTime:
-					break
-
-				board, turn = game.Start()
-				self.AiDataManager.UpdateStartingBoards(board)
-				numMoves = 0
-				gameStartTime = time.time()
-		
-		for loop in range(len(agents)):
-			agents[loop].TournamentFinished()
-		return
-
-	def TrySaveData(self, forceSave=False):
-		if time.time()-self.LastSaveTime > 60 or forceSave:
-			self.LastSaveTook = time.time()
-
-
-			# save back up every hour
-			if self.AiDataManager.MetaDataGet("TotalTime")-self.AiDataManager.MetaDataGet("LastBackUpTotalTime") > 60*60:
-				self.AiDataManager.BackUp()
-
-			self.AiDataManager.Save()
-			self.LastSaveTime = time.time()
-			self.LastSaveTook = time.time() - self.LastSaveTook
-		return
-
 
 if __name__ == "__main__":
 	Logger = Logger.Logger()
 	Logger.Clear()
+	import Shared.AudioManager as AudioManager
+	AudioManager.sound_setup("Assets//Sounds//Error.wav")
 	hadError = False
 
 	try:
@@ -417,4 +224,5 @@ if __name__ == "__main__":
 		controller.RunTraning()
 
 	except Exception as error:
+		AudioManager.play_sound()
 		Logger.LogError(error)
