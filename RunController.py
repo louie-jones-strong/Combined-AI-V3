@@ -32,6 +32,10 @@ class RunController:
 			else:
 				self.RenderQuality = int(input("no Output 0) Just Info 1): "))
 
+		if not self.SimInfo["RenderSetup"] and self.RenderQuality >= 3:
+			self.RenderQuality = 2
+
+
 
 		self.SetupAgent(loadData, aiType, trainNetwork)
 		self.Logger.Clear()
