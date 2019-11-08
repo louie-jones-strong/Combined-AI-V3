@@ -215,6 +215,8 @@ class RunController:
 if __name__ == "__main__":
 	Logger = Logger.Logger()
 	Logger.Clear()
+	import Shared.AudioManager as AudioManager
+	AudioManager.sound_setup("Assets//Sounds//Error.wav")
 	hadError = False
 
 	try:
@@ -222,4 +224,5 @@ if __name__ == "__main__":
 		controller.RunTraning()
 
 	except Exception as error:
+		AudioManager.play_sound()
 		Logger.LogError(error)
