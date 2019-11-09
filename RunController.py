@@ -34,7 +34,7 @@ class RunController:
 				self.RenderQuality = int(input("no Output 0) Just Info 1): "))
 
 		if not self.SimInfo["RenderSetup"] and self.RenderQuality >= 3:
-			self.RenderQuality = 2
+			self.RenderQuality = 4
 
 		self.RenderQuality = eRenderType.FromInt(self.RenderQuality)
 

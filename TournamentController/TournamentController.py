@@ -100,10 +100,13 @@ class TournamentController:
 		if self.RenderQuality == eRenderType.eRenderType.Muted:
 			return
 
-		elif self.RenderQuality == eRenderType.eRenderType.TextOutput:
+		elif (self.RenderQuality == eRenderType.eRenderType.TextOutput or 
+			self.RenderQuality ==eRenderType.eRenderType.CustomOutput):
+			
 			self.Game.SimpleBoardOutput(board)
 		
 		elif self.RenderQuality == eRenderType.eRenderType.RenderOutput:
+
 			timeMark = time.time()
 			self.RenderEngine.PieceList = self.Game.ComplexBoardOutput(board)
 			timeMark = time.time()-timeMark
@@ -118,7 +121,9 @@ class TournamentController:
 			return
 
 		if (time.time() - self.LastOutputTime) < 0.5:
-			if self.RenderQuality == eRenderType.eRenderType.RenderOutput:
+			if (self.RenderQuality == eRenderType.eRenderType.RenderOutput or
+				self.RenderQuality == eRenderType.eRenderType.CustomOutput):
+
 				self.RenderBoard(board)
 			return
 
