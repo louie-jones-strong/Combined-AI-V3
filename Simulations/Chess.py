@@ -118,7 +118,7 @@ class Simulation(SimBase.SimBase):
 		return
 
 	def ComplexOutputSetup(self):
-		import RenderEngine.ImagePiece as ImagePiece
+		import RenderEngine.Piece.ImagePiece as ImagePiece
 		super().ComplexOutputSetup()
 		self.PieceImageDict = {}
 		self.PieceImageDict[-1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type1.png")
@@ -141,7 +141,7 @@ class Simulation(SimBase.SimBase):
 		return
 
 	def ComplexBoardOutput(self, board):
-		import RenderEngine.ImagePiece as ImagePiece
+		import RenderEngine.Piece.ImagePiece as ImagePiece
 		pieceList = super().ComplexBoardOutput(board)
 
 		pieceSize = 20
