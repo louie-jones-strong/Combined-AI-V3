@@ -1,4 +1,3 @@
-import RenderEngine.Shape as Shape
 import RenderEngine.ImagePiece as ImagePiece
 import Simulations.SimulationBase as SimBase
 
@@ -26,12 +25,9 @@ class Simulation(SimBase.SimBase):
 		self.PieceImageDict[6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-6.png")
 
 		boardImg = ImagePiece.LoadImage("Assets\\Images\\Board.png")
-		self.BackGroundpieceList = []
-		pieceSize = 30
-		grid = [8,8]
-		scale = [grid[0]*pieceSize, grid[1]*pieceSize]
+		scale = [240, 240]
 		pos = [scale[0], scale[1]]
-		self.BackGroundpieceList += [ImagePiece.ImagePiece(pos, scale, boardImg)]
+		self.BackGroundpieceList = [ImagePiece.ImagePiece(pos, scale, boardImg)]
 		return
 
 	def CreateNew(self):

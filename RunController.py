@@ -226,7 +226,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=3, simNumber=None, loadData="Y", aiType=None, stopTime=None)
+		controller = RunController(Logger, renderQuality=5, simNumber=None, loadData="Y", aiType=None, stopTime=None)
 		controller.RunTraning()
 
 	except Exception as error:
