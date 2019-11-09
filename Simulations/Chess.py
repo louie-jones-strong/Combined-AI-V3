@@ -1,6 +1,4 @@
-import RenderEngine.ImagePiece as ImagePiece
 import Simulations.SimulationBase as SimBase
-
 
 class Simulation(SimBase.SimBase):
 	Info = {"MinPlayers":2,"MaxPlayers":2,
@@ -9,25 +7,6 @@ class Simulation(SimBase.SimBase):
 			"Resolution":1,"RenderSetup":True}
 	
 	def __init__(self):
-		self.PieceImageDict = {}
-		self.PieceImageDict[-1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type1.png")
-		self.PieceImageDict[-2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type2.png")
-		self.PieceImageDict[-3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type3.png")
-		self.PieceImageDict[-4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type4.png")
-		self.PieceImageDict[-5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type5.png")
-		self.PieceImageDict[-6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type6.png")
-
-		self.PieceImageDict[1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-1.png")
-		self.PieceImageDict[2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-2.png")
-		self.PieceImageDict[3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-3.png")
-		self.PieceImageDict[4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-4.png")
-		self.PieceImageDict[5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-5.png")
-		self.PieceImageDict[6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-6.png")
-
-		boardImg = ImagePiece.LoadImage("Assets\\Images\\Board.png")
-		scale = [240, 240]
-		pos = [scale[0], scale[1]]
-		self.BackGroundpieceList = [ImagePiece.ImagePiece(pos, scale, boardImg)]
 		return
 
 	def CreateNew(self):
@@ -138,12 +117,36 @@ class Simulation(SimBase.SimBase):
 		print("   0  1  2  3  4  5  6  7   ")
 		return
 
+	def ComplexOutputSetup(self):
+		import RenderEngine.ImagePiece as ImagePiece
+		super().ComplexOutputSetup()
+		self.PieceImageDict = {}
+		self.PieceImageDict[-1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type1.png")
+		self.PieceImageDict[-2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type2.png")
+		self.PieceImageDict[-3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type3.png")
+		self.PieceImageDict[-4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type4.png")
+		self.PieceImageDict[-5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type5.png")
+		self.PieceImageDict[-6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type6.png")
+
+		self.PieceImageDict[1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-1.png")
+		self.PieceImageDict[2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-2.png")
+		self.PieceImageDict[3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-3.png")
+		self.PieceImageDict[4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-4.png")
+		self.PieceImageDict[5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-5.png")
+		self.PieceImageDict[6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-6.png")
+
+		boardImg = ImagePiece.LoadImage("Assets\\Images\\Board.png")
+		scale = [240, 240]
+		self.BackGroundpieceList = [ImagePiece.ImagePiece(scale, scale, boardImg)]
+		return
+
 	def ComplexBoardOutput(self, board):
+		import RenderEngine.ImagePiece as ImagePiece
+		pieceList = super().ComplexBoardOutput(board)
+
 		pieceSize = 20
 		gridSize = 30
 
-		pieceList = []
-		pieceList += self.BackGroundpieceList
 		grid = [8, 8]
 		for x in range(grid[0]):
 			for y in range(grid[1]):

@@ -1,5 +1,3 @@
-import RenderEngine.PolygonPiece as Piece
-import RenderEngine.Shape as Shape
 import Simulations.SimulationBase as SimBase
 
 
@@ -10,12 +8,6 @@ class Simulation(SimBase.SimBase):
 			"Resolution":1,"RenderSetup":True}
 
 	def __init__(self):
-		self.BackGroundpieceList = []
-		self.BackGroundpieceList += [Piece.PolygonPiece([350,300],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
-		self.BackGroundpieceList += [Piece.PolygonPiece([350,400],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
-		
-		self.BackGroundpieceList += [Piece.PolygonPiece([300, 350], [1, 150], Shape.VerticalLine(), [0, 0, 0])]
-		self.BackGroundpieceList += [Piece.PolygonPiece([400, 350], [1, 150], Shape.VerticalLine(), [0, 0, 0])]
 		return
 
 	def Start(self):
@@ -101,12 +93,25 @@ class Simulation(SimBase.SimBase):
 			if y < 2:
 				print("-+-+-")
 		return
+
+	def ComplexOutputSetup(self):
+		import RenderEngine.PolygonPiece as Piece
+		import RenderEngine.Shape as Shape
+		super().ComplexOutputSetup()
+		self.BackGroundpieceList += [Piece.PolygonPiece([350,300],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
+		self.BackGroundpieceList += [Piece.PolygonPiece([350,400],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
+		
+		self.BackGroundpieceList += [Piece.PolygonPiece([300, 350], [1, 150], Shape.VerticalLine(), [0, 0, 0])]
+		self.BackGroundpieceList += [Piece.PolygonPiece([400, 350], [1, 150], Shape.VerticalLine(), [0, 0, 0])]
+		return
+
 	def ComplexBoardOutput(self, board):
+		import RenderEngine.PolygonPiece as Piece
+		import RenderEngine.Shape as Shape
+		pieceList = super().ComplexBoardOutput(board)
 		pieceSize = 40
 		gridSize = 50
 
-		pieceList = []
-		pieceList += self.BackGroundpieceList
 		grid = [3, 3]
 		loop = 0
 		for x in range(grid[0]):

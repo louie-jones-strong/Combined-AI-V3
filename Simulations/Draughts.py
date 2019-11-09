@@ -1,5 +1,3 @@
-import RenderEngine.Shape as Shape
-import RenderEngine.PolygonPiece as Piece
 import Simulations.SimulationBase as SimBase
 
 
@@ -10,26 +8,7 @@ class Simulation(SimBase.SimBase):
 			"Resolution":1,"RenderSetup":True}
 			
 	def __init__(self):
-		self.BackGroundpieceList = []
-		pieceSize = 30
-		boardColor = True
-		for x in range(8):
-			for y in range(8):
 
-				if boardColor:
-					color = [255, 255, 255]
-					boardColor = False
-				else:
-					color = [0, 0, 0]
-					boardColor = True
-
-				self.BackGroundpieceList += [Piece.PolygonPiece([((x+0.5)-4)*pieceSize*2+350, ((y+0.5)-4)
-    	                          * pieceSize*2+350], [pieceSize, pieceSize], Shape.Square(), color)]
-
-			if boardColor:
-				boardColor = False
-			else:
-				boardColor = True
 		return
 
 	def CreateNew(self):
@@ -177,12 +156,23 @@ class Simulation(SimBase.SimBase):
 			print(str(loop)+" "+str(line)+" "+str(loop))
 		print("   0 1 2 3 4 5 6 7  ")
 		return
+
+	def ComplexOutputSetup(self):
+		import RenderEngine.ImagePiece as ImagePiece
+		super().ComplexOutputSetup()
+
+		boardImg = ImagePiece.LoadImage("Assets\\Images\\Board.png")
+		scale = [240, 240]
+		self.BackGroundpieceList = [ImagePiece.ImagePiece(scale, scale, boardImg)]
+		return
+
 	def ComplexBoardOutput(self, board):
+		import RenderEngine.Shape as Shape
+		import RenderEngine.PolygonPiece as Piece
+		pieceList = super().ComplexBoardOutput(board)
+
 		pieceSize = 20
 		gridSize = 30
-
-		pieceList = []
-		pieceList += self.BackGroundpieceList
 		grid = [8, 8]
 		for x in range(grid[0]):
 			for y in range(grid[1]):
