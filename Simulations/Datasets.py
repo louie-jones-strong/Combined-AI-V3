@@ -1,6 +1,4 @@
-import RenderEngine.Shape as Shape
 import Simulations.SimulationBase as SimBase
-
 
 class Simulation(SimBase.SimBase):
 	Info = {"MinPlayers":1,"MaxPlayers":1,
