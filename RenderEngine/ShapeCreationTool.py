@@ -1,4 +1,4 @@
-import Piece.Shape
+import Shape
 import RenderEngine2D
 import mouse
 import time
