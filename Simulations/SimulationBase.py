@@ -1,6 +1,3 @@
-import RenderEngine.Shape as Shape
-
-
 class SimBase:
 	ComplexOutputSetupDone = False
 
