@@ -213,7 +213,7 @@ class RunController:
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
-			tournamentController.RunTournament(gamesToPlay)
+			tournamentController.RunTournament(gamesToPlay, self.StopTime)
 
 		tournamentController.TrySaveData(True)
 		return
