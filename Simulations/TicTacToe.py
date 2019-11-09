@@ -95,7 +95,7 @@ class Simulation(SimBase.SimBase):
 		return
 
 	def ComplexOutputSetup(self):
-		import RenderEngine.PolygonPiece as Piece
+		import RenderEngine.Piece.PolygonPiece as Piece
 		import RenderEngine.Shape as Shape
 		super().ComplexOutputSetup()
 		self.BackGroundpieceList += [Piece.PolygonPiece([350,300],[150, 1], Shape.HorizontalLine(), [0, 0, 0])]
@@ -106,7 +106,7 @@ class Simulation(SimBase.SimBase):
 		return
 
 	def ComplexBoardOutput(self, board):
-		import RenderEngine.PolygonPiece as Piece
+		import RenderEngine.Piece.PolygonPiece as Piece
 		import RenderEngine.Shape as Shape
 		pieceList = super().ComplexBoardOutput(board)
 		pieceSize = 40

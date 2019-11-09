@@ -1,5 +1,5 @@
 import pygame
-import RenderEngine.PieceBase as Piece
+import RenderEngine.Piece.PieceBase as Piece
 
 
 class PolygonPiece(Piece.PieceBase):

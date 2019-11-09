@@ -158,7 +158,7 @@ class Simulation(SimBase.SimBase):
 		return
 
 	def ComplexOutputSetup(self):
-		import RenderEngine.ImagePiece as ImagePiece
+		import RenderEngine.Piece.ImagePiece as ImagePiece
 		super().ComplexOutputSetup()
 
 		boardImg = ImagePiece.LoadImage("Assets\\Images\\Board.png")
@@ -168,7 +168,7 @@ class Simulation(SimBase.SimBase):
 
 	def ComplexBoardOutput(self, board):
 		import RenderEngine.Shape as Shape
-		import RenderEngine.PolygonPiece as Piece
+		import RenderEngine.Piece.PolygonPiece as Piece
 		pieceList = super().ComplexBoardOutput(board)
 
 		pieceSize = 20

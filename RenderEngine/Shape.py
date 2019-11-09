@@ -1,5 +1,5 @@
-import RenderEngine.PolygonPiece as Piece
-from RenderEngine.PieceBase import RotatePoint as RotatePoint
+import RenderEngine.Piece.PolygonPiece as Piece
+from RenderEngine.Piece.PieceBase import RotatePoint as RotatePoint
 
 def BuildCardShapes(pos, scale, suit, value, rotate=0, showFace=True):
 	shapes = []
