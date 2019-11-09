@@ -1,6 +1,7 @@
 import time
 from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
+import TournamentController.eRenderType as eRenderType
 
 class TournamentController:
 
@@ -19,7 +20,7 @@ class TournamentController:
 		self.MoveNumber = 0
 		self.LastSaveTook = 0
 
-		if self.RenderQuality == 3:
+		if self.RenderQuality == eRenderType.eRenderType.RenderOutput:
 			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
 		return
@@ -96,13 +97,13 @@ class TournamentController:
 		return outComeBoard, turn, finished, fit
 
 	def RenderBoard(self, board):
-		if self.RenderQuality == 0:
+		if self.RenderQuality == eRenderType.eRenderType.Muted:
 			return
 
-		elif self.RenderQuality == 2:
+		elif self.RenderQuality == eRenderType.eRenderType.TextOutput:
 			self.Game.SimpleBoardOutput(board)
 		
-		elif self.RenderQuality == 3:
+		elif self.RenderQuality == eRenderType.eRenderType.RenderOutput:
 			timeMark = time.time()
 			self.RenderEngine.PieceList = self.Game.ComplexBoardOutput(board)
 			timeMark = time.time()-timeMark
@@ -113,11 +114,11 @@ class TournamentController:
 	def Output(self, board):
 		outputTime = time.time()
 
-		if self.RenderQuality == 0:
+		if self.RenderQuality == eRenderType.eRenderType.Muted:
 			return
 
 		if (time.time() - self.LastOutputTime) < 0.5:
-			if self.RenderQuality == 3:
+			if self.RenderQuality == eRenderType.eRenderType.RenderOutput:
 				self.RenderBoard(board)
 			return
 

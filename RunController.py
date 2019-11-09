@@ -7,7 +7,8 @@ from Shared import Logger
 import importlib
 import time
 import os
-from TournamentController import TournamentController
+import TournamentController.eRenderType as eRenderType
+import TournamentController.TournamentController as TournamentController
 
 class RunController:
 
@@ -35,6 +36,7 @@ class RunController:
 		if not self.SimInfo["RenderSetup"] and self.RenderQuality >= 3:
 			self.RenderQuality = 2
 
+		self.RenderQuality = eRenderType.FromInt(self.RenderQuality)
 
 
 		self.SetupAgent(loadData, aiType, trainNetwork)
@@ -207,7 +209,7 @@ class RunController:
 
 		startTime = time.time()
 		
-		tournamentController = TournamentController(self.Logger, self.Sim, self.Agents, self.DataManager, self.OutcomePredictor, self.RenderQuality)
+		tournamentController = TournamentController.TournamentController(self.Logger, self.Sim, self.Agents, self.DataManager, self.OutcomePredictor, self.RenderQuality)
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
