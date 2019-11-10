@@ -61,9 +61,14 @@ class DataSetManager:
 		return
 
 	def Save(self):
+		loadingBar = LoadingBar.LoadingBar(self.Logger)
+		loadingBar.Setup("Saving", 6)
+
 		with self.Lock:
+
 			if (not self.CanAppendData) and os.path.exists(self.DatasetAddress):
 				shutil.rmtree(self.DatasetAddress)
+			loadingBar.Update(1)
 
 			if len(self.NewDataSetHashTable) > 0:
 				if self.CanAppendData:
@@ -72,13 +77,17 @@ class DataSetManager:
 					DictSave(self.DataSetHashTableAddress, self.NewDataSetHashTable)
 
 				self.NewDataSetHashTable = {}
+			loadingBar.Update(2)
 
 			DictSave(self.StartingBoardsAddress, self.StartingBoards)
+			loadingBar.Update(3)
 
 			if (not ComplexFileExists(self.MoveIDLookUpAdress)):
 				ComplexSave(self.MoveIDLookUpAdress, self.MoveIDLookUp)
+			loadingBar.Update(4)
 
 			listOfKeys = list(self.LoadedDataSetTables.keys())
+
 			for tableKey in listOfKeys:
 
 				if self.LoadedDataSetTables[tableKey] > 0:
@@ -88,6 +97,8 @@ class DataSetManager:
 					self.DataSetTables[tableKey].Unload()
 					del self.LoadedDataSetTables[tableKey]
 
+			loadingBar.Update(5)
+
 
 
 			self.CanAppendData = True
@@ -96,6 +107,7 @@ class DataSetManager:
 			self.MetaDataSet("FillingTable", self.FillingTable)
 
 		self.SaveMetaData()
+		loadingBar.Update(6)
 		return
 	def Clear(self):
 		with self.Lock:
@@ -110,6 +122,7 @@ class DataSetManager:
 
 	def BackUp(self):
 		with self.Lock:
+			print("Doing BackUp")
 			if (os.path.exists(self.DatasetBackUpAddress)):
 				shutil.rmtree(self.DatasetBackUpAddress)
 			shutil.copytree(self.DatasetAddress, self.DatasetBackUpAddress)
