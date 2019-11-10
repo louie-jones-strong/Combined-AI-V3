@@ -12,7 +12,9 @@ def serializer(inputObject):
 	if inputObject == None:
 		return "None"
 
-	elif type(inputObject) is bytes:
+	inputType = type(inputObject)
+
+	if inputType is bytes:
 		outputObject = "b("
 		for loop in range(len(inputObject)):
 			outputObject += str(inputObject[loop])
@@ -21,7 +23,7 @@ def serializer(inputObject):
 
 		return outputObject + ")"
 	
-	elif type(inputObject) is str:
+	elif inputType is str:
 		return "'"+inputObject+"'"
 
 	elif hasattr(inputObject, "__len__"):
@@ -35,7 +37,16 @@ def serializer(inputObject):
 		return str(inputObject)
 def deserializer(inputString):
 
-	if inputString.startswith("b("):
+	if inputString == "None":
+		outputObject = None
+
+	elif inputString == "True":
+		outputObject = True
+
+	elif inputString == "False":
+		outputObject = False
+
+	elif inputString.startswith("b("):
 		subInputString = inputString[2:-1]
 		byteArray = list(map(int, subInputString.split(",")))
 		outputObject = bytes(byteArray)
@@ -60,15 +71,6 @@ def deserializer(inputString):
 
 		outputObject = list(map(deserializer, stringList))
 
-	elif inputString == "None":
-		outputObject = None
-
-	elif inputString == "True":
-		outputObject = True
-
-	elif inputString == "False":
-		outputObject = False
-
 	elif inputString.startswith("'"):
 		outputObject = inputString.replace("'","")
 
@@ -82,3 +84,32 @@ def deserializer(inputString):
 		    outputObject = inputString
 			
 	return outputObject
+
+
+if __name__ == "__main__":
+	import time
+
+	inputObject = [[4,2,3,6,5,3,2,4],
+			 [1,1,1,1,1,1,1,1],
+			 [0,0,0,0,0,0,0,0],
+			 [0,0,0,0,0,0,0,0],
+			 [0,0,0,0,0,0,0,0],
+			 [0,0,0,0,0,0,0,0],
+			 [-1,-1,-1,-1,-1,-1,-1,-1],
+			 [-4,-2,-3,-6,-5,-3,-2,-4]]
+
+	serializerTime = 0
+	deserializerTime = 0
+
+	for loop in range(10000):
+
+		timeMark = time.time()
+		serializerOut = serializer(inputObject)
+		serializerTime += time.time()-timeMark
+
+		timeMark = time.time()
+		deserializer(serializerOut)
+		deserializerTime += time.time()-timeMark
+
+	print("Serializer took: "+str(serializerTime))
+	print("deserializer took: "+str(deserializerTime))
