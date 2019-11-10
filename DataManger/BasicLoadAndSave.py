@@ -1,7 +1,7 @@
 import pickle
 import os
 from Shared import LoadingBar as LoadingBar
-from DataManger.Serializer import *
+import DataManger.Serializer as Serializer
 import threading
 
 def DictAppend(address, dictionary): 
@@ -15,7 +15,7 @@ def DictAppend(address, dictionary):
 		address += ".txt"
 		file = open(address, "a")
 		for key, value in dictionary.items():
-			file.write(str(key)+":"+serializer(value)+"\n")
+			file.write(str(key)+":"+Serializer.serializer(value)+"\n")
 		file.close()
 
 	return
@@ -25,35 +25,30 @@ def DictSave(address, dictionary):
 
 	file = open(address, "w")
 	for key, value in dictionary.items():
-		serializerValue = serializer(value)
+		serializerValue = Serializer.serializer(value)
 		file.write(str(key)+":"+serializerValue+"\n")
 	file.close()
 	return
 def DictLoad(address, loadingBar=None):
 	dictionary = {}
 	address += ".txt"
-	
-	if loadingBar != None:
-		loadingBar.Update(0, "Loading Dict")
-
 	file = open(address, "r")
 	lines = file.readlines()
 	file.close()
 	
 	numberOfLines = len(lines)
 	if loadingBar != None:
-		loadingBar.Update(0, "Loading dict", 0, numberOfLines)
+		loadingBar.Setup("Loading dict", numberOfLines)
 
 	for loop in range(numberOfLines):
-		line = lines[loop][:-1].split(":")
-		key = line[0]
-		dictionary[key] = deserializer(line[1])
+		key, value = lines[loop][:-1].split(":")
+		dictionary[key] = Serializer.deserializer(value)
 
 		if loadingBar != None:
-			loadingBar.Update(loop/numberOfLines, "Loading dict", loop, numberOfLines)
+			loadingBar.Update(loop)
 			
 	if loadingBar != None:
-		loadingBar.Update(loop/numberOfLines, "Loading dict", numberOfLines, numberOfLines)
+		loadingBar.Update(loop)
 
 	return dictionary
 def DictFileExists(address):

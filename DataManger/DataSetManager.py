@@ -4,6 +4,7 @@ from Shared import LoadingBar as LoadingBar
 from Shared import OutputFormating as Format
 from Shared import RamUsedInfo as RamInfo
 from DataManger.BasicLoadAndSave import *
+import DataManger.Serializer as Serializer
 import shutil
 import threading
 
@@ -206,7 +207,7 @@ class DataSetManager:
 		return found, boardInfo
 	
 	def UpdateStartingBoards(self, board):
-		key = BoardToKey(board)
+		key = Serializer.BoardToKey(board)
 		if key in self.StartingBoards:
 			self.StartingBoards[key] += 1
 		else:
@@ -224,7 +225,8 @@ class DataSetManager:
 			(not ComplexFileExists(self.AnnDataSetAddress+"XMoveDataSet")) or 
 			(not ComplexFileExists(self.AnnDataSetAddress+"YMoveDataSet"))):
 			loadingBar = LoadingBar.LoadingBar(self.Logger)
-			
+			loadingBar.Setup("building Dataset", len(self.DataSetHashTable))
+
 			self.LoadTableInfo()
 			loop = 0
 			for key, value in self.DataSetHashTable.items():
@@ -255,7 +257,7 @@ class DataSetManager:
 					dataSetY += [outputY]
 
 
-				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset", loop, len(self.DataSetHashTable))
+				loadingBar.Update(loop)
 				loop += 1
 
 			ComplexSave(self.AnnDataSetAddress+"XMoveDataSet", dataSetX)
@@ -281,6 +283,7 @@ class DataSetManager:
 			(not ComplexFileExists(self.AnnDataSetAddress+"YPredictionDataSet"))):
 			
 			loadingBar = LoadingBar.LoadingBar(self.Logger)
+			loadingBar.Setup("building Dataset", len(self.DataSetHashTable))
 			
 			self.LoadTableInfo()
 			loop = 0
@@ -309,7 +312,7 @@ class DataSetManager:
 						dataSetY += [[1]]
 
 
-				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset", loop, len(self.DataSetHashTable))
+				loadingBar.Update(loop)
 				loop += 1
 
 			ComplexSave(self.AnnDataSetAddress+"XPredictionDataSet", dataSetX)
@@ -333,6 +336,7 @@ class DataSetManager:
 			(not ComplexFileExists(self.AnnDataSetAddress+"YValueDataSet"))):
 			
 			loadingBar = LoadingBar.LoadingBar(self.Logger)
+			loadingBar.Setup("building Dataset", len(self.DataSetHashTable))
 			
 			self.LoadTableInfo()
 			loop = 0
@@ -349,7 +353,7 @@ class DataSetManager:
 					dataSetY += [[boardInfo.TotalAvgFitness]]
 
 
-				loadingBar.Update(loop/len(self.DataSetHashTable), "building Dataset", loop, len(self.DataSetHashTable))
+				loadingBar.Update(loop)
 				loop += 1
 
 			ComplexSave(self.AnnDataSetAddress+"XValueDataSet", dataSetX)
