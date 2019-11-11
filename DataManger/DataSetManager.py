@@ -96,7 +96,7 @@ class DataSetManager:
 			loadingBar.Update(4)
 
 			listOfKeys = list(self.LoadedDataSetTables.keys())
-			any(map(self.ThreadSave, listOfKeys))
+			map(self.ThreadSave, listOfKeys)
 
 			loadingBar.Update(5)
 
