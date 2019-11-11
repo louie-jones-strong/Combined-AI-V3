@@ -60,15 +60,6 @@ class DataSetManager:
 		self.MoveIDLookUpAdress = self.DatasetAddress+"LookUp//"+"MoveIdLookUp"
 		return
 
-	def ThreadSave(self, tableKey):
-		if self.LoadedDataSetTables[tableKey] > 0:
-			self.DataSetTables[tableKey].Save()
-			self.LoadedDataSetTables[tableKey] = 0
-		else:
-			self.DataSetTables[tableKey].Unload()
-			del self.LoadedDataSetTables[tableKey]
-		return
-
 	def Save(self):
 		loadingBar = LoadingBar.LoadingBar(self.Logger)
 		loadingBar.Setup("Saving", 6)
@@ -96,7 +87,15 @@ class DataSetManager:
 			loadingBar.Update(4)
 
 			listOfKeys = list(self.LoadedDataSetTables.keys())
-			map(self.ThreadSave, listOfKeys)
+
+			for tableKey in listOfKeys:
+
+				if self.LoadedDataSetTables[tableKey] > 0:
+					self.DataSetTables[tableKey].Save()
+					self.LoadedDataSetTables[tableKey] = 0
+				else:
+					self.DataSetTables[tableKey].Unload()
+					del self.LoadedDataSetTables[tableKey]
 
 			loadingBar.Update(5)
 
