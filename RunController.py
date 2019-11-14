@@ -8,13 +8,14 @@ import importlib
 import time
 import os
 import TournamentController.eRenderType as eRenderType
+import TournamentController.eLoadType as eLoadType
 import TournamentController.TournamentController as TournamentController
 
 class RunController:
 
 	Version = 1.5
 
-	def __init__(self, logger, simNumber=None, loadData=None, aiType=None, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
+	def __init__(self, logger, simNumber=None, loadType=eLoadType.eLoadType.Null, aiType=None, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
 		self.Logger = logger
 		self.PickSimulation(simNumber)
 		self.StopTime = stopTime
@@ -35,13 +36,12 @@ class RunController:
 
 			self.RenderQuality = eRenderType.FromInt(temp)
 
-
-		self.SetupAgent(loadData, aiType, trainNetwork)
+		self.SetupAgent(loadType, aiType, trainNetwork)
 		self.Logger.Clear()
 
 		return
 
-	def SetupAgent(self, loadData=None, aiType=None, trainNetwork=None):
+	def SetupAgent(self, loadType, aiType, trainNetwork):
 		if aiType == None:
 			userInput = input("Brute B) Network N) Evolution E) Random R) See Tree T) Human H) MonteCarloAgent M):")
 		else:
@@ -52,7 +52,7 @@ class RunController:
 		self.Agents = []
 
 		if userInput == "T":
-			loadData = self.SetUpMetaData("Y")
+			loadData = self.SetUpMetaData(eLoadType.eLoadType.Load)
 			if loadData:
 				import RenderEngine.TreeVisualiser as TreeVisualiser
 				TreeVisualiser.TreeVisualiser(self.DataManager)
@@ -60,8 +60,7 @@ class RunController:
 			input("hold here error!!!!!")
 
 
-
-		loadData = self.SetUpMetaData(loadData)
+		loadData = self.SetUpMetaData(loadType)
 		import Predictors.SimOutputPredictor as SimOutputPredictor
 		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.DataManager, loadData)
 
@@ -154,12 +153,11 @@ class RunController:
 		self.Logger.SetTitle(self.SimInfo["SimName"])
 
 		return
-	def SetUpMetaData(self, loadData=None):
-		userInput = "N"
-
+	def SetUpMetaData(self, loadType):
 		if self.DataManager.LoadMetaData():
+
 			if self.DataManager.MetaDataGet("Version") == self.Version:
-				if loadData == None:
+				if loadType == eLoadType.eLoadType.Null:
 					self.Logger.Clear()
 					print("")
 					print("SizeOfDataSet: "+str(self.DataManager.MetaDataGet("SizeOfDataSet")))
@@ -169,14 +167,17 @@ class RunController:
 					print("TotalTime: "+Format.SplitTime(self.DataManager.MetaDataGet("TotalTime"), roundTo=2))
 					print("LastBackUpTotalTime: "+Format.SplitTime(self.DataManager.MetaDataGet("LastBackUpTotalTime"), roundTo=2))
 					print("")
-					userInput = input("load Dataset[Y/N]:")
-				else:
-					userInput = loadData
+
+					if input("load Dataset[Y/N]:").capitalize() == "N":
+						loadType = eLoadType.eLoadType.NotLoad
+					else:
+						loadType = eLoadType.eLoadType.Load
+
 			else:
 				print("MetaData Version "+str(self.DataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
 				input()
 
-		if userInput == "n" or userInput == "N":
+		if loadType == eLoadType.eLoadType.NotLoad:
 			self.DataManager.MetaDataSet("Version", self.Version)
 			self.DataManager.MetaDataSet("SizeOfDataSet", 0)
 			self.DataManager.MetaDataSet("NumberOfTables", 0)
@@ -223,7 +224,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=eRenderType.eRenderType.Null, simNumber=None, loadData="Y", aiType=None, stopTime=None)
+		controller = RunController(Logger, renderQuality=eRenderType.eRenderType.Null, simNumber=None, loadType=eLoadType.eLoadType.Load, aiType=None, stopTime=None)
 		controller.RunTraning()
 
 	except Exception as error:

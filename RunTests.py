@@ -1,6 +1,8 @@
 import RunController as runner
 from Shared import Logger
 import time
+import TournamentController.eRenderType as eRenderType
+import TournamentController.eLoadType as eLoadType
 from Shared.OutputFormating import SplitTime, TimeToDateTime
 from DataManger import BasicLoadAndSave
 
@@ -45,7 +47,7 @@ class Tests:
 
 		try:
 			timeMarkSetup = time.time()
-			controller = runner.RunController(self.Logger, simNumber=simNum, loadData="N", aiType=agent, renderQuality=0, trainNetwork="Y", stopTime=60)
+			controller = runner.RunController(self.Logger, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad, aiType=agent, renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup))
 			print("Sim = "+controller.SimInfo["SimName"])
