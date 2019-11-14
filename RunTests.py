@@ -47,7 +47,8 @@ class Tests:
 
 		try:
 			timeMarkSetup = time.time()
-			controller = runner.RunController(self.Logger, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad, aiType=agent, renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
+			controller = runner.RunController(self.Logger, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad,
+			                                  aiType=agent, renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup))
 			print("Sim = "+controller.SimInfo["SimName"])
@@ -68,7 +69,8 @@ class Tests:
 			print("number complete boards: " + str(metaData1["NumberOfCompleteBoards"]))
 			print("number finished boards: " + str(metaData1["NumberOfFinishedBoards"]))
 
-			controller = runner.RunController(self.Logger, simNumber=simNum, loadData="Y", aiType=agent, renderQuality=0, trainNetwork="N", stopTime=10)
+			controller = runner.RunController(self.Logger, simNumber=simNum, loadType=eLoadType.eLoadType.Load, aiType=agent,
+			                                  renderQuality=eRenderType.eRenderType.Muted, trainNetwork="N", stopTime=10)
 
 			metaData2 = controller.DataManager.MetaData.Content
 			address = self.MetaDataAddress+"MetaData_" + controller.SimInfo["SimName"]+"_"+agent+"_2"
