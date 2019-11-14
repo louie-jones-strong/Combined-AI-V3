@@ -14,7 +14,7 @@ class RunController:
 
 	Version = 1.5
 
-	def __init__(self, logger, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None, stopTime=None):
+	def __init__(self, logger, simNumber=None, loadData=None, aiType=None, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
 		self.Logger = logger
 		self.PickSimulation(simNumber)
 		self.StopTime = stopTime
@@ -25,18 +25,15 @@ class RunController:
 
 		self.DataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
 
-		if renderQuality != None:
+		if renderQuality != eRenderType.eRenderType.Null:
 			self.RenderQuality = renderQuality
 		else:
 			if self.SimInfo["RenderSetup"]:
-				self.RenderQuality = int(input("no Output 0) Just Info 1) Simple 2) Complex 3): "))
+				temp = int(input("no Output 0) Just Info 1) Simple 2) Complex 3): "))
 			else:
-				self.RenderQuality = int(input("no Output 0) Just Info 1): "))
+				temp = int(input("no Output 0) Just Info 1): "))
 
-		if not self.SimInfo["RenderSetup"] and self.RenderQuality >= 3:
-			self.RenderQuality = 4
-
-		self.RenderQuality = eRenderType.FromInt(self.RenderQuality)
+			self.RenderQuality = eRenderType.FromInt(temp)
 
 
 		self.SetupAgent(loadData, aiType, trainNetwork)
@@ -226,7 +223,7 @@ if __name__ == "__main__":
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=5, simNumber=None, loadData="Y", aiType=None, stopTime=None)
+		controller = RunController(Logger, renderQuality=eRenderType.eRenderType.Null, simNumber=None, loadData="Y", aiType=None, stopTime=None)
 		controller.RunTraning()
 
 	except Exception as error:

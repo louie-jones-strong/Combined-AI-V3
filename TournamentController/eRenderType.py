@@ -1,24 +1,27 @@
 import enum 
 
 class eRenderType(enum.Enum): 
-	Muted = 0
-	JustInfo = 1
-	ArrayOutput = 2
-	TextOutput = 3
-	CustomOutput = 4
-	RenderOutput = 5
+	Null = 0
+	Muted = 1
+	JustInfo = 2
+	ArrayOutput = 3
+	TextOutput = 4
+	CustomOutput = 5
+	RenderOutput = 6
 	
 
 def FromInt(value):
 	if value == 0:
-		return eRenderType.Muted
+		return eRenderType.Null
 	if value == 1:
-		return eRenderType.JustInfo
+		return eRenderType.Muted
 	if value == 2:
-		return eRenderType.ArrayOutput
+		return eRenderType.JustInfo
 	if value == 3:
-		return eRenderType.TextOutput
+		return eRenderType.ArrayOutput
 	if value == 4:
-		return eRenderType.CustomOutput
+		return eRenderType.TextOutput
 	if value == 5:
+		return eRenderType.CustomOutput
+	if value == 6:
 		return eRenderType.RenderOutput
