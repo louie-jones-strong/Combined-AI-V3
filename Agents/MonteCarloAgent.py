@@ -2,6 +2,7 @@ import Agents.AgentBase as AgentBase
 import Predictors.SimOutputPredictor as BoardPredictor
 import Predictors.BoardValuePredictor as BoardValuePredictor
 from Shared import OutputFormating as Format
+from DataManger.Serializer import BoardToKey
 import sys
 
 class Agent(AgentBase.AgentBase):
@@ -22,6 +23,10 @@ class Agent(AgentBase.AgentBase):
 
 		self.MaxMoveCalDepth = 10
 		self.MaxMoveCalTime = 1
+
+		self.MoveListCalCache = {}
+		self.SimOuputCache = {}
+		self.ValueCache = {}
 		return
 
 	def MoveCal(self, board):
@@ -40,16 +45,16 @@ class Agent(AgentBase.AgentBase):
 		maxv = -sys.maxsize
 		bestMove = None
 
-		moveList = self.MoveAgent.MoveListCal(board)
+		moveList = self.GetAgentMove(board)
 
 		for move in moveList:
 			
-			predictedBoard = self.BoardPredictor.PredictOutput(board, move)
+			predictedBoard = self.CalSimOuput(board, move)
 
 			if predictedBoard != "GameFinished" and depth < self.MaxMoveCalDepth:
 				m, _ = self.AlphaBeta(predictedBoard, alpha=alpha, beta=beta, isMax=not isMax, depth=depth+1)
 			else:
-				m = self.ValuePredictor.PredictValue(board)
+				m = self.CalBoardValue(board)
 
 			if isMax:
 				if m > maxv:
@@ -72,8 +77,44 @@ class Agent(AgentBase.AgentBase):
 
 		return minv, bestMove
 
+	def GetAgentMove(self, board):
+		key = BoardToKey(board)
+
+		if key in self.MoveListCalCache:
+			return self.MoveListCalCache[key]
+
+		moveList = self.MoveAgent.MoveListCal(board)
+		self.MoveListCalCache[key] = moveList
+		return moveList
+
+	def CalSimOuput(self, board, move):
+		key = BoardToKey(board)+","+str(move)
+
+		if key in self.SimOuputCache:
+			return self.SimOuputCache[key]
+
+		predictedBoard = self.BoardPredictor.PredictOutput(board, move)
+		self.SimOuputCache[key] = predictedBoard
+		return predictedBoard
+
+	def CalBoardValue(self, board):
+		key = BoardToKey(board)
+
+		if key in self.ValueCache:
+			return self.ValueCache[key]
+
+		value = self.ValuePredictor.PredictValue(board)
+		self.ValueCache[key] = value
+		return value
+
 	def AgentInfoOutput(self):
 		info = super().AgentInfoOutput()
 		info += "\n"
 		info += "NumDiffrentMoves: "+Format.SplitNumber(self.NumDiffrentMoves)
+		info += "\n"
+		info += "MoveListCalCache size: " + Format.SplitNumber(len(self.MoveListCalCache))
+		info += "\n"
+		info += "SimOuputCache size: " + Format.SplitNumber(len(self.SimOuputCache))
+		info += "\n"
+		info += "ValueCache size: " + Format.SplitNumber(len(self.ValueCache))
 		return info
