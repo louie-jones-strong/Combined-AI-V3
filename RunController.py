@@ -30,9 +30,10 @@ class RunController:
 			self.RenderQuality = renderQuality
 		else:
 			if self.SimInfo["RenderSetup"]:
-				temp = int(input("no Output 0) Just Info 1) Simple 2) Complex 3): "))
+				temp = int(input("Muted 1) just info 2) Raw 3) Text 4) custom 5) pygame 6): "))
+
 			else:
-				temp = int(input("no Output 0) Just Info 1): "))
+				temp = int(input("Muted 1) just info 2) Raw 3) Text 4): "))
 
 			self.RenderQuality = eRenderType.FromInt(temp)
 
