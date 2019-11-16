@@ -20,11 +20,6 @@ class BoardValuePredictor(PredictorBase.PredictorBase):
 
 		if found:
 			value = boardInfo.TotalAvgFitness
-
-		else:
-			#todo
-			print("need to code ann for PredictValue")
-
 		
 		self.NumPredictions += 1
 		return value

@@ -177,6 +177,9 @@ class RunController:
 			else:
 				print("MetaData Version "+str(self.DataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
 				input()
+		
+		else:
+			loadType = eLoadType.eLoadType.NotLoad
 
 		if loadType == eLoadType.eLoadType.NotLoad:
 			self.DataManager.MetaDataSet("Version", self.Version)
