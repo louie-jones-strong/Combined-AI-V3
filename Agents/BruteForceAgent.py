@@ -44,8 +44,9 @@ class Agent(AgentBase.AgentBase):
 										moveID = moveId
 									else:
 										notPlayedList += [moveId]
-	
-							self.MovesNotPlayedCache[key] = notPlayedList
+
+							if len(notPlayedList) > 0:
+								self.MovesNotPlayedCache[key] = notPlayedList
 	
 					else:#played every move once already
 						nonFinishedLeastPlayed = sys.maxsize
