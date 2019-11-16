@@ -128,8 +128,6 @@ class TournamentController:
 				self.RenderQuality == eRenderType.eRenderType.CustomOutput):
 
 				self.RenderBoard(board)
-			else:
-				return
 
 		else:
 			self.Logger.Clear()
