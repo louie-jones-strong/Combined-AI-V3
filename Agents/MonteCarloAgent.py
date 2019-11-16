@@ -123,6 +123,14 @@ class Agent(AgentBase.AgentBase):
 		info += "ValueCache size: " + Format.SplitNumber(len(self.ValueCache))
 		return info
 
+	def GameFinished(self, fitness):
+		super().GameFinished(fitness)
+
+		self.MoveListCalCache = {}
+		self.SimOuputCache = {}
+		self.ValueCache = {}
+		return
+
 	def UpdateInvalidMove(self, board, move):
 		super().UpdateInvalidMove(board, move)
 
