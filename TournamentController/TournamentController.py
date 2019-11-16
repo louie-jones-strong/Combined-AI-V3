@@ -20,6 +20,9 @@ class TournamentController:
 		self.MoveNumber = 0
 		self.LastSaveTook = 0
 
+		self.OutputFrameCount = 0
+		self.TotalOutputTime = 0
+
 		if self.RenderQuality == eRenderType.eRenderType.RenderOutput:
 			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
@@ -125,53 +128,68 @@ class TournamentController:
 				self.RenderQuality == eRenderType.eRenderType.CustomOutput):
 
 				self.RenderBoard(board)
-			return
+			else:
+				return
 
-		self.Logger.Clear()
+		else:
+			self.Logger.Clear()
 
-		self.RenderBoard(board)
+			self.RenderBoard(board)
 
-		numGames = self.DataManager.MetaDataGet("NumberOfGames")+1
-		backUpTime = self.DataManager.MetaDataGet("LastBackUpTotalTime")
-		totalTime = self.DataManager.MetaDataGet("TotalTime")
-		realTime = self.DataManager.MetaDataGet("RealTime")
-		numberOfCompleteBoards = self.DataManager.MetaDataGet("NumberOfCompleteBoards")
-		numberOfFinishedBoards = self.DataManager.MetaDataGet("NumberOfFinishedBoards")
-		avgMoveTime = 0
-		if self.MoveNumber != 0:
-			avgMoveTime = (time.time() - self.GameStartTime)/self.MoveNumber
-			avgMoveTime = round(avgMoveTime, 6)
+			numGames = self.DataManager.MetaDataGet("NumberOfGames")+1
+			backUpTime = self.DataManager.MetaDataGet("LastBackUpTotalTime")
+			totalTime = self.DataManager.MetaDataGet("TotalTime")
+			realTime = self.DataManager.MetaDataGet("RealTime")
+			numberOfCompleteBoards = self.DataManager.MetaDataGet("NumberOfCompleteBoards")
+			numberOfFinishedBoards = self.DataManager.MetaDataGet("NumberOfFinishedBoards")
+			avgMoveTime = 0
+			if self.MoveNumber != 0:
+				avgMoveTime = (time.time() - self.GameStartTime)/self.MoveNumber
+				avgMoveTime = round(avgMoveTime, 6)
 
-		print("")
-		print("Dataset size: " + str(Format.SplitNumber(self.DataManager.GetNumberOfBoards())))
-		print("Number Of Complete Boards: " + str(Format.SplitNumber(numberOfCompleteBoards)))
-		print("Number Of Finished Boards: " + str(Format.SplitNumber(numberOfFinishedBoards)))
-		print("games: " + str(Format.SplitNumber(numGames)) + " moves: " + str(Format.SplitNumber(self.MoveNumber)))
-		print("moves avg took: " + str(avgMoveTime) + " seconds")
-		print("Games avg took: " + Format.SplitTime(totalTime/numGames, roundTo=6))
-		print("time since start: " + Format.SplitTime(totalTime))
-		print("Real Time since start: " + Format.SplitTime(realTime))
-		print("time since last BackUp: " + Format.SplitTime(totalTime-backUpTime))
+			print("")
+			print("Dataset size: " + str(Format.SplitNumber(self.DataManager.GetNumberOfBoards())))
+			print("Number Of Complete Boards: " + str(Format.SplitNumber(numberOfCompleteBoards)))
+			print("Number Of Finished Boards: " + str(Format.SplitNumber(numberOfFinishedBoards)))
+			print("games: " + str(Format.SplitNumber(numGames)) + " moves: " + str(Format.SplitNumber(self.MoveNumber)))
+			print("moves avg took: " + str(avgMoveTime) + " seconds")
+			print("Games avg took: " + Format.SplitTime(totalTime/numGames, roundTo=6))
+			print("time since start: " + Format.SplitTime(totalTime))
+			print("Real Time since start: " + Format.SplitTime(realTime))
+			print("time since last BackUp: " + Format.SplitTime(totalTime-backUpTime))
 
-		for loop in range(len(self.Agents)):
+			for loop in range(len(self.Agents)):
+				print()
+				print("Agent["+str(loop)+"] ("+str(self.Agents[loop].AgentType)+") Info: ")
+				print(self.Agents[loop].AgentInfoOutput())
+
 			print()
-			print("Agent["+str(loop)+"] ("+str(self.Agents[loop].AgentType)+") Info: ")
-			print(self.Agents[loop].AgentInfoOutput())
+			print("OutcomePredictor")
+			print(self.OutcomePredictor.PredictorInfoOutput())
+			
+			title = self.Game.Info["SimName"]
+			title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
+			title += " CachingInfo: " + self.DataManager.GetLoadedDataInfo()
+			title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
+			self.Logger.SetTitle(title)
 
-		print()
-		print("OutcomePredictor")
-		print(self.OutcomePredictor.PredictorInfoOutput())
-		
-		title = self.Game.Info["SimName"]
-		title += " Time Since Last Save: " + Format.SplitTime(time.time()-self.LastSaveTime, roundTo=1)
-		title += " CachingInfo: " + self.DataManager.GetLoadedDataInfo()
-		title += " LastSaveTook: " + Format.SplitTime(self.LastSaveTook)
-		self.Logger.SetTitle(title)
+			self.LastOutputTime = time.time()
 
-		outputTime = time.time()-outputTime
-		print()
-		print("Output Took: "+ Format.SplitTime(outputTime))
-		self.LastOutputTime = time.time()
+			avgOutputTime = 0
+			
+			if self.OutputFrameCount != 0:
+				avgOutputTime = self.TotalOutputTime / self.OutputFrameCount
+
+			print()
+			print("Output avg Took: "+ Format.SplitTime(avgOutputTime, roundTo=4))
+
+	
+		self.OutputFrameCount += 1
+		self.TotalOutputTime += time.time()-outputTime
+
+		if self.OutputFrameCount >= 1000:
+			self.OutputFrameCount = 0
+			self.TotalOutputTime = 0
 		return
 
 	def TrySaveData(self, forceSave=False):
