@@ -213,7 +213,8 @@ class RunController:
 
 		startTime = time.time()
 		
-		tournamentController = TournamentController.TournamentController(self.Logger, self.Sim, self.Agents, self.DataManager, self.OutcomePredictor, self.RenderQuality)
+		tournamentController = TournamentController.TournamentController(self.Logger, self.MetricsLogger, 
+			self.Sim, self.Agents, self.DataManager, self.OutcomePredictor, self.RenderQuality)
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 

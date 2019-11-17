@@ -5,8 +5,10 @@ import TournamentController.eRenderType as eRenderType
 
 class TournamentController:
 
-	def __init__(self, logger, game, agents, dataManager, outcomePredictor, renderQuality):
+	def __init__(self, logger, metricsLogger, game, agents, dataManager, outcomePredictor, renderQuality):
 		self.Logger = logger
+		self.MetricsLogger = metricsLogger
+
 		self.Game = game
 		self.Agents = agents
 		self.DataManager = dataManager
@@ -67,6 +69,8 @@ class TournamentController:
 
 		for loop in range(len(self.Agents)):
 			self.Agents[loop].GameFinished(fit[loop])
+
+		self.MetricsLogger.DictLog(self.DataManager.MetaData.Content)
 
 		self.TrySaveData()
 		return
