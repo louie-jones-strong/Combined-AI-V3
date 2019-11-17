@@ -38,7 +38,10 @@ class TournamentController:
 		while ((targetGameCount == -1 or gameCount < targetGameCount) and
 			(stopTime == None or self.DataManager.MetaDataGet("RealTime") >= stopTime)):
 
+			timeMark  = time.time()
 			self.RunGame()
+			self.MetricsLogger.Log("GameTook", time.time()-timeMark)
+
 			gameCount += 1
 
 		for agent in self.Agents:
@@ -78,9 +81,12 @@ class TournamentController:
 		return
 
 	def MakeAgentMove(self, turn, board):
+		timeMark  = time.time()
+
 		startBoardKey = BoardToKey(board)
 
-		agent = self.Agents[turn-1]
+		agentNum = turn-1
+		agent = self.Agents[agentNum]
 		valid = False
 		while not valid:
 			move = agent.MoveCal(board)
@@ -103,6 +109,7 @@ class TournamentController:
 
 		agent.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
 
+		self.MetricsLogger.Log("Agent"+str(agentNum)+"MoveTook", time.time()-timeMark)
 		return outComeBoard, turn, finished, fit
 
 	def RenderBoard(self, board):
@@ -203,9 +210,14 @@ class TournamentController:
 
 			# save back up every hour
 			if self.DataManager.MetaDataGet("TotalTime")-self.DataManager.MetaDataGet("LastBackUpTotalTime") > 60*60:
+				timeMark = time.time()
 				self.DataManager.BackUp()
+				self.MetricsLogger.Log("BackUpSavingTime", time.time()-timeMark)
 
+			timeMark = time.time()
 			self.DataManager.Save()
+			self.MetricsLogger.Log("SavingTime", time.time()-timeMark)
+
 			self.LastSaveTime = time.time()
 			# todo make this give avg save time
 			self.LastSaveTook = time.time() - self.LastSaveTook
