@@ -4,6 +4,7 @@ import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
+from Shared import MetricsLogger
 import importlib
 import time
 import os
@@ -15,8 +16,9 @@ class RunController:
 
 	Version = 1.5
 
-	def __init__(self, logger, simNumber=None, loadType=eLoadType.eLoadType.Null, aiType=None, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
+	def __init__(self, logger, metricsLogger, simNumber=None, loadType=eLoadType.eLoadType.Null, aiType=None, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
 		self.Logger = logger
+		self.MetricsLogger = metricsLogger
 		self.PickSimulation(simNumber)
 		self.StopTime = stopTime
 		self.outcomePredictor = None
@@ -221,16 +223,17 @@ class RunController:
 		return
 
 if __name__ == "__main__":
-	Logger = Logger.Logger()
-	Logger.Clear()
+	logger = Logger.Logger()
+	metricsLogger = MetricsLogger.MetricsLogger("combined-ai-v3")
+	logger.Clear()
 	import Shared.AudioManager as AudioManager
 	AudioManager.sound_setup("Assets//Sounds//Error.wav")
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=eRenderType.eRenderType.Null, simNumber=None, loadType=eLoadType.eLoadType.Load, aiType=None, stopTime=None)
+		controller = RunController(logger, metricsLogger, renderQuality=eRenderType.eRenderType.Null, simNumber=None, loadType=eLoadType.eLoadType.Load, aiType=None, stopTime=None)
 		controller.RunTraning()
 
 	except Exception as error:
 		AudioManager.play_sound()
-		Logger.LogError(error)
+		logger.LogError(error)
