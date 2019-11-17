@@ -50,6 +50,7 @@ class TournamentController:
 
 	def RunGame(self):
 		board, turn = self.Game.Start()
+		self.MetricsLogger.Log("numTablesLoaded", len(self.DataManager.LoadedDataSetTables))
 		self.DataManager.UpdateStartingBoards(board)
 
 		totalTime = time.time()
@@ -193,6 +194,7 @@ class TournamentController:
 
 			print()
 			print("Output avg Took: "+ Format.SplitTime(avgOutputTime, roundTo=4))
+			self.MetricsLogger.Log("AvgOutputTime", avgOutputTime)
 
 	
 		self.OutputFrameCount += 1

@@ -393,12 +393,7 @@ class DataSetManager:
 			return False, []
 
 	def GetLoadedDataInfo(self):
-		loadedTables = 0
-		for loop in range(len(self.DataSetTables)):
-			if (self.DataSetTables[loop].IsLoaded):
-				loadedTables += 1
-
-		return Format.SplitNumber(loadedTables)+"/"+Format.SplitNumber(len(self.DataSetTables))
+		return Format.SplitNumber(len(self.LoadedDataSetTables))+"/"+Format.SplitNumber(len(self.DataSetTables))
 	def GetNumberOfBoards(self):
 		return len(self.DataSetHashTable)
 
