@@ -197,6 +197,8 @@ class DataSetManager:
 			if len(self.DataSetTables[index].Content) >= self.TableBatchSize:
 				self.FillingTable += 1
 
+			self.MetaDataAdd("SizeOfDataSet", 1)
+
 		return
 	def GetBoardInfo(self, key):
 		boardInfo = None
