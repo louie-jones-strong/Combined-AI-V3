@@ -75,9 +75,10 @@ class AgentBase:
 		moveID = self.DataSetManager.MoveIDLookUp.index(move)
 
 		found, boardInfo = self.DataSetManager.GetBoardInfo(key)
-		with boardInfo.Lock:
-			if found and moveID in boardInfo.Moves:
-				del boardInfo.Moves[moveID]
+		if found:
+			with boardInfo.Lock:
+				if moveID in boardInfo.Moves:
+					del boardInfo.Moves[moveID]
 
 		if str(key)+str(moveID) in self.TempDataSet:
 			del self.TempDataSet[str(key)+str(moveID)]
