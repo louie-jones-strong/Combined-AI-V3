@@ -40,6 +40,8 @@ class RunController:
 			self.RenderQuality = eRenderType.FromInt(temp)
 
 		self.SetupAgent(loadType, aiType, trainNetwork)
+
+		self.MetricsLogger.RunSetup(self.SimInfo["SimName"])
 		self.Logger.Clear()
 
 		return
