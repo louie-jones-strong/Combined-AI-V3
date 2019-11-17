@@ -28,6 +28,8 @@ class TournamentController:
 		if self.RenderQuality == eRenderType.eRenderType.RenderOutput:
 			import RenderEngine.RenderEngine2D as RenderEngine
 			self.RenderEngine = RenderEngine.RenderEngine()
+
+		self.MetricsLogger.Log("RenderQuality", self.RenderQuality.value)
 		return
 
 	def RunTournament(self, targetGameCount, stopTime=None):

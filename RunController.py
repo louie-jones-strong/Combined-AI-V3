@@ -39,9 +39,16 @@ class RunController:
 
 			self.RenderQuality = eRenderType.FromInt(temp)
 
-		self.SetupAgent(loadType, aiType, trainNetwork)
+		loadData = self.SetupAgent(loadType, aiType, trainNetwork)
 
-		self.MetricsLogger.RunSetup(self.SimInfo["SimName"])
+		if loadData:
+			runId = self.DataManager.MetaDataGet("RunId")
+		else:
+			runId = self.SimInfo["SimName"] +"_"+ Format.TimeToDateTime(time.time(),True, True, 
+				dateSplitter="_", timeSplitter="_", dateTimeSplitter="_")
+
+		self.MetricsLogger.RunSetup(runId, loadData)
+		self.DataManager.MetaDataSet("RunId", runId)
 		self.Logger.Clear()
 
 		return
@@ -122,7 +129,7 @@ class RunController:
 			for loop in range(self.NumberOfAgents):
 				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
-		return
+		return loadData
 
 	def PickSimulation(self, simNumber=None):
 		files = os.listdir("Simulations")
@@ -205,6 +212,7 @@ class RunController:
 			self.DataManager.MetaDataSet("AnnRunId", None)
 			self.DataManager.MetaDataSet("TriedMovesPlayed", 0)
 			self.DataManager.MetaDataSet("VaildMovesPlayed", 0)
+			self.DataManager.MetaDataSet("RunId", "runId")
 			return False
 		
 		return True

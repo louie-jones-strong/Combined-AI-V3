@@ -1,6 +1,4 @@
 import wandb
-import Shared.OutputFormating as Format
-import time
 
 class MetricsLogger:
 	def __init__(self, projectName):
@@ -8,12 +6,9 @@ class MetricsLogger:
 
 		return
 
-	def RunSetup(self, envName):
+	def RunSetup(self, runId, resume):
 
-		runId = envName +"_"+ Format.TimeToDateTime(time.time(),True, True, 
-			dateSplitter="_", timeSplitter="_", dateTimeSplitter="_")
-
-		wandb.init(project=self.ProjectName, id=runId)
+		wandb.init(project=self.ProjectName, id=runId, resume=resume)
 		return
 
 	def Log(self, key, value):
