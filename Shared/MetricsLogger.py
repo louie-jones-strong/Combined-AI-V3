@@ -7,8 +7,13 @@ class MetricsLogger:
 		return
 
 	def RunSetup(self, runId, resume):
+		try:
+			wandb.init(project=self.ProjectName, id=runId, resume=resume)
+			
+		except Exception as e:
+			if resume:
+				wandb.init(project=self.ProjectName, id=runId, resume=False)
 
-		wandb.init(project=self.ProjectName, id=runId, resume=resume)
 		return
 
 	def Log(self, key, value):
