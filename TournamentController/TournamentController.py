@@ -78,8 +78,8 @@ class TournamentController:
 
 		self.TrySaveData()
 
-		self.MetricsLogger.Log("numTablesLoaded", len(
-			self.DataManager.LoadedDataSetTables))
+		self.MetricsLogger.Log("numTablesLoaded", len(self.DataManager.LoadedDataSetTables))
+		self.MetricsLogger.Log("MovesCountPerGame", self.MoveNumber)
 		self.MetricsLogger.DictLog(self.DataManager.MetaData.Content)
 		return
 
@@ -202,9 +202,10 @@ class TournamentController:
 		self.OutputFrameCount += 1
 		self.TotalOutputTime += time.time()-outputTime
 
-		if self.OutputFrameCount >= 1000:
-			self.TotalOutputTime = self.TotalOutputTime / (self.OutputFrameCount/10)
-			self.OutputFrameCount = 10
+		if self.OutputFrameCount >= 100000:
+			self.TotalOutputTime = self.TotalOutputTime / self.OutputFrameCount
+			self.OutputFrameCount = 1000
+			self.TotalOutputTime *= self.OutputFrameCount
 		return
 
 	def TrySaveData(self, forceSave=False):
@@ -221,6 +222,9 @@ class TournamentController:
 			timeMark = time.time()
 			self.DataManager.Save()
 			self.MetricsLogger.Log("SavingTime", time.time()-timeMark)
+
+			learnedDataSize = self.DataManager.GetSizeOfLearnedDataSize()
+			self.MetricsLogger.Log("LearnedDataDiskSize", learnedDataSize)
 
 			self.LastSaveTime = time.time()
 			# todo make this give avg save time

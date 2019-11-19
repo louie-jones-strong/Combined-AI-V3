@@ -2,7 +2,7 @@ import os
 import DataManger.BoardInfo as BoardInfo
 from Shared import LoadingBar as LoadingBar
 from Shared import OutputFormating as Format
-from Shared import RamUsedInfo as RamInfo
+from Shared import DataSizeCal as DataSizeCal
 from DataManger.BasicLoadAndSave import *
 import DataManger.Serializer as Serializer
 import shutil
@@ -59,6 +59,10 @@ class DataSetManager:
 		self.TesnorBoardLogAddress = self.DatasetAddress+"Logs//"
 		self.MoveIDLookUpAdress = self.DatasetAddress+"LookUp//"+"MoveIdLookUp"
 		return
+
+	def GetSizeOfLearnedDataSize(self):
+		size = DataSizeCal.GetFolderSize(self.DatasetAddress)
+		return (size/1048576)#MB
 
 	def Save(self):
 		loadingBar = LoadingBar.LoadingBar(self.Logger)
