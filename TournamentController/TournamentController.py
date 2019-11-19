@@ -50,7 +50,6 @@ class TournamentController:
 
 	def RunGame(self):
 		board, turn = self.Game.Start()
-		self.MetricsLogger.Log("numTablesLoaded", len(self.DataManager.LoadedDataSetTables))
 		self.DataManager.UpdateStartingBoards(board)
 
 		totalTime = time.time()
@@ -76,9 +75,12 @@ class TournamentController:
 		for loop in range(len(self.Agents)):
 			self.Agents[loop].GameFinished(fit[loop])
 
-		self.MetricsLogger.DictLog(self.DataManager.MetaData.Content)
 
 		self.TrySaveData()
+
+		self.MetricsLogger.Log("numTablesLoaded", len(
+			self.DataManager.LoadedDataSetTables))
+		self.MetricsLogger.DictLog(self.DataManager.MetaData.Content)
 		return
 
 	def MakeAgentMove(self, turn, board):
@@ -201,8 +203,8 @@ class TournamentController:
 		self.TotalOutputTime += time.time()-outputTime
 
 		if self.OutputFrameCount >= 1000:
-			self.OutputFrameCount = 0
-			self.TotalOutputTime = 0
+			self.TotalOutputTime = self.TotalOutputTime / (self.OutputFrameCount/10)
+			self.OutputFrameCount = 10
 		return
 
 	def TrySaveData(self, forceSave=False):

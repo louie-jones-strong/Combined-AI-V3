@@ -117,7 +117,7 @@ class Simulation(SimBase.SimBase):
 			player2Fitness = -5
 
 		#check if progress in last 50 moves if not then draw
-		if self.NumMoves >= 250:
+		if self.NumMoves >= 500:
 			finished = True
 			player1Fitness = 3
 			player2Fitness = 3
