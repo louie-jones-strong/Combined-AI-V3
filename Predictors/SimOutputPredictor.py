@@ -35,20 +35,16 @@ class SimOutputPredictor(PredictorBase.PredictorBase):
 
 		if found:
 			moveID = self.DataSetManager.MoveIDLookUp.index(move)
-			with boardInfo.Lock:
-				moveOutComes = boardInfo.Moves[moveID].MoveOutComes
+			if moveID in boardInfo.Moves:
+				with boardInfo.Lock:
+					moveOutComes = boardInfo.Moves[moveID].MoveOutComes
 
-				highestTimes = 0
-				for outCome, times in moveOutComes.items():
+					highestTimes = 0
+					for outCome, times in moveOutComes.items():
 
-					if highestTimes < times:
-						newBoard = outCome
-						highestTimes = times
-
-		else:
-			#todo
-			print("need to code ann for PredictOutput")
-
+						if highestTimes < times:
+							newBoard = outCome
+							highestTimes = times
 		
 		self.Predictions[str(key)+str(move)] = {"BoardKey": key, "Move": move, "Prediction": newBoard}
 		self.NumPredictions += 1

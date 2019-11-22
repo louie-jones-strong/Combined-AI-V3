@@ -1,5 +1,3 @@
-import RenderEngine.Shape as Shape
-import RenderEngine.PolygonPiece as Piece
 import Simulations.SimulationBase as SimBase
 
 
@@ -23,11 +21,6 @@ class Simulation(SimBase.SimBase):
 		self.Grid = gridSizeList[index]
 		self.Info["MaxInputSize"] = self.Grid[0]-1
 		self.Info["SimName"] = "ConnectFour"+str(self.Grid)
-
-
-		gridSize = 40
-		self.BackGroundpieceList = []
-		self.BackGroundpieceList += [Piece.PolygonPiece([350, 350], [self.Grid[0]*gridSize, self.Grid[1]*gridSize], Shape.Square(), [0, 0, 255])]
 		return
 
 	def CreateNew(self):
@@ -132,7 +125,20 @@ class Simulation(SimBase.SimBase):
 			print(temp)
 		print("|0|1|2|3|4|5|6|")
 		return
+
+	def ComplexOutputSetup(self):
+		import RenderEngine.Shape as Shape
+		import RenderEngine.Piece.PolygonPiece as Piece
+		super().ComplexOutputSetup()
+		gridSize = 40
+		self.BackGroundpieceList += [Piece.PolygonPiece([350, 350], [self.Grid[0]*gridSize, self.Grid[1]*gridSize], Shape.Square(), [0, 0, 255])]
+		return
+
 	def ComplexBoardOutput(self, board):
+		import RenderEngine.Shape as Shape
+		import RenderEngine.Piece.PolygonPiece as Piece
+
+		super().ComplexBoardOutput(board)
 		pieceSize = 30
 		gridSize = 40
 

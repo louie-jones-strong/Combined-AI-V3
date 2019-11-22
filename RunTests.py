@@ -1,6 +1,8 @@
 import RunController as runner
 from Shared import Logger
 import time
+import TournamentController.eRenderType as eRenderType
+import TournamentController.eLoadType as eLoadType
 from Shared.OutputFormating import SplitTime, TimeToDateTime
 from DataManger import BasicLoadAndSave
 
@@ -45,7 +47,8 @@ class Tests:
 
 		try:
 			timeMarkSetup = time.time()
-			controller = runner.RunController(self.Logger, simNumber=simNum, loadData="N", aiType=agent, renderQuality=0, trainNetwork="Y", stopTime=60)
+			controller = runner.RunController(self.Logger, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad,
+			                                  aiType=agent, renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup))
 			print("Sim = "+controller.SimInfo["SimName"])
@@ -53,7 +56,7 @@ class Tests:
 			timeMarkRun = time.time()
 
 			controller.RunTraning()
-			metaData1 = controller.AiDataManager.MetaData.Content
+			metaData1 = controller.DataManager.MetaData.Content
 
 			address = self.MetaDataAddress+"MetaData_" +controller.SimInfo["SimName"]+"_"+agent+"_1"
 			BasicLoadAndSave.DictSave(address, metaData1)
@@ -66,9 +69,10 @@ class Tests:
 			print("number complete boards: " + str(metaData1["NumberOfCompleteBoards"]))
 			print("number finished boards: " + str(metaData1["NumberOfFinishedBoards"]))
 
-			controller = runner.RunController(self.Logger, simNumber=simNum, loadData="Y", aiType=agent, renderQuality=0, trainNetwork="N", stopTime=10)
+			controller = runner.RunController(self.Logger, simNumber=simNum, loadType=eLoadType.eLoadType.Load, aiType=agent,
+			                                  renderQuality=eRenderType.eRenderType.Muted, trainNetwork="N", stopTime=10)
 
-			metaData2 = controller.AiDataManager.MetaData.Content
+			metaData2 = controller.DataManager.MetaData.Content
 			address = self.MetaDataAddress+"MetaData_" + controller.SimInfo["SimName"]+"_"+agent+"_2"
 			BasicLoadAndSave.DictSave(address, metaData2)
 

@@ -1,6 +1,7 @@
 __pycache__/
 __pycache__\
 Logs/
+wandb/
 TestOutputs/
 DataSets
 log

@@ -5,3 +5,4 @@ tflearn
 matplotlib
 networkx
 gym
+wandb

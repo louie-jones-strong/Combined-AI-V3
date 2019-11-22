@@ -1,4 +1,3 @@
-import pygame
 import math
 
 def RotatePoint(point, degrees, center=[0, 0]):

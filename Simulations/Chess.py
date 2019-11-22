@@ -1,7 +1,4 @@
-import RenderEngine.Shape as Shape
-import RenderEngine.ImagePiece as ImagePiece
 import Simulations.SimulationBase as SimBase
-
 
 class Simulation(SimBase.SimBase):
 	Info = {"MinPlayers":2,"MaxPlayers":2,
@@ -10,28 +7,6 @@ class Simulation(SimBase.SimBase):
 			"Resolution":1,"RenderSetup":True}
 	
 	def __init__(self):
-		self.PieceImageDict = {}
-		self.PieceImageDict[-1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type1.png")
-		self.PieceImageDict[-2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type2.png")
-		self.PieceImageDict[-3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type3.png")
-		self.PieceImageDict[-4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type4.png")
-		self.PieceImageDict[-5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type5.png")
-		self.PieceImageDict[-6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type6.png")
-
-		self.PieceImageDict[1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-1.png")
-		self.PieceImageDict[2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-2.png")
-		self.PieceImageDict[3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-3.png")
-		self.PieceImageDict[4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-4.png")
-		self.PieceImageDict[5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-5.png")
-		self.PieceImageDict[6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-6.png")
-
-		boardImg = ImagePiece.LoadImage("Assets\\Images\\Board.png")
-		self.BackGroundpieceList = []
-		pieceSize = 30
-		grid = [8,8]
-		scale = [grid[0]*pieceSize, grid[1]*pieceSize]
-		pos = [scale[0], scale[1]]
-		self.BackGroundpieceList += [ImagePiece.ImagePiece(pos, scale, boardImg)]
 		return
 
 	def CreateNew(self):
@@ -73,14 +48,26 @@ class Simulation(SimBase.SimBase):
 		if not (PieceMoveRulesCheck(inputs, self.Board, self.Turn)):
 			return False, self.Board, self.Turn
 
+		oldKingPos = [self.KingPos[self.Turn][0], self.KingPos[self.Turn][1]]
 		if abs(self.Board[ inputs[1] ][ inputs[0] ]) == 6:
 			self.KingPos[self.Turn] = [inputs[3], inputs[2]]
 
 		if abs(self.Board[ inputs[1] ][ inputs[0] ]) == 1 and (inputs[3] == 0 or inputs[3] == 7):
 			self.Board[ inputs[1] ][ inputs[0]] = 5*self.Board[ inputs[1] ][ inputs[0] ]
 
+		oldPiece = int(self.Board[ inputs[3] ][ inputs[2] ])
+
 		self.Board[ inputs[3] ][ inputs[2] ] = self.Board[ inputs[1] ][ inputs[0] ]
 		self.Board[ inputs[1] ][ inputs[0] ] = 0
+
+		if self.IsInCheck(self.Turn):
+			self.Board[ inputs[1] ][ inputs[0] ] = int(self.Board[ inputs[3] ][ inputs[2] ])
+			self.Board[ inputs[3] ][ inputs[2] ] = oldPiece
+
+			self.KingPos[self.Turn] = [oldKingPos[0], oldKingPos[1]]
+
+			return False, self.Board, self.Turn
+
 		self.NumMoves += 1
 
 		if self.Turn == 1:
@@ -104,7 +91,7 @@ class Simulation(SimBase.SimBase):
 			player1Fitness = 5
 			player2Fitness = -5
 
-		elif self.NumMoves >= 250:
+		elif self.NumMoves >= 1000:
 			finished = True
 			player1Fitness = 3
 			player2Fitness = 3
@@ -142,12 +129,36 @@ class Simulation(SimBase.SimBase):
 		print("   0  1  2  3  4  5  6  7   ")
 		return
 
+	def ComplexOutputSetup(self):
+		import RenderEngine.Piece.ImagePiece as ImagePiece
+		super().ComplexOutputSetup()
+		self.PieceImageDict = {}
+		self.PieceImageDict[-1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type1.png")
+		self.PieceImageDict[-2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type2.png")
+		self.PieceImageDict[-3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type3.png")
+		self.PieceImageDict[-4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type4.png")
+		self.PieceImageDict[-5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type5.png")
+		self.PieceImageDict[-6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type6.png")
+
+		self.PieceImageDict[1] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-1.png")
+		self.PieceImageDict[2] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-2.png")
+		self.PieceImageDict[3] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-3.png")
+		self.PieceImageDict[4] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-4.png")
+		self.PieceImageDict[5] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-5.png")
+		self.PieceImageDict[6] = ImagePiece.LoadImage("Assets\\Images\\Chess\\Type-6.png")
+
+		boardImg = ImagePiece.LoadImage("Assets\\Images\\Board.png")
+		scale = [240, 240]
+		self.BackGroundpieceList = [ImagePiece.ImagePiece(scale, scale, boardImg)]
+		return
+
 	def ComplexBoardOutput(self, board):
+		import RenderEngine.Piece.ImagePiece as ImagePiece
+		pieceList = super().ComplexBoardOutput(board)
+
 		pieceSize = 20
 		gridSize = 30
 
-		pieceList = []
-		pieceList += self.BackGroundpieceList
 		grid = [8, 8]
 		for x in range(grid[0]):
 			for y in range(grid[1]):
@@ -160,9 +171,73 @@ class Simulation(SimBase.SimBase):
 					
 		return pieceList
 
-	def CheckIfCheck(self):
+	def IsInCheck(self, turn):
+		kingPosY, kingPosX = self.KingPos[turn]
 
-		return 
+		KnightChecks = [
+			(kingPosX-1, kingPosY-2),
+			(kingPosX-2, kingPosY-1),
+			(kingPosX+1, kingPosY+2),
+			(kingPosX+2, kingPosY+1),
+			(kingPosX-1, kingPosY+2),
+			(kingPosX-2, kingPosY+1),
+			(kingPosX+1, kingPosY-2),
+			(kingPosX+2, kingPosY-1)]
+
+		for x, y in KnightChecks:
+
+			if x >= 0 and x < 8 and y >= 0 and y < 8:
+				piece = self.Board[y][x]
+				if abs(piece) == 2 and IsPieceEnemy(piece, turn):
+					return True
+
+		#diagonal check
+		for change in range(-7, 8):
+			x = kingPosX + change
+			y = kingPosY + change
+
+			if x >= 0 and x < 8 and y >= 0 and y < 8:
+				if ((abs(piece) == 3 or abs(piece) == 5 or
+					(abs(piece) == 1 and change < 0 and turn == 2) or
+					(abs(piece) == 1 and change > 0 and turn == 1)) and
+					IsPieceEnemy(piece, turn) and
+					CheckLineOfSight(self.Board, [kingPosY, kingPosX, y, x])):
+
+					return True
+
+			x = kingPosX - change
+			y = kingPosY + change
+
+			if x >= 0 and x < 8 and y >= 0 and y < 8:
+				if ((abs(piece) == 3 or abs(piece) == 5 or
+					(abs(piece) == 1 and change < 0 and turn == 2) or
+					(abs(piece) == 1 and change > 0 and turn == 1)) and
+					IsPieceEnemy(piece, turn) and
+					CheckLineOfSight(self.Board, [kingPosY, kingPosX, y, x])):
+
+					return True
+				
+
+		for loop in range(8):
+			
+			#horizontal check
+			piece = self.Board[kingPosY][loop]
+
+			if ((abs(piece) == 4 or abs(piece) == 5) and 
+				IsPieceEnemy(piece, turn) and
+				CheckLineOfSight(self.Board, [kingPosY, kingPosX, kingPosY, loop])):
+
+				return True
+
+			#Vertical check
+			piece = self.Board[loop][kingPosX]
+
+			if ((abs(piece) == 4 or abs(piece) == 5) and 
+				IsPieceEnemy(piece, turn) and
+				CheckLineOfSight(self.Board, [kingPosY, kingPosX, loop, kingPosX])):
+				
+				return True
+		return False
 
 def NewBoard():
 	board = [[4,2,3,6,5,3,2,4],
@@ -174,19 +249,9 @@ def NewBoard():
 			 [-1,-1,-1,-1,-1,-1,-1,-1],
 			 [-4,-2,-3,-6,-5,-3,-2,-4]]
 
-	# board = [[0, 0, 0, 0, 0, 0, 0, 0], 
-	# 		[-4, 0, 0, 0, 0, 0, 0, 1], 
-	# 		[0, 0, 0, 0, 0, 0, 0, -1], 
-	# 		[0, 0, 0, 0, 0, 0, 0, 0], 
-	# 		[0, 0, 0, 0, 0, 0, 0, 0], 
-	# 		[0, 0, 0, 0, 0, 0, 0, 0], 
-	# 		[0, 0, 0, 0, 0, 0, 0, 0], 
-	# 		[0, 0, 0, 0, 0, 0, 0, 0]]
-
-
 	KingPos = {}
-	KingPos[1] = [0, 3]
-	KingPos[2] = [7, 3]
+	KingPos[2] = [0, 3]
+	KingPos[1] = [7, 3]
 	return board, KingPos
 
 def PieceMoveRulesCheck(move, board, turn ):
@@ -315,4 +380,11 @@ def CheckLineOfSight(board, move):
 			if board[ move[1] + y ][ move[0] + x] != 0:
 				return False
 
+	return True
+
+def IsPieceEnemy(piece, turn):
+	if piece < 0 and turn == 1:
+		return False
+	if piece > 0 and turn == 2:
+		return False
 	return True

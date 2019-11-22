@@ -4,17 +4,21 @@ import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
+from Shared import MetricsLogger
 import importlib
 import time
 import os
-from TournamentController import TournamentController
+import TournamentController.eRenderType as eRenderType
+import TournamentController.eLoadType as eLoadType
+import TournamentController.TournamentController as TournamentController
 
 class RunController:
 
 	Version = 1.5
 
-	def __init__(self, logger, simNumber=None, loadData=None, aiType=None, renderQuality=None, trainNetwork=None, stopTime=None):
+	def __init__(self, logger, metricsLogger, simNumber=None, loadType=eLoadType.eLoadType.Null, aiType=None, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
 		self.Logger = logger
+		self.MetricsLogger = metricsLogger
 		self.PickSimulation(simNumber)
 		self.StopTime = stopTime
 		self.outcomePredictor = None
@@ -24,21 +28,32 @@ class RunController:
 
 		self.DataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
 
-		if renderQuality != None:
+		if renderQuality != eRenderType.eRenderType.Null:
 			self.RenderQuality = renderQuality
 		else:
 			if self.SimInfo["RenderSetup"]:
-				self.RenderQuality = int(input("no Output 0) Just Info 1) Simple 2) Complex 3): "))
+				temp = int(input("Muted 1) just info 2) Raw 3) Text 4) custom 5) pygame 6): "))
+
 			else:
-				self.RenderQuality = int(input("no Output 0) Just Info 1): "))
+				temp = int(input("Muted 1) just info 2) Raw 3) Text 4): "))
 
+			self.RenderQuality = eRenderType.FromInt(temp)
 
-		self.SetupAgent(loadData, aiType, trainNetwork)
+		loadData = self.SetupAgent(loadType, aiType, trainNetwork)
+
+		if loadData:
+			runId = self.DataManager.MetaDataGet("RunId")
+		else:
+			runId = self.SimInfo["SimName"] +"_"+ Format.TimeToDateTime(time.time(),True, True, 
+				dateSplitter="_", timeSplitter="_", dateTimeSplitter="_")
+
+		self.MetricsLogger.RunSetup(runId, loadData)
+		self.DataManager.MetaDataSet("RunId", runId)
 		self.Logger.Clear()
 
 		return
 
-	def SetupAgent(self, loadData=None, aiType=None, trainNetwork=None):
+	def SetupAgent(self, loadType, aiType, trainNetwork):
 		if aiType == None:
 			userInput = input("Brute B) Network N) Evolution E) Random R) See Tree T) Human H) MonteCarloAgent M):")
 		else:
@@ -49,7 +64,7 @@ class RunController:
 		self.Agents = []
 
 		if userInput == "T":
-			loadData = self.SetUpMetaData("Y")
+			loadData = self.SetUpMetaData(eLoadType.eLoadType.Load)
 			if loadData:
 				import RenderEngine.TreeVisualiser as TreeVisualiser
 				TreeVisualiser.TreeVisualiser(self.DataManager)
@@ -57,8 +72,7 @@ class RunController:
 			input("hold here error!!!!!")
 
 
-
-		loadData = self.SetUpMetaData(loadData)
+		loadData = self.SetUpMetaData(loadType)
 		import Predictors.SimOutputPredictor as SimOutputPredictor
 		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.DataManager, loadData)
 
@@ -115,7 +129,7 @@ class RunController:
 			for loop in range(self.NumberOfAgents):
 				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
-		return
+		return loadData
 
 	def PickSimulation(self, simNumber=None):
 		files = os.listdir("Simulations")
@@ -151,12 +165,11 @@ class RunController:
 		self.Logger.SetTitle(self.SimInfo["SimName"])
 
 		return
-	def SetUpMetaData(self, loadData=None):
-		userInput = "N"
-
+	def SetUpMetaData(self, loadType):
 		if self.DataManager.LoadMetaData():
+
 			if self.DataManager.MetaDataGet("Version") == self.Version:
-				if loadData == None:
+				if loadType == eLoadType.eLoadType.Null:
 					self.Logger.Clear()
 					print("")
 					print("SizeOfDataSet: "+str(self.DataManager.MetaDataGet("SizeOfDataSet")))
@@ -166,14 +179,20 @@ class RunController:
 					print("TotalTime: "+Format.SplitTime(self.DataManager.MetaDataGet("TotalTime"), roundTo=2))
 					print("LastBackUpTotalTime: "+Format.SplitTime(self.DataManager.MetaDataGet("LastBackUpTotalTime"), roundTo=2))
 					print("")
-					userInput = input("load Dataset[Y/N]:")
-				else:
-					userInput = loadData
+
+					if input("load Dataset[Y/N]:").capitalize() == "N":
+						loadType = eLoadType.eLoadType.NotLoad
+					else:
+						loadType = eLoadType.eLoadType.Load
+
 			else:
 				print("MetaData Version "+str(self.DataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
 				input()
+		
+		else:
+			loadType = eLoadType.eLoadType.NotLoad
 
-		if userInput == "n" or userInput == "N":
+		if loadType == eLoadType.eLoadType.NotLoad:
 			self.DataManager.MetaDataSet("Version", self.Version)
 			self.DataManager.MetaDataSet("SizeOfDataSet", 0)
 			self.DataManager.MetaDataSet("NumberOfTables", 0)
@@ -193,6 +212,7 @@ class RunController:
 			self.DataManager.MetaDataSet("AnnRunId", None)
 			self.DataManager.MetaDataSet("TriedMovesPlayed", 0)
 			self.DataManager.MetaDataSet("VaildMovesPlayed", 0)
+			self.DataManager.MetaDataSet("RunId", "runId")
 			return False
 		
 		return True
@@ -203,26 +223,28 @@ class RunController:
 
 		startTime = time.time()
 		
-		tournamentController = TournamentController(self.Logger, self.Sim, self.Agents, self.DataManager, self.OutcomePredictor, self.RenderQuality)
+		tournamentController = TournamentController.TournamentController(self.Logger, self.MetricsLogger, 
+			self.Sim, self.Agents, self.DataManager, self.OutcomePredictor, self.RenderQuality)
 
 		while not (self.StopTime != None and time.time()-startTime >= self.StopTime):
 
-			tournamentController.RunTournament(gamesToPlay)
+			tournamentController.RunTournament(gamesToPlay, self.StopTime)
 
 		tournamentController.TrySaveData(True)
 		return
 
 if __name__ == "__main__":
-	Logger = Logger.Logger()
-	Logger.Clear()
+	logger = Logger.Logger()
+	metricsLogger = MetricsLogger.MetricsLogger("combined-ai-v3")
+	logger.Clear()
 	import Shared.AudioManager as AudioManager
 	AudioManager.sound_setup("Assets//Sounds//Error.wav")
 	hadError = False
 
 	try:
-		controller = RunController(Logger, renderQuality=3, simNumber=None, loadData="Y", aiType=None, stopTime=None)
+		controller = RunController(logger, metricsLogger, renderQuality=eRenderType.eRenderType.Null, simNumber=None, loadType=eLoadType.eLoadType.Load, aiType=None, stopTime=None)
 		controller.RunTraning()
 
 	except Exception as error:
 		AudioManager.play_sound()
-		Logger.LogError(error)
+		logger.LogError(error)

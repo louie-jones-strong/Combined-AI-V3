@@ -1,10 +1,7 @@
-import RenderEngine.Shape as Shape
-
-
 class SimBase:
-	
+	ComplexOutputSetupDone = False
+
 	def __init__(self):
-		self.BackGroundpieceList = []
 		return
 
 	def Start(self, numPlayers):
@@ -35,7 +32,15 @@ class SimBase:
 		print(board)
 		return
 
+	def ComplexOutputSetup(self):
+		self.BackGroundpieceList = []
+		self.ComplexOutputSetupDone = True
+		return
+
 	def ComplexBoardOutput(self, board):
+		if not self.ComplexOutputSetupDone:
+			self.ComplexOutputSetup()
+
 		pieceList = []
 		pieceList += self.BackGroundpieceList
 		return pieceList
