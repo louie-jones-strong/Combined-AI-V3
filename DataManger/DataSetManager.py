@@ -184,20 +184,18 @@ class DataSetManager:
 		if key in self.DataSetHashTable:
 			return
 
-		pickledBoard = pickle.dumps(board)
-
 		with self.Lock:
 			index = self.FillingTable
 			if (len(self.DataSetTables) <= index):
 				self.DataSetTables += [DataSetTable(self.TableAddress+"Table_"+str(index), True)]
 
-			self.DataSetHashTable[key] = (index, pickledBoard)
-			self.NewDataSetHashTable[key] = (index, pickledBoard)
+			self.DataSetHashTable[key] = index
+			self.NewDataSetHashTable[key] = index
 
 			if not self.DataSetTables[index].IsLoaded:
 				self.DataSetTables[index].Load()
 	
-			self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo()
+			self.DataSetTables[index].Content[key] = BoardInfo.BoardInfo(board)
 			if len(self.DataSetTables[index].Content) >= self.TableBatchSize:
 				self.FillingTable += 1
 
@@ -209,7 +207,7 @@ class DataSetManager:
 		found = False
 
 		if key in self.DataSetHashTable:
-			index = self.DataSetHashTable[key][0]
+			index = self.DataSetHashTable[key]
 
 			if not self.DataSetTables[index].IsLoaded:
 				self.DataSetTables[index].Load()
@@ -248,9 +246,7 @@ class DataSetManager:
 
 			self.LoadTableInfo()
 			loop = 0
-			for key, value in self.DataSetHashTable.items():
-				index = value[0]
-				board = pickle.loads(value[1])
+			for key, index in self.DataSetHashTable.items():
 
 				if not self.DataSetTables[index].IsLoaded:
 					self.DataSetTables[index].Load()
@@ -258,7 +254,7 @@ class DataSetManager:
 				if key in self.DataSetTables[index].Content:
 					boardInfo = self.DataSetTables[index].Content[key]
 
-					dataSetX += [board]
+					dataSetX += [boardInfo.Board]
 					
 					if isOneHotEncoding:
 						outputY = []
@@ -306,9 +302,7 @@ class DataSetManager:
 			
 			self.LoadTableInfo()
 			loop = 0
-			for key, value in self.DataSetHashTable.items():
-				index = value[0]
-				board = pickle.loads(value[1])
+			for key, index in self.DataSetHashTable.items():
 
 				if not self.DataSetTables[index].IsLoaded:
 					self.DataSetTables[index].Load()
@@ -319,7 +313,7 @@ class DataSetManager:
 
 						move = self.MoveIDToMove(moveId)
 
-						dataSetX += [[board, move]]
+						dataSetX += [[boardInfo.board, move]]
 						
 						mostcommonAmount = 0
 						mostcommonKey = ""
@@ -359,16 +353,14 @@ class DataSetManager:
 			
 			self.LoadTableInfo()
 			loop = 0
-			for key, value in self.DataSetHashTable.items():
-				index = value[0]
-				board = pickle.loads(value[1])
+			for key, index in self.DataSetHashTable.items():
 
 				if not self.DataSetTables[index].IsLoaded:
 					self.DataSetTables[index].Load()
 			
 				if key in self.DataSetTables[index].Content:
 					boardInfo = self.DataSetTables[index].Content[key]
-					dataSetX += [[board]]
+					dataSetX += [[boardInfo.Board]]
 					dataSetY += [[boardInfo.TotalAvgFitness]]
 
 

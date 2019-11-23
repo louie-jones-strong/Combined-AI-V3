@@ -2,17 +2,8 @@ import sys
 import threading
 
 class BoardInfo():
-	MoveIDOfBestAvgFitness = 0
-	BestAvgFitness = -sys.maxsize
-	TotalAvgFitness = -sys.maxsize
-	TotalTimesPlayed = 0
-	Moves = {}
-	PlayedMovesLookUpArray = 0
-	Finished = False
-	Lock = threading.Lock()
-	BeingUsed = False
 
-	def __init__(self):
+	def __init__(self, board):
 		self.MoveIDOfBestAvgFitness = 0
 		self.BestAvgFitness = -sys.maxsize
 		self.TotalAvgFitness = -sys.maxsize
@@ -22,6 +13,7 @@ class BoardInfo():
 		self.Finished = False
 		self.Lock = threading.Lock()
 		self.BeingUsed = False
+		self.Board = board
 		return
 
 	def __getstate__(self):
@@ -33,6 +25,7 @@ class BoardInfo():
 		state["TotalTimesPlayed"] = self.TotalTimesPlayed
 		state["PlayedMovesLookUpArray"] = self.PlayedMovesLookUpArray
 		state["Finished"] = self.Finished
+		state["Board"] = self.Board
 		
 		self.Lock = threading.Lock()
 		self.BeingUsed = False
@@ -46,6 +39,7 @@ class BoardInfo():
 		self.TotalTimesPlayed = state["TotalTimesPlayed"]
 		self.PlayedMovesLookUpArray = state["PlayedMovesLookUpArray"]
 		self.Finished = state["Finished"]
+		self.Board = state["Board"]
 
 		self.Lock = threading.Lock()
 		self.BeingUsed = False
