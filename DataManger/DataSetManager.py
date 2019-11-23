@@ -279,7 +279,6 @@ class DataSetManager:
 			ComplexSave(self.AnnDataSetAddress+"YMoveDataSet", dataSetY)
 			self.MetaDataSet("AnnDataMadeFromTotalTime", self.MetaDataGet("TotalTime"))
 			self.MetaDataSet("NetworkUsingOneHotEncoding", isOneHotEncoding)
-			self.Clear()
 
 		elif ComplexFileExists(self.AnnDataSetAddress+"XMoveDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YMoveDataSet"):
 			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XMoveDataSet")
@@ -331,7 +330,6 @@ class DataSetManager:
 			ComplexSave(self.AnnDataSetAddress+"XPredictionDataSet", dataSetX)
 			ComplexSave(self.AnnDataSetAddress+"YPredictionDataSet", dataSetY)
 			#self.MetaDataSet("AnnDataMadeFromTotalTime", self.MetaDataGet("TotalTime"))
-			self.Clear()
 
 		elif ComplexFileExists(self.AnnDataSetAddress+"XPredictionDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YPredictionDataSet"):
 			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XPredictionDataSet")
@@ -370,7 +368,6 @@ class DataSetManager:
 			ComplexSave(self.AnnDataSetAddress+"XValueDataSet", dataSetX)
 			ComplexSave(self.AnnDataSetAddress+"YValueDataSet", dataSetY)
 			#self.MetaDataSet("AnnDataMadeFromTotalTime", self.MetaDataGet("TotalTime"))
-			self.Clear()
 
 		elif ComplexFileExists(self.AnnDataSetAddress+"XValueDataSet") and ComplexFileExists(self.AnnDataSetAddress+"YValueDataSet"):
 			dataSetX = ComplexLoad(self.AnnDataSetAddress+"XValueDataSet")

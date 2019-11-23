@@ -53,7 +53,6 @@ class Agent(AgentBase.AgentBase):
 		
 		weights = self.AnnModel.GetWeights()
 		self.DataSetManager.SaveNetworkWeights("BestMove", weights)
-		dataSetX, dataSetY = self.DataSetManager.GetMoveDataSet()
 
 		return
 
