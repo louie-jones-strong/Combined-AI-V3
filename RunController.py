@@ -234,13 +234,12 @@ class RunController:
 
 if __name__ == "__main__":
 	from Shared import WAndBMetrics
-	logger = Logger.Logger()
-	metricsLogger = WAndBMetrics.MetricsLogger("combined-ai-v3")
-	logger.Clear()
 	import Shared.AudioManager as AudioManager
 	AudioManager.sound_setup("Assets//Sounds//Error.wav")
-	hadError = False
-
+	
+	logger = Logger.Logger()
+	logger.Clear()
+	metricsLogger = WAndBMetrics.MetricsLogger("combined-ai-v3", True)
 	try:
 		controller = RunController(logger, metricsLogger, renderQuality=eRenderType.eRenderType.Null, simNumber=None, loadType=eLoadType.eLoadType.Load, aiType=None, stopTime=None)
 		controller.RunTraning()

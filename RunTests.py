@@ -48,7 +48,7 @@ class Tests:
 
 		try:
 			timeMarkSetup = time.time()
-			metricsLogger = BaseMetricsLogger.MetricsLogger("combined-ai-v3")
+			metricsLogger = BaseMetricsLogger.MetricsLogger("combined-ai-v3", False)
 
 			controller = runner.RunController(self.Logger, metricsLogger, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad,
 			                                  aiType=agent, renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
