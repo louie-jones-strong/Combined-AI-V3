@@ -1,11 +1,7 @@
+import Shared.BaseMetricsLogger as BaseMetricsLogger
 import wandb
 
-class MetricsLogger:
-	def __init__(self, projectName):
-		self.ProjectName = projectName
-
-		return
-
+class MetricsLogger(BaseMetricsLogger.MetricsLogger):
 	def RunSetup(self, runId, resume):
 		try:
 			wandb.init(project=self.ProjectName, id=runId, resume=resume)

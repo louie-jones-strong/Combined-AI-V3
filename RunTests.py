@@ -5,6 +5,7 @@ import TournamentController.eRenderType as eRenderType
 import TournamentController.eLoadType as eLoadType
 from Shared.OutputFormating import SplitTime, TimeToDateTime
 from DataManger import BasicLoadAndSave
+from Shared import BaseMetricsLogger
 
 class Tests:
 	def __init__(self):
@@ -47,7 +48,9 @@ class Tests:
 
 		try:
 			timeMarkSetup = time.time()
-			controller = runner.RunController(self.Logger, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad,
+			metricsLogger = BaseMetricsLogger.MetricsLogger("combined-ai-v3")
+
+			controller = runner.RunController(self.Logger, metricsLogger, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad,
 			                                  aiType=agent, renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup))
@@ -69,7 +72,7 @@ class Tests:
 			print("number complete boards: " + str(metaData1["NumberOfCompleteBoards"]))
 			print("number finished boards: " + str(metaData1["NumberOfFinishedBoards"]))
 
-			controller = runner.RunController(self.Logger, simNumber=simNum, loadType=eLoadType.eLoadType.Load, aiType=agent,
+			controller = runner.RunController(self.Logger, metricsLogger, simNumber=simNum, loadType=eLoadType.eLoadType.Load, aiType=agent,
 			                                  renderQuality=eRenderType.eRenderType.Muted, trainNetwork="N", stopTime=10)
 
 			metaData2 = controller.DataManager.MetaData.Content

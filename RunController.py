@@ -4,7 +4,6 @@ import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
-from Shared import MetricsLogger
 import importlib
 import time
 import os
@@ -234,8 +233,9 @@ class RunController:
 		return
 
 if __name__ == "__main__":
+	from Shared import WAndBMetrics
 	logger = Logger.Logger()
-	metricsLogger = MetricsLogger.MetricsLogger("combined-ai-v3")
+	metricsLogger = WAndBMetrics.MetricsLogger("combined-ai-v3")
 	logger.Clear()
 	import Shared.AudioManager as AudioManager
 	AudioManager.sound_setup("Assets//Sounds//Error.wav")
