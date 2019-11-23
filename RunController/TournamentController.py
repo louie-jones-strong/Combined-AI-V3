@@ -1,7 +1,7 @@
 import time
 from DataManger.Serializer import BoardToKey
 from Shared import OutputFormating as Format
-import TournamentController.eRenderType as eRenderType
+import RunController.eRenderType as eRenderType
 
 class TournamentController:
 

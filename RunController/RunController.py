@@ -7,9 +7,9 @@ from Shared import Logger
 import importlib
 import time
 import os
-import TournamentController.eRenderType as eRenderType
-import TournamentController.eLoadType as eLoadType
-import TournamentController.TournamentController as TournamentController
+import RunController.eRenderType as eRenderType
+import RunController.eLoadType as eLoadType
+import RunController.TournamentController as TournamentController
 
 class RunController:
 

@@ -1,8 +1,8 @@
-import RunController as runner
 from Shared import Logger
 import time
-import TournamentController.eRenderType as eRenderType
-import TournamentController.eLoadType as eLoadType
+import RunController.eRenderType as eRenderType
+import RunController.eLoadType as eLoadType
+import RunController.RunController as runner
 from Shared.OutputFormating import SplitTime, TimeToDateTime
 from DataManger import BasicLoadAndSave
 from Shared import BaseMetricsLogger
