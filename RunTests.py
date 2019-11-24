@@ -6,6 +6,8 @@ import RunController.RunController as runner
 from Shared.OutputFormating import SplitTime, TimeToDateTime
 from DataManger import BasicLoadAndSave
 from Shared import BaseMetricsLogger
+import RunController.AgentSetupData as AgentData
+import RunController.eAgentType as eAgentType
 
 class Tests:
 	def __init__(self):
@@ -23,7 +25,7 @@ class Tests:
 		self.Logger.InputAllowed = False
 
 		Sims = [1, 3, 4, 6]
-		Agents = ["b"]
+		Agents = [AgentData.AgentSetupData(eAgentType.eAgentType.BruteForce)]
 
 		hadError = False
 		timeMark = time.time()
@@ -41,17 +43,23 @@ class Tests:
 		return
 
 
-	def RunTest(self, simNum, agent):
+	def RunTest(self, simNum, agentData):
+		agentType = agentData.GetType().name
+
 		hadError = False
 		print("")
-		print("Setup Sim: "+str(simNum)+" With Agent: "+str(agent))
+		print("Setup Sim: "+str(simNum)+" With Agent: "+str(agentType))
+
+		agentSetupData = []
+		agentSetupData += [agentData]
+		agentSetupData += [AgentData.AgentSetupData(eAgentType.eAgentType.BruteForce)]
 
 		try:
 			timeMarkSetup = time.time()
 			metricsLogger = BaseMetricsLogger.MetricsLogger("combined-ai-v3", False)
 
-			controller = runner.RunController(self.Logger, metricsLogger, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad,
-			                                  aiType=agent, renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
+			controller = runner.RunController(self.Logger, metricsLogger, agentSetupData, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad,
+			                                  renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup))
 			print("Sim = "+controller.SimInfo["SimName"])
@@ -61,7 +69,7 @@ class Tests:
 			controller.RunTraning()
 			metaData1 = controller.DataManager.MetaData.Content
 
-			address = self.MetaDataAddress+"MetaData_" +controller.SimInfo["SimName"]+"_"+agent+"_1"
+			address = self.MetaDataAddress+"MetaData_" +controller.SimInfo["SimName"]+"_"+agentType+"_1"
 			BasicLoadAndSave.DictSave(address, metaData1)
 
 			print("Run+Save Took: "+SplitTime(time.time()-timeMarkRun))
@@ -72,11 +80,11 @@ class Tests:
 			print("number complete boards: " + str(metaData1["NumberOfCompleteBoards"]))
 			print("number finished boards: " + str(metaData1["NumberOfFinishedBoards"]))
 
-			controller = runner.RunController(self.Logger, metricsLogger, simNumber=simNum, loadType=eLoadType.eLoadType.Load, aiType=agent,
+			controller = runner.RunController(self.Logger, metricsLogger, agentSetupData, simNumber=simNum, loadType=eLoadType.eLoadType.Load,
 			                                  renderQuality=eRenderType.eRenderType.Muted, trainNetwork="N", stopTime=10)
 
 			metaData2 = controller.DataManager.MetaData.Content
-			address = self.MetaDataAddress+"MetaData_" + controller.SimInfo["SimName"]+"_"+agent+"_2"
+			address = self.MetaDataAddress+"MetaData_" + controller.SimInfo["SimName"]+"_"+agentType+"_2"
 			BasicLoadAndSave.DictSave(address, metaData2)
 
 			metaDataSame = True
@@ -86,7 +94,7 @@ class Tests:
 					break
 
 			if not metaDataSame:
-				self.Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: " +agent+" metaData1 != metaData2: save error?")
+				self.Logger.LogWarning("sim: "+controller.SimInfo["SimName"]+" AI: " +agentType+" metaData1 != metaData2: save error?")
 				hadError = True
 			else:
 				controller.RunTraning()

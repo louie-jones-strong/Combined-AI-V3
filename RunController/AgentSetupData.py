@@ -16,18 +16,19 @@ class AgentSetupData:
 			userInput = userInput.upper()
 
 			if userInput == "B":
-				self.Type = eAgentType.eAgentType.BruteForce
+				agentType = eAgentType.eAgentType.BruteForce
 			elif userInput == "H":
-				self.Type = eAgentType.eAgentType.Human
+				agentType = eAgentType.eAgentType.Human
 			elif userInput == "R":
-				self.Type = eAgentType.eAgentType.Random
+				agentType = eAgentType.eAgentType.Random
 			elif userInput == "N":
-				self.Type = eAgentType.eAgentType.NeuralNetwork
+				agentType = eAgentType.eAgentType.NeuralNetwork
 			elif userInput == "E":
-				self.Type = eAgentType.eAgentType.Evolution
+				agentType = eAgentType.eAgentType.Evolution
 			elif userInput == "M":
-				self.Type = eAgentType.eAgentType.MonteCarlo
-		
+				agentType = eAgentType.eAgentType.MonteCarlo
+			return agentType
+
 		return self.Type
 
 	def GetPlayingMode(self):
@@ -38,7 +39,7 @@ class AgentSetupData:
 
 	def GetSubMoveAgent(self):
 		if self.SubMoveAgent == None:
-			self.SubMoveAgent = AgentSetupData(None)
+			return AgentSetupData(None)
 		
 		return self.SubMoveAgent
 

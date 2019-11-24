@@ -1,6 +1,7 @@
 import Agents.BruteForceAgent as BruteForceAgent
 import Agents.RandomAgent as RandomAgent
 import Agents.HumanAgent as HumanAgent
+import Agents.Evolution.EvolutionController as EvolutionController
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
 from Shared import Logger
@@ -9,13 +10,14 @@ import time
 import os
 import RunController.eRenderType as eRenderType
 import RunController.eLoadType as eLoadType
+import RunController.eAgentType as eAgentType
 import RunController.TournamentController as TournamentController
 
 class RunController:
 
 	Version = 1.5
 
-	def __init__(self, logger, metricsLogger, simNumber=None, loadType=eLoadType.eLoadType.Null, aiType=None, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
+	def __init__(self, logger, metricsLogger, agentSetupData, simNumber=None, loadType=eLoadType.eLoadType.Null, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
 		self.Logger = logger
 		self.MetricsLogger = metricsLogger
 		self.PickSimulation(simNumber)
@@ -40,7 +42,19 @@ class RunController:
 
 		loadData = self.SetUpMetaData(loadType)
 		
-		self.SetupAgent(loadData, aiType, trainNetwork)
+		import Predictors.SimOutputPredictor as SimOutputPredictor
+		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.DataManager, loadData)
+
+		self.EvoController = None
+
+		self.Agents = []
+		for loop in range(self.NumberOfAgents):
+			if loop >= len(agentSetupData):
+				agentData = agentSetupData[len(agentSetupData)-1]
+			else:
+				agentData = agentSetupData[loop]
+
+			self.Agents += [self.SetupAgent(agentData, loadData)]
 
 		if loadData:
 			runId = self.DataManager.MetaDataGet("RunId")
@@ -54,60 +68,41 @@ class RunController:
 
 		return
 
-	def SetupAgent(self, loadData, aiType, trainNetwork):
-		if aiType == None:
-			userInput = input("Brute B) Network N) Evolution E) Random R) Human H) MonteCarloAgent M):")
-		else:
-			userInput = aiType
+	def SetupAgent(self, agentData, loadData):
+		agent = None
 
-		userInput = userInput.upper()
+		agentType = agentData.GetType()
 
-		self.Agents = []
-		import Predictors.SimOutputPredictor as SimOutputPredictor
-		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.DataManager, loadData)
+		if agentType == eAgentType.eAgentType.Human:
+			agent = HumanAgent.Agent(self.DataManager, loadData, winningModeON=True)
 
-		if userInput == "H":
-			self.Agents += [HumanAgent.Agent(self.DataManager, loadData, winningModeON=True)]
+		elif agentType == eAgentType.eAgentType.BruteForce:
+			agent = BruteForceAgent.Agent(self.DataManager, loadData)
 
-			import Agents.MonteCarloAgent as MonteCarloAgent
-			for loop in range(self.NumberOfAgents-1):
-				moveAgent = BruteForceAgent.Agent(self.DataManager, loadData)
+		elif agentType == eAgentType.eAgentType.Random:
+			agent = RandomAgent.Agent(self.DataManager, loadData)
 
-				self.Agents += [MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent, winningModeON=True)]
-
-
-		elif userInput == "R":
-			self.Agents += [RandomAgent.Agent(self.DataManager, loadData)]
-
-		elif userInput == "N":
-			if trainNetwork == None:
-				userInput = input("Train Network[Y/N]: ")
-			else:
-				userInput = trainNetwork
-
+		elif agentType == eAgentType.eAgentType.NeuralNetwork:
 			import Agents.NeuralNetworkAgent as NeuralNetwork
-			trainingMode = userInput == "Y" or userInput == "y"
 			
-			self.Agents += [NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=trainingMode)]
+			agent = NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=agentData.GetPlayingMode())
 
-		elif userInput == "E":
+		elif agentType == eAgentType.eAgentType.Evolution:
 			import Agents.Evolution.EvolutionAgent as EvolutionAgent
-			import Agents.Evolution.EvolutionController as EvolutionController
-			evoController = EvolutionController.EvolutionController(self.DataManager, loadData)
 
-			self.Agents += [EvolutionAgent.Agent(evoController, self.DataManager, loadData)]
+			if self.EvoController == None:
+				self.EvoController = EvolutionController.EvolutionController(self.DataManager, loadData)
+
+			agent = EvolutionAgent.Agent(self.EvoController, self.DataManager, loadData)
 			
-		elif userInput == "M":
+		elif agentType == eAgentType.eAgentType.MonteCarlo:
 			import Agents.MonteCarloAgent as MonteCarloAgent
-			moveAgent = BruteForceAgent.Agent(self.DataManager, loadData)
 
-			self.Agents += [MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent)]
+			moveAgent = self.SetupAgent(agentData.GetSubMoveAgent(),loadData)
 
+			agent = MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent)
 
-		while self.NumberOfAgents > len(self.Agents):
-			self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
-
-		return
+		return agent
 
 	def PickSimulation(self, simNumber=None):
 		files = os.listdir("Simulations")
