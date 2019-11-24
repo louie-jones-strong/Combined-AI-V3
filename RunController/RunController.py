@@ -54,23 +54,13 @@ class RunController:
 
 	def SetupAgent(self, loadType, aiType, trainNetwork):
 		if aiType == None:
-			userInput = input("Brute B) Network N) Evolution E) Random R) See Tree T) Human H) MonteCarloAgent M):")
+			userInput = input("Brute B) Network N) Evolution E) Random R) Human H) MonteCarloAgent M):")
 		else:
 			userInput = aiType
 
 		userInput = userInput.upper()
 
 		self.Agents = []
-
-		if userInput == "T":
-			loadData = self.SetUpMetaData(eLoadType.eLoadType.Load)
-			if loadData:
-				import RenderEngine.TreeVisualiser as TreeVisualiser
-				TreeVisualiser.TreeVisualiser(self.DataManager)
-
-			input("hold here error!!!!!")
-
-
 		loadData = self.SetUpMetaData(loadType)
 		import Predictors.SimOutputPredictor as SimOutputPredictor
 		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.DataManager, loadData)
