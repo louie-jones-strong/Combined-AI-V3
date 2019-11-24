@@ -9,8 +9,8 @@ class Agent(AgentBase.AgentBase):
 	TrainedEpochs = 0
 	AgentType = "NeuralNetwork"
 
-	def __init__(self, dataSetManager, loadData, winningModeON=False, trainingMode=False):
-		super().__init__(dataSetManager, loadData, winningModeON)
+	def __init__(self, dataSetManager, loadData, trainingMode=False):
+		super().__init__(dataSetManager, loadData, True)
 		
 		self.TrainingMode = trainingMode
 
