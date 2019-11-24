@@ -38,7 +38,9 @@ class RunController:
 
 			self.RenderQuality = eRenderType.FromInt(temp)
 
-		loadData = self.SetupAgent(loadType, aiType, trainNetwork)
+		loadData = self.SetUpMetaData(loadType)
+		
+		self.SetupAgent(loadData, aiType, trainNetwork)
 
 		if loadData:
 			runId = self.DataManager.MetaDataGet("RunId")
@@ -52,7 +54,7 @@ class RunController:
 
 		return
 
-	def SetupAgent(self, loadType, aiType, trainNetwork):
+	def SetupAgent(self, loadData, aiType, trainNetwork):
 		if aiType == None:
 			userInput = input("Brute B) Network N) Evolution E) Random R) Human H) MonteCarloAgent M):")
 		else:
@@ -61,7 +63,6 @@ class RunController:
 		userInput = userInput.upper()
 
 		self.Agents = []
-		loadData = self.SetUpMetaData(loadType)
 		import Predictors.SimOutputPredictor as SimOutputPredictor
 		self.OutcomePredictor = SimOutputPredictor.SimOutputPredictor(self.DataManager, loadData)
 
@@ -78,9 +79,6 @@ class RunController:
 		elif userInput == "R":
 			self.Agents += [RandomAgent.Agent(self.DataManager, loadData)]
 
-			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
-
 		elif userInput == "N":
 			if trainNetwork == None:
 				userInput = input("Train Network[Y/N]: ")
@@ -92,33 +90,24 @@ class RunController:
 			
 			self.Agents += [NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=trainingMode)]
 
-			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
-
 		elif userInput == "E":
 			import Agents.Evolution.EvolutionAgent as EvolutionAgent
 			import Agents.Evolution.EvolutionController as EvolutionController
 			evoController = EvolutionController.EvolutionController(self.DataManager, loadData)
 
 			self.Agents += [EvolutionAgent.Agent(evoController, self.DataManager, loadData)]
-
-			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
-
+			
 		elif userInput == "M":
 			import Agents.MonteCarloAgent as MonteCarloAgent
 			moveAgent = BruteForceAgent.Agent(self.DataManager, loadData)
 
 			self.Agents += [MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent)]
 
-			for loop in range(self.NumberOfAgents-1):
-				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
-		else:
-			for loop in range(self.NumberOfAgents):
-				self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
+		while self.NumberOfAgents > len(self.Agents):
+			self.Agents += [BruteForceAgent.Agent(self.DataManager, loadData)]
 
-		return loadData
+		return
 
 	def PickSimulation(self, simNumber=None):
 		files = os.listdir("Simulations")
