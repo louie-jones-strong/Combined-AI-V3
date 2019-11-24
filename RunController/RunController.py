@@ -231,19 +231,3 @@ class RunController:
 
 		tournamentController.TrySaveData(True)
 		return
-
-if __name__ == "__main__":
-	from Shared import WAndBMetrics
-	import Shared.AudioManager as AudioManager
-	AudioManager.sound_setup("Assets//Sounds//Error.wav")
-	
-	logger = Logger.Logger()
-	logger.Clear()
-	metricsLogger = WAndBMetrics.MetricsLogger("combined-ai-v3", True)
-	try:
-		controller = RunController(logger, metricsLogger, renderQuality=eRenderType.eRenderType.Null, simNumber=None, loadType=eLoadType.eLoadType.Load, aiType=None, stopTime=None)
-		controller.RunTraning()
-
-	except Exception as error:
-		AudioManager.play_sound()
-		logger.LogError(error)
