@@ -30,7 +30,10 @@ class RunController:
 		self.DataManager = DataSetManager.DataSetManager(self.Logger, self.SimInfo)
 
 		if renderQuality != eRenderType.eRenderType.Null:
-			self.RenderQuality = renderQuality
+			if not self.SimInfo["RenderSetup"] and renderQuality.value >= eRenderType.eRenderType.CustomOutput.value:
+				self.RenderQuality = eRenderType.eRenderType.TextOutput
+			else:
+				self.RenderQuality = renderQuality
 		else:
 			if self.SimInfo["RenderSetup"]:
 				temp = int(input("Muted 1) just info 2) Raw 3) Text 4) custom 5) pygame 6): "))

@@ -21,7 +21,7 @@ if __name__ == "__main__":
 		controller = RunController.RunController(logger, 
 			metricsLogger, 
 			agentSetupData,
-			renderQuality=eRenderType.eRenderType.Null, 
+			renderQuality=eRenderType.eRenderType.RenderOutput, 
 			simNumber=None, 
 			loadType=eLoadType.eLoadType.Load, 
 			stopTime=None)
