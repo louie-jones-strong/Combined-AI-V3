@@ -1,9 +1,5 @@
-import Agents.BruteForceAgent as BruteForceAgent
-import Agents.RandomAgent as RandomAgent
-import Agents.HumanAgent as HumanAgent
 import DataManger.DataSetManager as DataSetManager
 from Shared import OutputFormating as Format
-from Shared import Logger
 import importlib
 import time
 import os
@@ -76,12 +72,18 @@ class RunController:
 		agentType = agentData.GetType()
 
 		if agentType == eAgentType.eAgentType.Human:
+			import Agents.HumanAgent as HumanAgent
+
 			agent = HumanAgent.Agent(self.DataManager, loadData, winningModeON=True)
 
 		elif agentType == eAgentType.eAgentType.BruteForce:
+			import Agents.BruteForceAgent as BruteForceAgent
+
 			agent = BruteForceAgent.Agent(self.DataManager, loadData)
 
 		elif agentType == eAgentType.eAgentType.Random:
+			import Agents.RandomAgent as RandomAgent
+
 			agent = RandomAgent.Agent(self.DataManager, loadData)
 
 		elif agentType == eAgentType.eAgentType.NeuralNetwork:
@@ -94,6 +96,7 @@ class RunController:
 
 			if self.EvoController == None:
 				import Agents.Evolution.EvolutionController as EvolutionController
+				
 				self.EvoController = EvolutionController.EvolutionController(self.DataManager, loadData)
 
 			agent = EvolutionAgent.Agent(self.EvoController, self.DataManager, loadData)
