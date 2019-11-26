@@ -48,7 +48,7 @@ def DictLoad(address, loadingBar=None):
 			loadingBar.Update(loop)
 			
 	if loadingBar != None:
-		loadingBar.Update(loop)
+		loadingBar.Update(loop+1)
 
 	return dictionary
 def DictFileExists(address):
