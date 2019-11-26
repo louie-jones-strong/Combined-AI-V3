@@ -10,7 +10,7 @@ import RunController.TournamentController as TournamentController
 
 class RunController:
 
-	Version = 1.5
+	Version = 1.6
 
 	def __init__(self, logger, metricsLogger, agentSetupData, simNumber=None, loadType=eLoadType.eLoadType.Null, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
 		self.Logger = logger
@@ -167,6 +167,7 @@ class RunController:
 			else:
 				print("MetaData Version "+str(self.DataManager.MetaDataGet("Version"))+" != AiVersion "+str(self.Version)+" !")
 				input()
+				loadType = eLoadType.eLoadType.NotLoad
 		
 		else:
 			loadType = eLoadType.eLoadType.NotLoad
