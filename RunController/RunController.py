@@ -52,6 +52,8 @@ class RunController:
 			else:
 				agentData = agentSetupData[loop]
 
+			print("")
+			print("Setting up Agent["+str(loop)+"]...")
 			self.Agents += [self.SetupAgent(agentData, loadData)]
 
 		if loadData:
@@ -104,6 +106,7 @@ class RunController:
 		elif agentType == eAgentType.eAgentType.MonteCarlo:
 			import Agents.MonteCarloAgent as MonteCarloAgent
 
+			print("Setting up SubAgent")
 			moveAgent = self.SetupAgent(agentData.GetSubMoveAgent(),loadData)
 
 			agent = MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent)
