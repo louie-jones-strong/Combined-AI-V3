@@ -63,6 +63,13 @@ class RunController:
 				dateSplitter="_", timeSplitter="_", dateTimeSplitter="_")
 
 		self.MetricsLogger.RunSetup(runId, loadData)
+
+		loop = 0
+		for agent in self.Agents:
+			self.MetricsLogger.Log("Agent"+str(loop)+" Type", agent.AgentType)
+			loop += 1
+
+
 		self.DataManager.MetaDataSet("RunId", runId)
 		self.Logger.Clear()
 
