@@ -53,7 +53,7 @@ class RunController:
 				agentData = agentSetupData[loop]
 
 			print("")
-			print("Setting up Agent["+str(loop)+"]...")
+			print("Setting up Agent["+str(loop)+"]:")
 			self.Agents += [self.SetupAgent(agentData, loadData)]
 
 		if loadData:
