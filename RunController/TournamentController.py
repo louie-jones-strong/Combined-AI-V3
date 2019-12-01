@@ -119,6 +119,9 @@ class TournamentController:
 		if self.RenderQuality == eRenderType.eRenderType.Muted:
 			return
 
+		elif (self.RenderQuality == eRenderType.eRenderType.ArrayOutput):
+			print(board)
+
 		elif (self.RenderQuality == eRenderType.eRenderType.TextOutput or 
 			self.RenderQuality ==eRenderType.eRenderType.CustomOutput):
 			
