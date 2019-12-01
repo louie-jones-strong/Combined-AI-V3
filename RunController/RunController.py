@@ -47,13 +47,16 @@ class RunController:
 
 		self.Agents = []
 		for loop in range(self.NumberOfAgents):
-			if loop >= len(agentSetupData):
-				agentData = agentSetupData[len(agentSetupData)-1]
-			else:
-				agentData = agentSetupData[loop]
+			
+			index = loop
+
+			if index >= len(agentSetupData):
+				index = len(agentSetupData)-1
+			
+			agentData = agentSetupData[index]
 
 			print("")
-			print("Setting up Agent["+str(loop)+"]:")
+			print("Setting up Agent["+str(loop)+"] with agent data["+str(index)+"]: ")
 			self.Agents += [self.SetupAgent(agentData, loadData)]
 
 		if loadData:
