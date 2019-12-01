@@ -82,11 +82,12 @@ class RunController:
 		agent = None
 
 		agentType = agentData.GetType()
+		playingMode = agentData.GetPlayingMode()
 
 		if agentType == eAgentType.eAgentType.Human:
 			import Agents.HumanAgent as HumanAgent
 
-			agent = HumanAgent.Agent(self.DataManager, loadData, winningModeON=True)
+			agent = HumanAgent.Agent(self.DataManager, loadData, winningModeON=playingMode)
 
 		elif agentType == eAgentType.eAgentType.BruteForce:
 			import Agents.BruteForceAgent as BruteForceAgent
@@ -101,7 +102,7 @@ class RunController:
 		elif agentType == eAgentType.eAgentType.NeuralNetwork:
 			import Agents.NeuralNetworkAgent as NeuralNetwork
 			
-			agent = NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=agentData.GetPlayingMode())
+			agent = NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=playingMode)
 
 		elif agentType == eAgentType.eAgentType.Evolution:
 			import Agents.Evolution.EvolutionAgent as EvolutionAgent

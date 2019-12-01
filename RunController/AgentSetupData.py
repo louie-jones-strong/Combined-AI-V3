@@ -33,7 +33,14 @@ class AgentSetupData:
 
 	def GetPlayingMode(self):
 		if self.PlayingMode == None:
-			input("pick an PlayingMode")
+			userInput = input("Winning Mode True[T] False[F]: ")
+			userInput = userInput.upper()
+
+			if userInput == "T":
+				playingMode = True
+			elif userInput == "F":
+				playingMode = False
+			return playingMode
 		
 		return self.PlayingMode
 
