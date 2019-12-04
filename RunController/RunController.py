@@ -12,7 +12,7 @@ class RunController:
 
 	Version = 1.6
 
-	def __init__(self, logger, metricsLogger, agentSetupData, simNumber=None, loadType=eLoadType.eLoadType.Null, renderQuality=eRenderType.eRenderType.Null, trainNetwork=None, stopTime=None):
+	def __init__(self, logger, metricsLogger, agentSetupData, simNumber=None, loadType=eLoadType.eLoadType.Null, renderQuality=eRenderType.eRenderType.Null, stopTime=None):
 		self.Logger = logger
 		self.MetricsLogger = metricsLogger
 		self.PickSimulation(simNumber)
@@ -102,7 +102,7 @@ class RunController:
 		elif agentType == eAgentType.eAgentType.NeuralNetwork:
 			import Agents.NeuralNetworkAgent as NeuralNetwork
 			
-			agent = NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=playingMode)
+			agent = NeuralNetwork.Agent(self.DataManager, loadData, trainingMode=not playingMode)
 
 		elif agentType == eAgentType.eAgentType.Evolution:
 			import Agents.Evolution.EvolutionAgent as EvolutionAgent

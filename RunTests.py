@@ -59,7 +59,7 @@ class Tests:
 			metricsLogger = BaseMetricsLogger.MetricsLogger("combined-ai-v3", False)
 
 			controller = runner.RunController(self.Logger, metricsLogger, agentSetupData, simNumber=simNum, loadType=eLoadType.eLoadType.NotLoad,
-			                                  renderQuality=eRenderType.eRenderType.Muted, trainNetwork="Y", stopTime=60)
+			                                  renderQuality=eRenderType.eRenderType.Muted, stopTime=60)
 
 			print("Setup Done Took: "+SplitTime(time.time()-timeMarkSetup))
 			print("Sim = "+controller.SimInfo["SimName"])
@@ -81,7 +81,7 @@ class Tests:
 			print("number finished boards: " + str(metaData1["NumberOfFinishedBoards"]))
 
 			controller = runner.RunController(self.Logger, metricsLogger, agentSetupData, simNumber=simNum, loadType=eLoadType.eLoadType.Load,
-			                                  renderQuality=eRenderType.eRenderType.Muted, trainNetwork="N", stopTime=10)
+			                                  renderQuality=eRenderType.eRenderType.Muted, stopTime=10)
 
 			metaData2 = controller.DataManager.MetaData.Content
 			address = self.MetaDataAddress+"MetaData_" + controller.SimInfo["SimName"]+"_"+agentType+"_2"
