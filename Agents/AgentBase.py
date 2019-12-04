@@ -8,6 +8,7 @@ class AgentBase:
 	NumInvailds = 0
 	NumMoves = 0
 	NumGames = 1
+	AgentNumber = 0
 
 	def __init__(self, dataSetManager, loadData, winningModeON=False):
 		self.DataSetManager = dataSetManager

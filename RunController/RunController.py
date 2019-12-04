@@ -57,7 +57,9 @@ class RunController:
 
 			print("")
 			print("Setting up Agent["+str(loop)+"] with agent data["+str(index)+"]: ")
-			self.Agents += [self.SetupAgent(agentData, loadData)]
+			agent = self.SetupAgent(agentData, loadData)
+			agent.AgentNumber = "loop"
+			self.Agents += [agent]
 
 		if loadData:
 			runId = self.DataManager.MetaDataGet("RunId")
@@ -67,10 +69,8 @@ class RunController:
 
 		self.MetricsLogger.RunSetup(runId, loadData)
 
-		loop = 0
 		for agent in self.Agents:
-			self.MetricsLogger.Log("Agent"+str(loop)+" Type", agent.AgentType)
-			loop += 1
+			self.MetricsLogger.Log("Agent"+str(agent.AgentNumber)+" Type", agent.AgentType)
 
 
 		self.DataManager.MetaDataSet("RunId", runId)
@@ -119,6 +119,7 @@ class RunController:
 
 			print("Setting up SubAgent")
 			moveAgent = self.SetupAgent(agentData.GetSubMoveAgent(),loadData)
+			moveAgent.AgentNumber = "SubAgent"
 
 			agent = MonteCarloAgent.Agent(self.DataManager, loadData, moveAgent)
 

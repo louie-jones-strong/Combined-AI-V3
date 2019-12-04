@@ -88,8 +88,7 @@ class TournamentController:
 
 		startBoardKey = BoardToKey(board)
 
-		agentNum = turn-1
-		agent = self.Agents[agentNum]
+		agent = self.Agents[turn-1]
 		valid = False
 		while not valid:
 			move = agent.MoveCal(board)
@@ -112,7 +111,7 @@ class TournamentController:
 
 		agent.UpdateMoveOutCome(startBoardKey, move, outComeBoard, finished)
 
-		self.MetricsLogger.Log("Agent"+str(agentNum)+"MoveTook", time.time()-timeMark)
+		self.MetricsLogger.Log("Agent"+str(agent.AgentNumber)+"MoveTook", time.time()-timeMark)
 		return outComeBoard, turn, finished, fit
 
 	def RenderBoard(self, board):
