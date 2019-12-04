@@ -52,6 +52,8 @@ class TournamentController:
 		board, turn = self.Game.Start()
 		self.DataManager.UpdateStartingBoards(board)
 
+		agents = self.ChangeOrderOfAgents()
+
 		totalTime = time.time()
 
 		self.GameFinished = False
@@ -59,7 +61,8 @@ class TournamentController:
 		self.GameStartTime = time.time()
 		while not self.GameFinished:
 			self.Output(board)
-			board, turn, self.GameFinished, fit = self.MakeAgentMove(turn, board)
+			board, turn, self.GameFinished, fit = self.MakeAgentMove(
+				turn, board, agents)
 			self.MoveNumber += 1
 
 			temp = time.time()-totalTime
@@ -73,7 +76,7 @@ class TournamentController:
 		self.DataManager.MetaDataAdd("NumberOfGames", 1)
 
 		for loop in range(len(self.Agents)):
-			self.Agents[loop].GameFinished(fit[loop])
+			agents[loop].GameFinished(fit[loop])
 
 
 		self.TrySaveData()
@@ -83,12 +86,12 @@ class TournamentController:
 		self.MetricsLogger.DictLog(self.DataManager.MetaData.Content)
 		return
 
-	def MakeAgentMove(self, turn, board):
+	def MakeAgentMove(self, turn, board, agents):
 		timeMark  = time.time()
 
 		startBoardKey = BoardToKey(board)
 
-		agent = self.Agents[turn-1]
+		agent = agents[turn-1]
 		valid = False
 		while not valid:
 			move = agent.MoveCal(board)
@@ -232,3 +235,10 @@ class TournamentController:
 			# todo make this give avg save time
 			self.LastSaveTook = time.time() - self.LastSaveTook
 		return
+	
+	def ChangeOrderOfAgents(self):
+		# the point of this funtion is to change the order of the agents 
+		# so no agent has an advantage
+		
+
+		return self.Agents
