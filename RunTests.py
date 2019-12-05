@@ -25,7 +25,7 @@ class Tests:
 		self.Logger.InputAllowed = False
 
 		Sims = [1, 3, 4, 6]
-		Agents = [AgentData.AgentSetupData(eAgentType.eAgentType.BruteForce)]
+		Agents = [AgentData.AgentSetupData(eAgentType.eAgentType.BruteForce, playingMode=False)]
 
 		hadError = False
 		timeMark = time.time()
@@ -52,7 +52,7 @@ class Tests:
 
 		agentSetupData = []
 		agentSetupData += [agentData]
-		agentSetupData += [AgentData.AgentSetupData(eAgentType.eAgentType.BruteForce)]
+		agentSetupData += [AgentData.AgentSetupData(eAgentType.eAgentType.BruteForce, playingMode=False)]
 
 		try:
 			timeMarkSetup = time.time()
