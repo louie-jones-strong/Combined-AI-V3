@@ -12,7 +12,11 @@ if __name__ == "__main__":
 	
 	logger = Logger.Logger()
 	logger.Clear()
-	metricsLogger = WAndBMetrics.MetricsLogger("combined-ai-v3", True)
+
+	metricsOn = "T" == input("Metrics On T) Off F)").upper()
+	#metricsOn = True
+	
+	metricsLogger = WAndBMetrics.MetricsLogger("combined-ai-v3", metricsOn)
 	
 	agentSetupData = []
 	agentSetupData += [AgentData.AgentSetupData(eAgentType.eAgentType.Null)]
