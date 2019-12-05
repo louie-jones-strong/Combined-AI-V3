@@ -39,7 +39,10 @@ class TournamentController:
 			(stopTime == None or self.DataManager.MetaDataGet("RealTime") >= stopTime)):
 
 			timeMark  = time.time()
-			self.RunGame()
+
+			agents = self.ChangeOrderOfAgents()
+
+			self.RunGame(agents)
 			self.MetricsLogger.Log("GameTook", time.time()-timeMark)
 
 			gameCount += 1
@@ -48,11 +51,9 @@ class TournamentController:
 			agent.TournamentFinished()
 		return
 
-	def RunGame(self):
+	def RunGame(self, agents):
 		board, turn = self.Game.Start()
 		self.DataManager.UpdateStartingBoards(board)
-
-		agents = self.ChangeOrderOfAgents()
 
 		totalTime = time.time()
 
@@ -75,7 +76,7 @@ class TournamentController:
 
 		self.DataManager.MetaDataAdd("NumberOfGames", 1)
 
-		for loop in range(len(self.Agents)):
+		for loop in range(len(agents)):
 			agents[loop].GameFinished(fit[loop])
 
 
@@ -242,3 +243,22 @@ class TournamentController:
 		
 
 		return self.Agents
+
+
+def GetAllPermutations(elements):
+
+	if len(elements) <= 1:
+		return elements
+
+	output = []
+	index = 0
+	while index < len(elements):
+		temp = elements[:]
+		del temp[index]
+
+		for permutation in GetAllPermutations(temp):
+			output += [elements[index]+permutation]
+
+		index += 1
+
+	return output
