@@ -5,6 +5,8 @@ import RunController.eRenderType as eRenderType
 
 class TournamentController:
 
+	AgentOrderPermutations = []
+
 	def __init__(self, logger, metricsLogger, game, agents, dataManager, outcomePredictor, renderQuality):
 		self.Logger = logger
 		self.MetricsLogger = metricsLogger
@@ -16,6 +18,7 @@ class TournamentController:
 		self.OutcomePredictor = outcomePredictor
 		self.RenderQuality = renderQuality
 
+		self.AgentOrderPermutations = GetAllPermutations(self.Agents)
 		#todo? should these be moved
 		self.LastSaveTime = time.time()
 		self.LastOutputTime = time.time()
@@ -40,7 +43,8 @@ class TournamentController:
 
 			timeMark  = time.time()
 
-			agents = self.ChangeOrderOfAgents()
+			permutationIndex = gameCount % len(self.AgentOrderPermutations)
+			agents = self.AgentOrderPermutations[permutationIndex]
 
 			self.RunGame(agents)
 			self.MetricsLogger.Log("GameTook", time.time()-timeMark)
@@ -236,14 +240,6 @@ class TournamentController:
 			# todo make this give avg save time
 			self.LastSaveTook = time.time() - self.LastSaveTook
 		return
-	
-	def ChangeOrderOfAgents(self):
-		# the point of this funtion is to change the order of the agents 
-		# so no agent has an advantage
-		
-
-		return self.Agents
-
 
 def GetAllPermutations(elements):
 
@@ -256,8 +252,8 @@ def GetAllPermutations(elements):
 		temp = elements[:]
 		del temp[index]
 
-		for permutation in GetAllPermutations(temp):
-			output += [elements[index]+permutation]
+		for permutation in [GetAllPermutations(temp)]:
+			output += [[elements[index]]+permutation]
 
 		index += 1
 
