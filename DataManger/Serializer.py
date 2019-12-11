@@ -1,3 +1,4 @@
+import json
 
 def BoardToKey(board):
 	key = str(board)
@@ -7,83 +8,84 @@ def BoardToKey(board):
 	return key
 
 def serializer(inputObject):
-	outputObject = ""
+	# if inputObject == None:
+	# 	return "None"
 
-	if inputObject == None:
-		return "None"
+	# inputType = type(inputObject)
 
-	inputType = type(inputObject)
+	# if inputType is bytes:
+	# 	outputObject = "b("
+	# 	for loop in range(len(inputObject)):
+	# 		outputObject += str(inputObject[loop])
+	# 		if loop < len(inputObject)-1:
+	# 			outputObject +=","
 
-	if inputType is bytes:
-		outputObject = "b("
-		for loop in range(len(inputObject)):
-			outputObject += str(inputObject[loop])
-			if loop < len(inputObject)-1:
-				outputObject +=","
-
-		return outputObject + ")"
+	# 	return outputObject + ")"
 	
-	elif inputType is str:
-		return "'"+inputObject+"'"
+	# elif inputType is str:
+	# 	return "'"+inputObject+"'"
 
-	elif hasattr(inputObject, "__len__"):
-		outputObject = []
-		for loop in range(len(inputObject)):
-			outputObject += [serializer(inputObject[loop])]
+	# elif hasattr(inputObject, "__len__"):
+	# 	outputObject = []
+	# 	for loop in range(len(inputObject)):
+	# 		outputObject += [serializer(inputObject[loop])]
 
-		outputObject = ",".join(outputObject)
-		return "["+outputObject+"]"
-	else:
-		return str(inputObject)
+	# 	outputObject = ",".join(outputObject)
+	# 	return "["+outputObject+"]"
+	# else:
+	# 	return str(inputObject)
+	return json.dumps(inputObject)
+
 def deserializer(inputString):
 
-	if inputString == "None":
-		outputObject = None
+	# if inputString == "None":
+	# 	outputObject = None
 
-	elif inputString == "True":
-		outputObject = True
+	# elif inputString == "True":
+	# 	outputObject = True
 
-	elif inputString == "False":
-		outputObject = False
+	# elif inputString == "False":
+	# 	outputObject = False
 
-	elif inputString.startswith("b("):
-		subInputString = inputString[2:-1]
-		byteArray = list(map(int, subInputString.split(",")))
-		outputObject = bytes(byteArray)
+	# elif inputString.startswith("b("):
+	# 	subInputString = inputString[2:-1]
+	# 	byteArray = list(map(int, subInputString.split(",")))
+	# 	outputObject = bytes(byteArray)
 
-	elif inputString.startswith("["):
-		lastIndex = inputString.rfind("]")
-		inputString = inputString[1:lastIndex]
+	# elif inputString.startswith("["):
+	# 	lastIndex = inputString.rfind("]")
+	# 	inputString = inputString[1:lastIndex]
 
-		stringList = []
-		if inputString.count("[") == 0:
-			stringList = inputString.split(",")
+	# 	stringList = []
+	# 	if inputString.count("[") == 0:
+	# 		stringList = inputString.split(",")
 
-		else:
-			index = 0
-			while index < len(inputString):
-				if inputString.startswith(","):
-					inputString = inputString[2:]
-				index = inputString.find("]")+1
-				stringList += [inputString[0:index]]
-				inputString = inputString[index:]
+	# 	else:
+	# 		index = 0
+	# 		while index < len(inputString):
+	# 			if inputString.startswith(","):
+	# 				inputString = inputString[2:]
+	# 			index = inputString.find("]")+1
+	# 			stringList += [inputString[0:index]]
+	# 			inputString = inputString[index:]
 
 
-		outputObject = list(map(deserializer, stringList))
+	# 	outputObject = list(map(deserializer, stringList))
 
-	elif inputString.startswith("'"):
-		outputObject = inputString.replace("'","")
+	# elif inputString.startswith("'"):
+	# 	outputObject = inputString.replace("'","")
 
-	elif "." in inputString:
-		outputObject = float(inputString)
+	# elif "." in inputString:
+	# 	outputObject = float(inputString)
 
-	else:
-		try:
-		    outputObject = int(inputString)
-		except:
-		    outputObject = inputString
+	# else:
+	# 	try:
+	# 	    outputObject = int(inputString)
+	# 	except:
+	# 	    outputObject = inputString
 			
-	return outputObject
+	# return outputObject
+	return json.loads(inputString)
 
 
 if __name__ == "__main__":

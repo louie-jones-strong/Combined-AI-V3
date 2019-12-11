@@ -10,7 +10,7 @@ import RunController.TournamentController as TournamentController
 
 class RunController:
 
-	Version = 1.6
+	Version = 1.7
 
 	def __init__(self, logger, metricsLogger, agentSetupData, simNumber=None, loadType=eLoadType.eLoadType.Null, renderQuality=eRenderType.eRenderType.Null, stopTime=None):
 		self.Logger = logger
