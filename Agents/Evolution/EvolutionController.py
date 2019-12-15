@@ -40,19 +40,25 @@ class EvolutionController:
 
 	def GetNextModelWeights(self, evoAgentId):
 		agentDna = None
-		for loop in range(len(self.DNAList)):
-			dna = self.DNAList[loop]
-			self.FittnessCache[loop] = round(dna.Fittness, 3)
-			
-			if dna.AgentId == None and dna.NumberOfGames == 0:
-				agentDna = dna
-				agentDna.AgentId = evoAgentId
-				break
-		
-		if agentDna == None:
-			self.CalNextGen()
-			agentDna = self.DNAList[0]
 
+		if self.EvoAgentList[evoAgentId].WinningModeON:
+			agentDna = self.DNAList[len(self.DNAList)-1]
+			agentDna.AgentId = evoAgentId
+
+		else:
+			for loop in range(len(self.DNAList)):
+				dna = self.DNAList[loop]
+				self.FittnessCache[loop] = round(dna.Fittness, 3)
+
+				if dna.AgentId == None and dna.NumberOfGames == 0:
+					agentDna = dna
+					break
+		
+			if agentDna == None:
+				self.CalNextGen()
+				agentDna = self.DNAList[0]
+
+			agentDna.AgentId = evoAgentId
 		return agentDna
 
 	def MakeDNAListFromSeed(self):
