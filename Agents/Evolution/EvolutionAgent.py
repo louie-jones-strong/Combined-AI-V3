@@ -12,7 +12,7 @@ class Agent(AgentBase.AgentBase):
 		self.EvoController = evoController
 
 		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
-		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
+		self.AnnModel = NeuralNetwork.NeuralNetwork(self.DataSetManager, networkModel, numberOfLayers, 5000, runId)
 		weights = self.AnnModel.GetWeights()
 
 		self.EvoAgentId, self.CurrentDNA = self.EvoController.RegisterEvoAgent(self, weights)

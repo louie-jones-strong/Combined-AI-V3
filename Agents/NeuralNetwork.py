@@ -8,7 +8,8 @@ import tflearn
 
 class NeuralNetwork:
 
-	def __init__(self, networkModel, numberOfLayers, batchSize, runId):
+	def __init__(self, dataSetManager, networkModel, numberOfLayers, batchSize, runId):
+		self.DataSetManager = dataSetManager
 		self.NetworkModel = networkModel
 		self.NumberOfLayers = numberOfLayers
 		self.BatchSize = batchSize
@@ -55,11 +56,30 @@ class NeuralNetwork:
 	def Train(self, dataSetX, dataSetY, trainingTime=60):
 		trainedEpochs = 0
 		trainingStartTime = time.time()
-		
+
+		secondsPerEpoch = self.DataSetManager.MetaDataGet("SecondsPerEpoch")
+
 		while trainingTime == None or (time.time()-trainingStartTime) < trainingTime:
-			epochs = 10
+			
+			if secondsPerEpoch == None or secondsPerEpoch == 0:
+				epochs = 1
+			
+			elif trainingTime == None:
+				epochs = 15/secondsPerEpoch
+
+			else:
+				trainTimeLeft = trainingTime-(time.time()-trainingStartTime)
+
+				epochs = trainTimeLeft/secondsPerEpoch
+
+			epochs = int(max(1, epochs))
+
 			self.NetworkModel.fit(dataSetX, dataSetY, n_epoch=epochs, batch_size=self.BatchSize, run_id=self.RunId, shuffle=True)
 			trainedEpochs += epochs
+
+			secondsPerEpoch = (time.time()-trainingStartTime)/trainedEpochs
+
+		self.DataSetManager.MetaDataSet("SecondsPerEpoch", secondsPerEpoch)
 
 		self.PredictionCache = {}
 		return trainedEpochs

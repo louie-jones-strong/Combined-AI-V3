@@ -15,7 +15,7 @@ class Agent(AgentBase.AgentBase):
 		self.TrainingMode = trainingMode
 
 		networkModel, runId, numberOfLayers = NeuralNetwork.MakeModel(self.DataSetManager)
-		self.AnnModel = NeuralNetwork.NeuralNetwork(networkModel, numberOfLayers, 5000, runId)
+		self.AnnModel = NeuralNetwork.NeuralNetwork(self.DataSetManager, networkModel, numberOfLayers, 5000, runId)
 
 		if loadData:
 			found, weights = self.DataSetManager.LoadNetworkWeights()
