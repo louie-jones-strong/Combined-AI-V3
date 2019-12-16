@@ -9,6 +9,7 @@ class EvolutionController:
 	GenrationNum = 0
 	FittnessCache = []
 	LastGenBestFittness = None
+	BestFittness = None
 	
 	def __init__(self, dataSetManager, loadData, winningModeON=False):
 		self.EvoAgentList = []
@@ -22,6 +23,8 @@ class EvolutionController:
 		if self.LoadData:
 			found, weights = self.DataSetManager.LoadNetworkWeights()
 			if found:
+
+				self.BestWeights = weights
 				self.WeightsSeed = weights
 				self.MakeDNAListFromSeed()
 		return
@@ -74,6 +77,11 @@ class EvolutionController:
 
 	def CalNextGen(self):
 		self.DNAList.sort(key=GetFittness, reverse=True)
+
+		if self.BestFittness == None or self.DNAList[0].Fittness >= self.BestFittness:
+			self.BestWeights = self.DNAList[0].Weights
+			self.BestFittness = self.DNAList[0].Fittness
+
 		self.LastGenBestFittness = self.DNAList[0].Fittness
 
 		self.DNAList = self.DNAList[:int(len(self.DNAList)/2)]
@@ -102,6 +110,10 @@ class EvolutionController:
 			
 		info += "Fittness: " + str(sorted(self.FittnessCache, reverse=True))
 		return info
+
+	def SaveData(self):
+		self.DataSetManager.SaveNetworkWeights("BestEvo", self.BestWeights)
+		return
 
 def GetFittness(dna):
 	return dna.Fittness

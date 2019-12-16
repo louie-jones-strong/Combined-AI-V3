@@ -52,7 +52,7 @@ class Agent(AgentBase.AgentBase):
 		self.TrainedEpochs += self.AnnModel.Train(dataSetX, dataSetY)
 		
 		weights = self.AnnModel.GetWeights()
-		self.DataSetManager.SaveNetworkWeights("BestMove", weights)
+		self.DataSetManager.SaveNetworkWeights("BestMoveAnn", weights)
 
 		return
 
