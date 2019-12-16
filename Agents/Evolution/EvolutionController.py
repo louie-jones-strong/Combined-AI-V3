@@ -90,7 +90,6 @@ class EvolutionController:
 			self.FittnessCache[loop] = 0
 
 		self.GenrationNum += 1
-		print("Genration: " + str(self.GenrationNum))
 		return
 
 	def ControllerInfoOutput(self):
@@ -134,11 +133,13 @@ def Breed(dnaList, selectionChance):
 	newDnaList = []
 	for loop in range(len(dnaList)):
 		dna1 = dnaList[loop]
-
+		#todo make sure it can't breed with it's self
 		dna2 = np.random.choice(dnaList, p=selectionChance)
 
 		newDnaList += [DNA.DNAObject(Mutation(dna1.Weights))]
 
+
+		#todo make the better one more important
 		newWeights = CrossFadeWithWeights(dna1.Weights, dna2.Weights, [0.5, 0.5])
 
 		newWeights = Mutation(newWeights)
