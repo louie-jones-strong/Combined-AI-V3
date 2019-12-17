@@ -113,6 +113,7 @@ class EvolutionController:
 
 	def SaveData(self):
 		self.DataSetManager.SaveNetworkWeights("BestEvo", self.BestWeights)
+		self.DataSetManager.MetaDataSet("BestEvoFittness", self.BestFittness)
 		return
 
 def GetFittness(dna):

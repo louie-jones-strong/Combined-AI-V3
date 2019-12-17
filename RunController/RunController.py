@@ -209,6 +209,7 @@ class RunController:
 			self.DataManager.MetaDataSet("VaildMovesPlayed", 0)
 			self.DataManager.MetaDataSet("RunId", "runId")
 			self.DataManager.MetaDataSet("SecondsPerEpoch", None)
+			self.DataManager.MetaDataSet("BestEvoFittness", None)
 			return False
 		
 		return True
